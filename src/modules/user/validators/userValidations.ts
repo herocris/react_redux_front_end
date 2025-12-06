@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-const passwordSchema = z
-    .string()
-    .min(8, "La contraseña debe tener al menos 8 caracteres")
-    .regex(/[A-Z]/, "Debe incluir al menos una letra mayúscula")
-    .regex(/[a-z]/, "Debe incluir al menos una letra minúscula")
-    .regex(/[0-9]/, "Debe incluir al menos un número")
-    .regex(/[@$!%*?&_]/, "Debe incluir al menos un carácter especial (@, $, !, %, *, ?, &, _)");
+// const passwordSchema = z
+//     .string()
+//     .min(8, "La contraseña debe tener al menos 8 caracteres")
+//     .regex(/[A-Z]/, "Debe incluir al menos una letra mayúscula")
+//     .regex(/[a-z]/, "Debe incluir al menos una letra minúscula")
+//     .regex(/[0-9]/, "Debe incluir al menos un número")
+//     .regex(/[@$!%*?&_]/, "Debe incluir al menos un carácter especial (@, $, !, %, *, ?, &, _)");
 
 export const userSchema = z.object({
     identificador: z.string().optional(),
