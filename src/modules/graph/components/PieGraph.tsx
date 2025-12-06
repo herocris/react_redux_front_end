@@ -8,7 +8,7 @@ const randomHexColor = (): string => {
 }
 
 const RADIAN = Math.PI / 180;
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+//const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: PieLabelRenderProps) => {
 
@@ -61,7 +61,7 @@ const renderActiveShape = ({
     endAngle,
     fill,
     payload,
-    percent,
+    //percent,
     value,
 }: PieSectorDataItem) => {
     const RADIAN = Math.PI / 180;
@@ -137,7 +137,7 @@ export const PieGraph = ({ data, isAnimationActive = true, defaultIndex = undefi
                 dataKey="value"
                 isAnimationActive={isAnimationActive}
             >
-                {data?.map((entry, index) => (
+                {data?.map((entry, _index) => (
                     <Cell key={`cell-${entry.name}`} fill={randomHexColor()} />
                 ))}
             </Pie>

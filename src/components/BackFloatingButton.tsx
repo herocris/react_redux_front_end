@@ -1,10 +1,10 @@
 import { Box, Fab } from "@mui/material"
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useLocation, useNavigate } from "react-router";
+import {  useNavigate } from "react-router";
 
 export const BackFloatingButton = () => {
     const navigate = useNavigate();
-    const location = useLocation();
+    //const location = useLocation();
     //console.log(location.state);
     
     return (

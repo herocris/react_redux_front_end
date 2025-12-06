@@ -1,7 +1,7 @@
 import { useAmmunitionConfiscation } from '../hooks';
 import { Box } from '@mui/material';
 import { AmmunitionConfiscationForm } from './';
-import { ListSubConfiscation } from '../../confiscation/components/ListSubConfiscation';
+import { ListSubConfiscation } from '../../confiscation/components/';
 import { AlertDialog } from '../../../components';
 
 export const CrudAmmunitionConfiscation = () => {
@@ -29,12 +29,13 @@ export const CrudAmmunitionConfiscation = () => {
                         handleOpen={handleOpenAmmunitionConfiscationForm}
                         handleOpenDialog={handleOpenDialogAmmunitionConfiscation}
                     />
-                    <AlertDialog
-                        title='Borrar'
-                        dialogMessage="Deseas borrar el decomiso?"
-                        openDialog={openDialogAmmunitionConfiscation}
-                        DeleteEntity={onDeleteAmmunitionConfiscation}
-                        handleOpen={handleOpenDialogAmmunitionConfiscation} />
+                    {openDialogAmmunitionConfiscation &&
+                        <AlertDialog
+                            title='Borrar'
+                            dialogMessage="Deseas borrar el decomiso?"
+                            DeleteEntity={onDeleteAmmunitionConfiscation}
+                            handleOpen={handleOpenDialogAmmunitionConfiscation} />
+                    }
                 </div>
                 :
                 <ListSubConfiscation

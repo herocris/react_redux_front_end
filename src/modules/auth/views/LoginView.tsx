@@ -13,7 +13,7 @@ import { useAuth } from '../hooks';
 
 type FormFields = z.infer<typeof authLoginSchema>;
 export const LoginView = () => {
-    const [defaultValue, setdefaultValue] = useState({
+    const [defaultValue, _setdefaultValue] = useState({
         email: 'cris_itg@yahoo.es',
         password: 'password'
     })
@@ -22,7 +22,6 @@ export const LoginView = () => {
     const {
         register,
         handleSubmit,
-        setError,
         formState: { errors, },
     } = useForm<FormFields>({
         defaultValues: defaultValue, resolver: zodResolver(authLoginSchema)

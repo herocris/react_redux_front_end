@@ -1,8 +1,6 @@
 import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line } from 'recharts';
+import { LineGraphProps } from '../types';
 
-interface LineGraphProps {
-    data: any[]
-}
 const randomHexColor = (): string => {
     return "#" + Math.floor(Math.random() * 0xffffff)
         .toString(16)

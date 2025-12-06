@@ -1,8 +1,7 @@
 import { BarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { BarGraphProps } from '../types';
 
-interface BarGraphProps {
-    data: any[]
-}
+
 const randomHexColor = (): string => {
     return "#" + Math.floor(Math.random() * 0xffffff)
         .toString(16)
