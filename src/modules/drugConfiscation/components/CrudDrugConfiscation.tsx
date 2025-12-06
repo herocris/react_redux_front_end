@@ -33,20 +33,21 @@ export const CrudDrugConfiscation = () => {
                         handleOpen={handleOpenDrugConfiscationForm}
                         handleOpenDialog={handleOpenDialogDrugConfiscation}
                     />
-                    <AlertDialog
-                        title='Borrar'
-                        dialogMessage="Deseas borrar el decomiso?"
-                        openDialog={openDialogDrugConfiscation}
-                        DeleteEntity={onDeleteDrugConfiscation}
-                        handleOpen={handleOpenDialogDrugConfiscation} />
+                    {openDialogDrugConfiscation &&
+                        <AlertDialog
+                            title='Borrar'
+                            dialogMessage="Deseas borrar el decomiso?"
+                            DeleteEntity={onDeleteDrugConfiscation}
+                            handleOpen={handleOpenDialogDrugConfiscation} />
+                    }
                 </div>
-                : 
-                    <ListSubConfiscation
-                        setOpen={handleOpenDrugConfiscationForm}
-                        list={drugConfiscations}
-                        setActiveSubConfiscation={setIdDrugConfiscation}
-                    />
-                
+                :
+                <ListSubConfiscation
+                    setOpen={handleOpenDrugConfiscationForm}
+                    list={drugConfiscations}
+                    setActiveSubConfiscation={setIdDrugConfiscation}
+                />
+
             }
         </Box>
     )

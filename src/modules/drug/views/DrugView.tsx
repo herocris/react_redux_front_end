@@ -21,10 +21,7 @@ export const DrugView = () => {
     drugs,
     activeDrug,
     onSaveOrUptdate,
-    modalTitle,
-    titleFormModal,
     errorMessage
-
   } = useDrugView()
   return (
     <>
@@ -38,21 +35,21 @@ export const DrugView = () => {
           tableOptions={tableOptions}
           loading={loading}
           columnsTable={columnsTable} />
-        <DrugFormModal
-          open={open}
-          handleOpen={handleOpen}
-          loading={loading}
-          activeDrug={activeDrug}
-          onSaveOrUptdate={onSaveOrUptdate}
-          modalTitle={modalTitle}
-          titleFormModal={titleFormModal}
-          errorMessage={errorMessage} />
-        <AlertDialog
-          title='Borrar'
-          dialogMessage="Deseas borrar la munición?"
-          openDialog={openDialog}
-          DeleteEntity={DeleteDrug}
-          handleOpen={handleOpenDialog} />
+        {open &&
+          <DrugFormModal
+            handleOpen={handleOpen}
+            loading={loading}
+            activeDrug={activeDrug}
+            onSaveOrUptdate={onSaveOrUptdate}
+            errorMessage={errorMessage} />
+        }
+        {openDialog &&
+          <AlertDialog
+            title='Borrar'
+            dialogMessage="Deseas borrar la munición?"
+            DeleteEntity={DeleteDrug}
+            handleOpen={handleOpenDialog} />
+        }
         <AddFloatingButton handleOpen={handleOpen} />
       </GrapLayout>
     </>

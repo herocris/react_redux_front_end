@@ -5,12 +5,12 @@ import { Avatar, Box, Tooltip } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { useEntityListProps } from '../shared/interfaces/sharedInterfaces';
 import { getEnvVariables } from '../helpers/getEnvVariables';
-import { useLocation, useNavigate } from 'react-router';
+//import { useLocation, useNavigate } from 'react-router';
 
 
 export const useEntityList = ({ handleOpen, handleOpenDialog, setIdEntity, columnsTable, LoadingEntities, editable = true, tableOptions }: useEntityListProps) => {
-    const location = useLocation();
-    const navigate = useNavigate();
+    // const location = useLocation();
+    // const navigate = useNavigate();
     const [filterModel, setFilterModel] = useState<GridFilterModel>({ items: [] });
     const [sortModel, setSortModel] = useState<GridSortModel>([{field:tableOptions.orderBy,sort:tableOptions.order as GridSortDirection}]);
     const [paginationModel, setPaginationModel] = useState({
@@ -19,7 +19,7 @@ export const useEntityList = ({ handleOpen, handleOpenDialog, setIdEntity, colum
     });
     const handleEditClick = (id: GridRowId) => () => {
         setIdEntity(id as string,'editar')
-        handleOpen();
+        handleOpen(true);
     };
 
     const handleDeleteClick = (id: GridRowId) => () => {

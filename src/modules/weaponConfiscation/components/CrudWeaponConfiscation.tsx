@@ -29,12 +29,13 @@ export const CrudWeaponConfiscation = () => {
                         handleOpen={handleOpenWeaponConfiscationForm}
                         handleOpenDialog={handleOpenDialogWeaponConfiscation}
                     />
-                    <AlertDialog
-                        title='Borrar'
-                        dialogMessage="Deseas borrar el decomiso?"
-                        openDialog={openDialogWeaponConfiscation}
-                        DeleteEntity={onDeleteWeaponConfiscation}
-                        handleOpen={handleOpenDialogWeaponConfiscation} />
+                    {openDialogWeaponConfiscation &&
+                        <AlertDialog
+                            title='Borrar'
+                            dialogMessage="Deseas borrar el decomiso?"
+                            DeleteEntity={onDeleteWeaponConfiscation}
+                            handleOpen={handleOpenDialogWeaponConfiscation} />
+                    }
                 </div>
                 :
                 <ListSubConfiscation

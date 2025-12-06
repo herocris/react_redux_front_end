@@ -24,20 +24,21 @@ export const ConfiscationsView = () => {
     <>
       <GrapLayout>
         <EntityList
-          handleOpen={()=>{}}
+          handleOpen={() => { }}
           handleOpenDialog={handleOpenDialog}
           LoadingEntities={LoadingEntities}
           setIdEntity={setIdConfiscation}
           EntityCollection={confiscations}
           tableOptions={tableOptions}
           loading={loading}
-          columnsTable={matches?columnsTable:[columnsTable[1],columnsTable[2]]} />
-        <AlertDialog
-          title='Borrar'
-          dialogMessage="Deseas borrar el decomiso?"
-          openDialog={openDialog}
-          DeleteEntity={DeleteConfiscation}
-          handleOpen={handleOpenDialog} />
+          columnsTable={matches ? columnsTable : [columnsTable[1], columnsTable[2]]} />
+        {openDialog &&
+          <AlertDialog
+            title='Borrar'
+            dialogMessage="Deseas borrar el decomiso?"
+            DeleteEntity={DeleteConfiscation}
+            handleOpen={handleOpenDialog} />
+        }
         <AddFloatingButton handleOpen={newConfication} />
       </GrapLayout>
     </>

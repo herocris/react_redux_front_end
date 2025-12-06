@@ -2,17 +2,13 @@ import { EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { useActivityView } from '../hooks';
 
-
-
-
 export const ActivityView = () => {
   const {
     activities,
     LoadingEntities,
     columnsTable,
     loading,
-    tableOptions,
-    errorMessage
+    tableOptions
   } = useActivityView()
   return (
     <>

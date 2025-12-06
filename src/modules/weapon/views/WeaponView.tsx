@@ -1,9 +1,5 @@
-
-
-
 import { AddFloatingButton, AlertDialog, EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
-
 import { WeaponFormModal } from '../components';
 import { useWeaponView } from '../hooks';
 
@@ -23,10 +19,7 @@ export const WeaponView = () => {
     weapons,
     activeWeapon,
     onSaveOrUptdate,
-    modalTitle,
-    titleFormModal,
     errorMessage
-
   } = useWeaponView()
   return (
     <>
@@ -40,21 +33,21 @@ export const WeaponView = () => {
           tableOptions={tableOptions}
           loading={loading}
           columnsTable={columnsTable} />
-        <WeaponFormModal
-          open={open}
-          handleOpen={handleOpen}
-          loading={loading}
-          activeWeapon={activeWeapon}
-          onSaveOrUptdate={onSaveOrUptdate}
-          modalTitle={modalTitle}
-          titleFormModal={titleFormModal}
-          errorMessage={errorMessage} />
-        <AlertDialog
-          title='Borrar'
-          dialogMessage="Deseas borrar la munición?"
-          openDialog={openDialog}
-          DeleteEntity={DeleteWeapon}
-          handleOpen={handleOpenDialog} />
+        {open &&
+          <WeaponFormModal
+            handleOpen={handleOpen}
+            loading={loading}
+            activeWeapon={activeWeapon}
+            onSaveOrUptdate={onSaveOrUptdate}
+            errorMessage={errorMessage} />
+        }
+        {openDialog &&
+          <AlertDialog
+            title='Borrar'
+            dialogMessage="Deseas borrar la munición?"
+            DeleteEntity={DeleteWeapon}
+            handleOpen={handleOpenDialog} />
+        }
         <AddFloatingButton handleOpen={handleOpen} />
       </GrapLayout>
     </>

@@ -6,7 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { TransitionProps } from '@mui/material/transitions';
-import React from 'react';
+import React, { memo } from 'react';
 import { AlertDialogProps } from '../shared/interfaces/sharedInterfaces';
 
 const Transition = React.forwardRef(function Transition(
@@ -22,11 +22,11 @@ const Transition = React.forwardRef(function Transition(
 });
 
 
-export const AlertDialog = ({ openDialog, DeleteEntity, handleOpen, title, dialogMessage }: AlertDialogProps) => {
+export const AlertDialog = memo(({ DeleteEntity, handleOpen, title, dialogMessage }: AlertDialogProps) => {
     return (
         <>
             <Dialog
-                open={openDialog}
+                open={true}
                 TransitionComponent={Transition}
                 onClose={() => handleOpen()}
                 aria-labelledby="alert-dialog-title"
@@ -49,4 +49,4 @@ export const AlertDialog = ({ openDialog, DeleteEntity, handleOpen, title, dialo
             </Dialog>
         </>
     );
-}
+})

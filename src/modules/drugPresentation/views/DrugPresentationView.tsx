@@ -1,9 +1,5 @@
-
-
-
 import { AddFloatingButton, AlertDialog, EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
-
 import { DrugPresentationFormModal } from '../components';
 import { useDrugPresentationView } from '../hooks';
 
@@ -22,10 +18,7 @@ export const DrugPresentationView = () => {
     drugPresentations,
     activeDrugPresentation,
     onSaveOrUptdate,
-    modalTitle,
-    titleFormModal,
     errorMessage
-
   } = useDrugPresentationView()
   return (
     <>
@@ -39,21 +32,21 @@ export const DrugPresentationView = () => {
           tableOptions={tableOptions}
           loading={loading}
           columnsTable={columnsTable} />
-        <DrugPresentationFormModal
-          open={open}
-          handleOpen={handleOpen}
-          loading={loading}
-          activeDrugPresentation={activeDrugPresentation}
-          onSaveOrUptdate={onSaveOrUptdate}
-          modalTitle={modalTitle}
-          titleFormModal={titleFormModal}
-          errorMessage={errorMessage} />
-        <AlertDialog
-          title='Borrar'
-          dialogMessage="Deseas borrar la munición?"
-          openDialog={openDialog}
-          DeleteEntity={DeleteDrugPresentation}
-          handleOpen={handleOpenDialog} />
+        {open &&
+          <DrugPresentationFormModal
+            handleOpen={handleOpen}
+            loading={loading}
+            activeDrugPresentation={activeDrugPresentation}
+            onSaveOrUptdate={onSaveOrUptdate}
+            errorMessage={errorMessage} />
+        }
+        {openDialog &&
+          <AlertDialog
+            title='Borrar'
+            dialogMessage="Deseas borrar la munición?"
+            DeleteEntity={DeleteDrugPresentation}
+            handleOpen={handleOpenDialog} />
+        }
         <AddFloatingButton handleOpen={handleOpen} />
       </GrapLayout>
     </>

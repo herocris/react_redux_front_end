@@ -1,54 +1,50 @@
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { startDeleteAmmunition, startLoadingAmmunitions, startSaveAmmunition, startUpdateAmmunition } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { Ammunition } from "../../../shared/interfaces/sharedInterfaces";
+import { Ammunition } from "../";
 import { clearActiveAmmunition, onSetActiveAmmunition } from "../slices";
 
 export const useAmmunitionView = () => {
   const { activeAmmunition, ammunitions, tableOptions, loading, errorMessage } = useAppSelector((state: RootState) => state.ammunition);
   const dispatch = useAppDispatch();
 
-  const [modalTitle, setModalTitle] = useState('')
   const [open, setOpen] = useState(false);
-  const handleOpen = () => {
-    if (open !== false) dispatch(clearActiveAmmunition())
-    setOpen(!open);
-  }
+
+  const handleOpen = useCallback((valOp: boolean) => {
+    if (open) dispatch(clearActiveAmmunition())
+    setOpen(valOp);
+  },[open])
 
   const [openDialog, setOpenDialog] = useState(false);
-  const handleOpenDialog = () => {
+  const handleOpenDialog = useCallback(() => {
     setOpenDialog(!openDialog);
-  }
+  },[openDialog])
 
-  const setIdAmmunition = (id: string) => {
+  const setIdAmmunition = useCallback((id: string) => {
     const ammunition = ammunitions.find((row: Ammunition) => row.id === id);
     dispatch(onSetActiveAmmunition(ammunition as Ammunition))
-  };
+  },[ammunitions]);
 
-  const DeleteAmmunition = async () => {
+  const DeleteAmmunition = useCallback(async () => {
     await dispatch(startDeleteAmmunition(activeAmmunition));
     setOpenDialog(!openDialog);
-  }
+  },[activeAmmunition])
 
-  const onSaveOrUptdate = async (ammunition: Ammunition) => {
+  const onSaveOrUptdate = useCallback(async (ammunition: Ammunition) => {
     console.log(ammunition);
     if (activeAmmunition.id === undefined) {
       await dispatch(startSaveAmmunition(ammunition)).then(() => {
-        handleOpen()
+        handleOpen(false)
       })
     } else {
       await dispatch(startUpdateAmmunition({ ...ammunition, id: activeAmmunition.id })).then(() => {
-        handleOpen()
+        handleOpen(false)
       })
     }
-     dispatch(clearActiveAmmunition())
-  }
+  },[activeAmmunition])
 
-  const titleFormModal = () => activeAmmunition.id === undefined ? setModalTitle('Crear municion') : setModalTitle('Editar municion')
-
-
-  const LoadingEntities = (
+  const LoadingEntities = useCallback((
     page: number,
     sortBy: string,
     sortType: string,
@@ -57,19 +53,10 @@ export const useAmmunitionView = () => {
     filterValue: string
   ) => {
     dispatch(startLoadingAmmunitions(page, sortBy, sortType, pageSize, filterField, filterValue))
-  }
+  },[ammunitions])
 
-  const onSubmitForm = (formState: any) => {
-    if (activeAmmunition.id === undefined) {
-      dispatch(startSaveAmmunition(formState))
-    } else {
-      console.log(activeAmmunition.id);
-      dispatch(startUpdateAmmunition(formState))
-    }
-    dispatch(clearActiveAmmunition())
-  }
 
-  const columnsTable = ['id', 'descripcion', 'logo']
+  const columnsTable = useMemo(() => ['id', 'descripcion', 'logo'], []);
 
   return {
     tableOptions,
@@ -79,15 +66,12 @@ export const useAmmunitionView = () => {
     columnsTable,
     ammunitions,
     activeAmmunition,
-    modalTitle,
     errorMessage,
     handleOpen,
     handleOpenDialog,
     setIdAmmunition,
     DeleteAmmunition,
     LoadingEntities,
-    onSubmitForm,
     onSaveOrUptdate,
-    titleFormModal,
   }
 }
