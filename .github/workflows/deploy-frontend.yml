@@ -30,6 +30,11 @@ jobs:
       #   run: npm test -- --watch=false
       #   continue-on-error: true # opcional si no tienes test
 
+      # Crear archivo .env usando el secret REACT_ENV
+      - name: Prepare .env for build
+        run: |
+          echo "${{ secrets.REACT_ENV }}" > .env
+
       # Build de producción
       - name: Build project
         run: npm run build
