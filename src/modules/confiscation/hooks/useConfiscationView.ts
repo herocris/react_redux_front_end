@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { Confiscation } from "../../../shared/interfaces/sharedInterfaces";
+import { Confiscation } from "../";
 import { useNavigate } from "react-router";
 import { clearActiveConfiscation, onSetActiveConfiscation } from "../slices";
 import { startDeleteConfiscation, startLoadingConfiscations, startSaveConfiscation, startUpdateConfiscation } from "../thunks";

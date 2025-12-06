@@ -1,7 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
-import { setUsers,onSetActiveUser,onAddNewUser,onUpdateUser,onDeleteUser, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
-import { User } from '../../../shared/interfaces/sharedInterfaces';
+import { setUsers,onAddNewUser,onUpdateUser,onDeleteUser, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
+import { User } from '../';
 
 
 export const startLoadingUsers = (page:number,sortBy:string,orderType:string,per_page:number,search_by:string, valueSearch:string) => {
@@ -29,7 +29,6 @@ export const startLoadingUsers = (page:number,sortBy:string,orderType:string,per
 export const startSaveUser = (user:User) => {
     return async( dispatch:Dispatch ) => {
         dispatch( onLoading( true ));
-        dispatch(onSetActiveUser(user))
         try {
             const {data} = await calendarApi.post('/user',user); 
             const { identificador: id, ...resto } = data;
@@ -61,10 +60,9 @@ export const startUpdateUser = (user:User) => {
 export const startDeleteUser = (user:User) => {
     return async( dispatch:Dispatch ) => {
         dispatch( onLoading( true ));
-        dispatch(onSetActiveUser(user))
         try {
             await calendarApi.delete(`/user/${user.id}`,); 
-            dispatch(onDeleteUser())
+            dispatch(onDeleteUser(user.id as string))
         } catch (error) {
             return handleApiError(error, dispatch);
         }finally { 

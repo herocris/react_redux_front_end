@@ -1,7 +1,6 @@
 import { createSlice,PayloadAction } from '@reduxjs/toolkit'
-import { TableOptions, Permission, PermissionState } from '../../../shared/interfaces/sharedInterfaces';
-
-
+import { TableOptions} from '../../../shared/interfaces/sharedInterfaces';
+import { Permission, PermissionState } from '../';
 
 const permission: Permission = {
     nombre: '',
@@ -72,9 +71,9 @@ export const permissionSlice = createSlice({
             });
             state.activePermission = permission;
         },
-        onDeletePermission: (state) => {
+        onDeletePermission: (state, { payload }: PayloadAction<string>) => {
             if (state.activePermission) {
-                state.permissions = state.permissions.filter(rol => rol.id !== state.activePermission.id);
+                state.permissions = state.permissions.filter(rol => rol.id !== payload);
                 state.activePermission = permission;
             }
         }

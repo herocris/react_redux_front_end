@@ -1,7 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
 import { onLoading, onSetErrorMessage, setBarLineGraphs, setPieGraphs } from '../slices';
-import { AmmunitionGraphForm, DrugGraphForm, WeaponGraphForm } from '../../../shared/interfaces/sharedInterfaces';
+import { AmmunitionGraphForm, DrugGraphForm, WeaponGraphForm } from '../types';
 
 
 export const startLoadingDrugs = (data: DrugGraphForm) => {

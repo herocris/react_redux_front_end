@@ -1,7 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
 import { setPermissions, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
-import { Activity } from '../../../shared/interfaces/sharedInterfaces';
+import { Activity } from '../';
 import dayjs from "dayjs";
 
 

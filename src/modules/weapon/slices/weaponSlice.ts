@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { TableOptions, Weapon, WeaponState } from '../../../shared/interfaces/sharedInterfaces';
-
-
+import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
+import { Weapon, WeaponState } from '../';
 
 const weapon: Weapon = {
     descripcion: '',
@@ -73,9 +72,9 @@ export const weaponSlice = createSlice({
             });
             state.activeWeapon = weapon;
         },
-        onDeleteWeapon: (state) => {
+        onDeleteWeapon: (state, { payload }: PayloadAction<string>) => {
             if (state.activeWeapon) {
-                state.weapons = state.weapons.filter(weapon => weapon.id !== state.activeWeapon.id);
+                state.weapons = state.weapons.filter(weapon => weapon.id !== payload);
                 state.activeWeapon = weapon;
             }
         }

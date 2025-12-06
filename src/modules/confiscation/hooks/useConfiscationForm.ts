@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { Confiscation } from "../../../shared/interfaces/sharedInterfaces";
+import { Confiscation } from "../";
 import { useNavigate } from "react-router";
 import { startSaveConfiscation, startUpdateConfiscation } from "../thunks";
 
@@ -12,13 +12,11 @@ export const useConfiscationForm = () => {
     const { activeConfiscation, loading, errorMessage } = useAppSelector((state: RootState) => state.confiscation);
     const dispatch = useAppDispatch();
 
-    const [modalTitle, setModalTitle] = useState('')
-
     const onSaveOrUptdate = async (confiscation: Confiscation) => {
         console.log(confiscation);
         if (activeConfiscation.id === undefined) {
-            await dispatch(startSaveConfiscation(confiscation)).then(() => {
-                navigate(`/confiscation/edit/${activeConfiscation.identificador}`)
+            await dispatch(startSaveConfiscation(confiscation)).then((idConf) => {
+                navigate(`/confiscation/edit/${idConf}`)
             })
         } else {
             await dispatch(startUpdateConfiscation({ ...confiscation, id: activeConfiscation.id })).then(() => {
@@ -32,24 +30,12 @@ export const useConfiscationForm = () => {
         setOpenMap(open)
     }
 
-    const titleFormModal = () => activeConfiscation.id === undefined ? setModalTitle('Crear decomiso') : setModalTitle('Editar decomiso')
-
-    // useEffect(() => {
-    //     if (confiscationId) {
-    //         dispatch(startLoadingConfiscation(confiscationId));
-    //     }
-    // }, [confiscationId]);
-
-    useEffect(() => {
-        titleFormModal()
-    }, [activeConfiscation])
 
     return {
         loading,
         activeConfiscation,
         openMap,
         errorMessage,
-        modalTitle,
         onSaveOrUptdate,
         handleOpenMap
     }

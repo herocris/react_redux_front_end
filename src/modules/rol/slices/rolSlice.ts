@@ -1,5 +1,6 @@
 import { createSlice,PayloadAction } from '@reduxjs/toolkit'
-import { TableOptions, Role, RoleState } from '../../../shared/interfaces/sharedInterfaces';
+import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
+import { Role,RoleState } from '../';
 
 
 const role: Role = {
@@ -72,9 +73,9 @@ export const roleSlice = createSlice({
             });
             state.activeRole = role;
         },
-        onDeleteRol: (state) => {
+        onDeleteRol: (state, { payload }: PayloadAction<string>) => {
             if (state.activeRole) {
-                state.roles = state.roles.filter(role => role.id !== state.activeRole.id);
+                state.roles = state.roles.filter(role => role.id !== payload);
                 state.activeRole = role;
             }
         }

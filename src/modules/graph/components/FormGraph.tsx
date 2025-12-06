@@ -1,24 +1,15 @@
 import { Box, Button, Zoom } from '@mui/material'
+import { Timeline, BarChart, PieChart,Save, AllInbox, HomeRepairServiceOutlined, Vaccines } from '@mui/icons-material';
 import Grid from '@mui/material/Grid2';
-import SaveIcon from '@mui/icons-material/Save';
-import { Timeline, BarChart, PieChart, AllInbox, HomeRepairServiceOutlined, Vaccines } from '@mui/icons-material';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
 import { graphSchema } from '../validators';
-import { SelectOptions } from '../../../shared/interfaces/sharedInterfaces';
-import { MultipleSelectButton } from '../../../components';
 import { useState } from 'react';
-import { DatePickerField } from '../../../components';
-import { OptionSelector } from '../../../components';
+import { DatePickerField,OptionSelector,MultipleSelectButton } from '../../../components';
+import { FormGraphProps } from '../types';
 
-interface FormGraphProps {
-    drugCollection: SelectOptions[]
-    weaponCollection: SelectOptions[]
-    ammunitionCollection: SelectOptions[]
-    setGraphType: Function
-    getGraphData: Function
-}
+
 type FormFields = z.infer<typeof graphSchema>;
 const initStateForm: FormFields = { //asingandole tipo FormFields (graphSchema) para que no de problemas al ponerlo en defaultValues del useForm
     period: 0,
@@ -178,7 +169,7 @@ export const FormGraph = ({ drugCollection, weaponCollection, ammunitionCollecti
                         </Grid>
                         <Grid size={{ xs: 12, sm: 12 }} sx={{ mt: 2, display: 'flex', flexDirection: 'row', gap: 2 }}>
                             <Button type='submit' variant='contained' loading={false} sx={{ width: '100%' }}>
-                                <SaveIcon />
+                                <Save/>
                             </Button>
                         </Grid>
                     </Grid>

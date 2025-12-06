@@ -1,6 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
-import { User, UserState, TableOptions } from '../../../shared/interfaces/sharedInterfaces';
+import { createSlice,PayloadAction } from '@reduxjs/toolkit'
+import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
+import { User, UserState } from '../types';
 
 
 const user: User = {
@@ -76,9 +76,9 @@ export const userSlice = createSlice({
             });
             state.activeUser = user;
         },
-        onDeleteUser: (state) => {
+        onDeleteUser: (state, { payload }: PayloadAction<string>) => {
             if (state.activeUser) {
-                state.users = state.users.filter(user => user.id !== state.activeUser.id);
+                state.users = state.users.filter(user => user.id !== payload);
                 state.activeUser = user;
             }
         }

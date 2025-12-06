@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from '../../../store';
 import { startLoadingMapItems } from '../thunks';
-import { MapForm } from '../../../shared/interfaces/sharedInterfaces';
+import { MapForm } from '../';
 import { startLoadingAmmunitionNames, startLoadingDrugNames, startLoadingWeaponNames } from '../../resouce/thunks';
 
 export const useMap = () => {

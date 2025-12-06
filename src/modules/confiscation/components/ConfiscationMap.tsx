@@ -1,4 +1,4 @@
-import { ConfiscationMapModalProps } from '../../../shared/interfaces/sharedInterfaces';
+import { ConfiscationMapModalProps } from '../';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import Grid from '@mui/material/Grid2';
@@ -62,11 +62,11 @@ export const ConfiscationMap = ({ handleOpen, lat, lng, nameLat, nameLng, nameDe
                     <Controller
                         name={nameMuni}
                         control={control}
-                        render={({ field: { value, onChange: onChangeMuni } }) => (
+                        render={({ field: {  onChange: onChangeMuni } }) => (
                             <Controller
                                 name={nameDepto}
                                 control={control}
-                                render={({ field: { value, onChange: onChangeDepto } }) => (
+                                render={({ field: {  onChange: onChangeDepto } }) => (
                                     <Controller
                                         name={nameLat}
                                         control={control}

@@ -1,7 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
-import { setRoles, onSetActiveRole, onAddNewRole, onUpdateRole, onDeleteRol, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
-import { Role } from '../../../shared/interfaces/sharedInterfaces';
+import { setRoles, onAddNewRole, onUpdateRole, onDeleteRol, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
+import { Role } from '../';
 
 
 export const startLoadingRoles = (page: number, sortBy: string, orderType: string, per_page: number, search_by: string, valueSearch: string) => {
@@ -29,7 +29,6 @@ export const startLoadingRoles = (page: number, sortBy: string, orderType: strin
 export const startSaveRol = (role: Role) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActiveRole(role))
         try {
             const { data } = await calendarApi.post('/role', role);
             const { identificador: id, ...resto } = data;
@@ -61,10 +60,9 @@ export const startUpdateRol = (role: Role) => {
 export const startDeleteRol = (role: Role) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActiveRole(role))
         try {
             await calendarApi.delete(`/role/${role.id}`,);
-            dispatch(onDeleteRol())
+            dispatch(onDeleteRol(role.id as string))
         } catch (error) {
             return handleApiError(error, dispatch);
         } finally {

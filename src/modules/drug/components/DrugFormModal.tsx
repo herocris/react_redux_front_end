@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid2';
 import SaveIcon from '@mui/icons-material/Save';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { DrugFormModalProps } from '../../../shared/interfaces/sharedInterfaces';
+import { DrugFormModalProps } from '../';
 import { SubmitHandler, useForm } from "react-hook-form";
 import { drugSchema } from '../validators';
 import { boxStyleFormModal } from '../../../helpers/boxStyle';
@@ -13,7 +13,12 @@ import { PhotoInput } from '../../../components';
 
 
 type FormFields = z.infer<typeof drugSchema>;
-export const DrugFormModal = ({ open, handleOpen, loading, onSaveOrUptdate, modalTitle, titleFormModal, activeDrug, errorMessage }: DrugFormModalProps) => {
+export const DrugFormModal = ({ handleOpen,
+     loading,
+     onSaveOrUptdate,
+     activeDrug,
+     errorMessage 
+    }: DrugFormModalProps) => {
     const { 
         register, 
         handleSubmit, 
@@ -28,12 +33,8 @@ export const DrugFormModal = ({ open, handleOpen, loading, onSaveOrUptdate, moda
 
     const onSubmit: SubmitHandler<z.infer<typeof drugSchema>> = async (data) => {
         await onSaveOrUptdate(data)
+        reset()
     };
-
-    useEffect(() => {
-        titleFormModal()
-        reset(activeDrug)
-    }, [activeDrug])
 
     useEffect(() => {
         if (typeof errorMessage === 'object') {
@@ -49,16 +50,16 @@ export const DrugFormModal = ({ open, handleOpen, loading, onSaveOrUptdate, moda
     return (
         <>
             <Modal
-                open={open}
+                open={true}
                 onClose={() => {
-                    handleOpen()
+                    handleOpen(false)
                     reset()
                 }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={boxStyleFormModal}>
-                    <Typography variant='h5' sx={{ mb: 1 }}>{modalTitle}</Typography>
+                    <Typography variant='h5' sx={{ mb: 1 }}>{activeDrug.id?'Editar droga':'Crear droga'}</Typography>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Zoom in={true} style={{ transitionDelay: '150ms' }}>
                             <Grid container sx={{ alignItems: 'center', alignContent: 'center', display: 'flex' }}>

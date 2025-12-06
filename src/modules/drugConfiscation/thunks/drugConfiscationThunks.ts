@@ -1,7 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
-import { setDrugConfiscations, onSetActiveDrugConfiscation, onAddNewDrugConfiscation, onUpdateDrugConfiscation, onDeleteDrugConfiscation, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
-import { DrugConfiscation } from '../../../shared/interfaces/sharedInterfaces';
+import { setDrugConfiscations, onAddNewDrugConfiscation, onUpdateDrugConfiscation, onDeleteDrugConfiscation, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
+import { DrugConfiscation } from '../';
 
 
 export const startLoadingDrugConfiscations = (idConfiscation: number, page: number, sortBy: string, orderType: string, per_page: number, search_by: string, valueSearch: string) => {
@@ -29,7 +29,6 @@ export const startLoadingDrugConfiscations = (idConfiscation: number, page: numb
 export const startSaveDrugConfiscation = (drugConfiscation: DrugConfiscation) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActiveDrugConfiscation({ ...drugConfiscation, foto: '' }))
         try {
             const { data } = await calendarApi.post('/drugConfiscation', drugConfiscation, {
                 headers: {
@@ -60,11 +59,11 @@ export const startUpdateDrugConfiscation = (drugConfiscation: DrugConfiscation) 
         formData.append('presentacion', drugConfiscation.presentacion.toString());
         // Si el archivo existe (por ejemplo, desde tu componente PhotoInput)
         if (drugConfiscation.foto instanceof File) {
-            formData.append('logo', drugConfiscation.foto);
+            formData.append('foto', drugConfiscation.foto);
         }
         // Si quieres enviar un método PUT (Laravel lo reconocerá si el form usa POST):
         formData.append('_method', 'PUT');
-
+        
         try {
             const { data } = await calendarApi.post(`/drugConfiscation/${drugConfiscation.identificador}`, formData, {
                 headers: {
@@ -86,10 +85,9 @@ export const startUpdateDrugConfiscation = (drugConfiscation: DrugConfiscation) 
 export const startDeleteDrugConfiscation = (drugConfiscation: DrugConfiscation) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActiveDrugConfiscation(drugConfiscation))
         try {
             await calendarApi.delete(`/drugConfiscation/${drugConfiscation.identificador}`,);
-            dispatch(onDeleteDrugConfiscation())
+            dispatch(onDeleteDrugConfiscation(drugConfiscation.identificador as string))
         } catch (error) {
             return handleApiError(error, dispatch);
         } finally {

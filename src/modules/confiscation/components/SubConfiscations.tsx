@@ -1,7 +1,6 @@
 import { MouseEvent, useState } from 'react';
-import { AllInbox, HomeRepairServiceOutlined, Vaccines } from '@mui/icons-material';
+import { AllInbox, HomeRepairServiceOutlined, Vaccines,ExpandMore } from '@mui/icons-material';
 import { Accordion, AccordionSummary, AccordionDetails, Box, Typography } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { CrudDrugConfiscation } from '../../drugConfiscation';
 import { CrudAmmunitionConfiscation } from '../../ammunitionConfiscation';
 import { CrudWeaponConfiscation } from '../../weaponConfiscation';
@@ -27,7 +26,7 @@ export const SubConfiscations = () => {
             <div>
                 <Accordion expanded={selectedCard === "panel1-header"}>
                     <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
+                        expandIcon={<ExpandMore />}
                         aria-controls="panel1-content"
                         id="panel1-header"
                         onClick={(e: MouseEvent<HTMLDivElement>) => setCardId(e)}
@@ -52,7 +51,7 @@ export const SubConfiscations = () => {
                 </Accordion>
                 <Accordion expanded={selectedCard === "panel2-header"}>
                     <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
+                        expandIcon={<ExpandMore />}
                         aria-controls="panel2-content"
                         id="panel2-header"
                         onClick={(e: MouseEvent<HTMLDivElement>) => setCardId(e)}
@@ -77,7 +76,7 @@ export const SubConfiscations = () => {
                 </Accordion>
                 <Accordion expanded={selectedCard === "panel3-header"}>
                     <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
+                        expandIcon={<ExpandMore />}
                         aria-controls="panel3-content"
                         id="panel3-header"
                         onClick={(e: MouseEvent<HTMLDivElement>) => setCardId(e)}

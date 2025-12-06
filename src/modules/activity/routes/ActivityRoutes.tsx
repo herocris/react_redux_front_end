@@ -1,15 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router';
 import { ActivityView } from '../views';
 
-
-
-
-
-
 export const ActivityRoutes = () => {
-  
-
-
   return (
     <Routes>
       {/* <Route path='user' element={<UserView />} /> */}

@@ -1,26 +1,15 @@
 import { Box, Button, IconButton, TextField, Zoom } from '@mui/material'
 import Grid from '@mui/material/Grid2';
 import  {Save,Cancel,Delete } from '@mui/icons-material';
-import { PhotoInput } from '../../../components';
+import { PhotoInput,MultipleSelectButton } from '../../../components';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
-
-import { WeaponConfiscation, SelectOptions } from '../../../shared/interfaces/sharedInterfaces';
-import { MultipleSelectButton } from '../../../components';
 import { weaponConfiscationSchema } from '../validators';
+import { WeaponConfiscationFormProps } from '../';
 
 type FormFields = z.infer<typeof weaponConfiscationSchema>;
-
-interface WeaponConfiscationForm {
-    activeWeaponConfiscation: WeaponConfiscation
-    handleOpen: Function
-    onSaveOrUptdate: Function
-    weaponCollection: SelectOptions[]
-    handleOpenDialog: Function
-}
-
-export const WeaponConfiscationForm = ({ activeWeaponConfiscation, handleOpen, onSaveOrUptdate, weaponCollection, handleOpenDialog }: WeaponConfiscationForm) => {
+export const WeaponConfiscationForm = ({ activeWeaponConfiscation, handleOpen, onSaveOrUptdate, weaponCollection, handleOpenDialog }: WeaponConfiscationFormProps) => {
     const {
         register,
         handleSubmit,

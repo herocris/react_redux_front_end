@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { BarLineGraph, GraphState, PieGraph } from '../../../shared/interfaces/sharedInterfaces';
+import { PieGraph,BarLineGraph, GraphState } from '../types';
 
 const initialState: GraphState = {
     barLineGraph: [],

@@ -2,7 +2,7 @@ import  { useCallback, useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from '../../../store';
 import { startLoadingAmmunitions, startLoadingDrugs, startLoadingWeapons } from '../thunks';
-import { AmmunitionGraphForm, DrugGraphForm, WeaponGraphForm } from '../../../shared/interfaces/sharedInterfaces';
+import { AmmunitionGraphForm, DrugGraphForm, WeaponGraphForm } from '../types';
 import { startLoadingAmmunitionNames, startLoadingDrugNames, startLoadingWeaponNames } from '../../resouce/thunks';
 
 export const useGraph = () => {

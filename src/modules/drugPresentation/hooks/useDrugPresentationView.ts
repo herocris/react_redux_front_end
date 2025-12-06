@@ -3,17 +3,16 @@ import { clearActiveDrugPresentation, onSetActiveDrugPresentation} from "../slic
 import { startDeleteDrugPresentation, startLoadingDrugPresentations, startSaveDrugPresentation, startUpdateDrugPresentation } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { DrugPresentation } from "../../../shared/interfaces/sharedInterfaces";
+import { DrugPresentation } from "../";
 
 export const useDrugPresentationView = () => {
   const { activeDrugPresentation, drugPresentations, tableOptions, loading, errorMessage } = useAppSelector((state: RootState) => state.drugPresentation);
   const dispatch = useAppDispatch();
 
-  const [modalTitle, setModalTitle] = useState('')
   const [open, setOpen] = useState(false);
-  const handleOpen = () => {
-    if (open !== false) dispatch(clearActiveDrugPresentation())
-    setOpen(!open);
+  const handleOpen = (valOp:boolean) => {
+    if (open) dispatch(clearActiveDrugPresentation())
+    setOpen(valOp);
   }
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -35,18 +34,14 @@ export const useDrugPresentationView = () => {
     console.log(drugPresentation);
     if (activeDrugPresentation.id === undefined) {
       await dispatch(startSaveDrugPresentation(drugPresentation)).then(() => {
-        handleOpen()
+        handleOpen(false)
       })
     } else {
       await dispatch(startUpdateDrugPresentation({ ...drugPresentation, id: activeDrugPresentation.id })).then(() => {
-        handleOpen()
+        handleOpen(false)
       })
     }
-     dispatch(clearActiveDrugPresentation())
   }
-
-  const titleFormModal = () => activeDrugPresentation.id === undefined ? setModalTitle('Crear municion') : setModalTitle('Editar municion')
-
 
   const LoadingEntities = (
     page: number,
@@ -59,15 +54,6 @@ export const useDrugPresentationView = () => {
     dispatch(startLoadingDrugPresentations(page, sortBy, sortType, pageSize, filterField, filterValue))
   }
 
-  const onSubmitForm = (formState: any) => {
-    if (activeDrugPresentation.id === undefined) {
-      dispatch(startSaveDrugPresentation(formState))
-    } else {
-      console.log(activeDrugPresentation.id);
-      dispatch(startUpdateDrugPresentation(formState))
-    }
-    dispatch(clearActiveDrugPresentation())
-  }
 
   const columnsTable = ['id', 'descripcion', 'logo']
 
@@ -79,15 +65,12 @@ export const useDrugPresentationView = () => {
     columnsTable,
     drugPresentations,
     activeDrugPresentation,
-    modalTitle,
     errorMessage,
     handleOpen,
     handleOpenDialog,
     setIdDrugPresentation,
     DeleteDrugPresentation,
     LoadingEntities,
-    onSubmitForm,
     onSaveOrUptdate,
-    titleFormModal,
   }
 }

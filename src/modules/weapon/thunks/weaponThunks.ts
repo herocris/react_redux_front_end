@@ -1,7 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
-import { setWeapons, onSetActiveWeapon, onAddNewWeapon, onUpdateWeapon, onDeleteWeapon, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
-import { Weapon } from '../../../shared/interfaces/sharedInterfaces';
+import { setWeapons, onAddNewWeapon, onUpdateWeapon, onDeleteWeapon, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
+import { Weapon } from '../';
 
 
 export const startLoadingWeapons = (page: number, sortBy: string, orderType: string, per_page: number, search_by: string, valueSearch: string) => {
@@ -27,7 +27,6 @@ export const startLoadingWeapons = (page: number, sortBy: string, orderType: str
 export const startSaveWeapon = (weapon: Weapon) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActiveWeapon({ ...weapon, logo:'' }))
         try {
             const { data } = await calendarApi.post('/weapon', weapon, {
                 headers: {
@@ -48,7 +47,6 @@ export const startSaveWeapon = (weapon: Weapon) => {
 export const startUpdateWeapon = (weapon: Weapon) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-
         const formData = new FormData();
         formData.append('descripcion', weapon.descripcion);
         // Si el archivo existe (por ejemplo, desde tu componente PhotoInput)
@@ -79,10 +77,9 @@ export const startUpdateWeapon = (weapon: Weapon) => {
 export const startDeleteWeapon = (weapon: Weapon) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActiveWeapon(weapon))
         try {
             await calendarApi.delete(`/weapon/${weapon.id}`,);
-            dispatch(onDeleteWeapon())
+            dispatch(onDeleteWeapon(weapon.id as string))
         } catch (error) {
             return handleApiError(error, dispatch);
         } finally {

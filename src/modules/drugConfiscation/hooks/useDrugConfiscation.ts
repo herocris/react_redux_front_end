@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { clearActiveDrugConfiscation, onSetActiveDrugConfiscation} from "../slices";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { DrugConfiscation } from '../../../shared/interfaces/sharedInterfaces';
+import { DrugConfiscation } from '../';
 import { useParams } from "react-router";
 import { startDeleteDrugConfiscation, startLoadingDrugConfiscations, startSaveDrugConfiscation, startUpdateDrugConfiscation } from "../thunks";
 import { startLoadingDrugNames, startLoadingDrugPresentationNames } from "../../resouce/thunks";

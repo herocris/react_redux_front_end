@@ -5,26 +5,29 @@ import SaveIcon from '@mui/icons-material/Save';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { RoleFormModalProps, Role } from '../../../shared/interfaces/sharedInterfaces';
+import { RoleFormModalProps, Role } from '../';
 import { MultipleSelectButton } from '../../../components';
 import { roleSchema } from '../validators';
 import { boxStyleFormModal } from '../../../helpers/boxStyle';
 
 
 type FormFields = z.infer<typeof roleSchema>;
-export const RoleFormModal = ({ open, handleOpen, permisos, loading, onSaveOrUptdate, modalTitle, titleFormModal, activeRole, errorMessage }: RoleFormModalProps) => {
+export const RoleFormModal = ({ 
+    handleOpen,
+     permisos,
+     loading,
+     onSaveOrUptdate,
+     activeRole,
+     errorMessage 
+    }: RoleFormModalProps) => {
     const { register, handleSubmit, setError, formState: { errors, }, control, reset } = useForm<FormFields>({
         defaultValues: activeRole, resolver: zodResolver(roleSchema)
     });
 
     const onSubmit: SubmitHandler<Role> = async (data) => {
         await onSaveOrUptdate(data)
+        reset()
     };
-
-    useEffect(() => {
-        titleFormModal()
-        reset(activeRole)
-    }, [activeRole])
 
     useEffect(() => {
         if (typeof errorMessage === 'object') {
@@ -40,16 +43,16 @@ export const RoleFormModal = ({ open, handleOpen, permisos, loading, onSaveOrUpt
     return (
         <>
             <Modal
-                open={open}
+                open={true}
                 onClose={() => {
-                    handleOpen()
+                    handleOpen(false)
                     reset()
                 }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={boxStyleFormModal}>
-                    <Typography variant='h5' sx={{ mb: 1 }}>{modalTitle}</Typography>
+                    <Typography variant='h5' sx={{ mb: 1 }}>{activeRole.id?'Editar rol':'Crear rol'}</Typography>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Zoom in={true} style={{ transitionDelay: '150ms' }}>
                             <Grid container>

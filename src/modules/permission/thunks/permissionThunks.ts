@@ -1,7 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
-import { Permission } from '../../../shared/interfaces/sharedInterfaces';
-import { onAddNewPermission, onDeletePermission, onLoading, onSetActivePermission, onSetErrorMessage, onSetTableOptions, onUpdatePermission, setPermissions } from '../slices';
+import { Permission } from '../';
+import { onAddNewPermission, onDeletePermission, onLoading, onSetErrorMessage, onSetTableOptions, onUpdatePermission, setPermissions } from '../slices';
 
 
 export const startLoadingPermissions = (page: number, sortBy: string, orderType: string, per_page: number, search_by: string, valueSearch: string) => {
@@ -27,7 +27,6 @@ export const startLoadingPermissions = (page: number, sortBy: string, orderType:
 export const startSavePermission = (permission: Permission) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActivePermission(permission))
         try {
             const { data } = await calendarApi.post('/permission', permission);
             const { identificador: id, ...resto } = data;
@@ -59,10 +58,9 @@ export const startUpdatePermission = (permission: Permission) => {
 export const startDeletePermission = (permission: Permission) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActivePermission(permission))
         try {
             await calendarApi.delete(`/permission/${permission.id}`,);
-            dispatch(onDeletePermission())
+            dispatch(onDeletePermission(permission.id as string))
         } catch (error) {
             return handleApiError(error, dispatch);
         } finally {

@@ -1,7 +1,11 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
 import { setRoles, onLoading, setPermissions,setDrugs,setDrugPresentations, setWeapons,setAmmunitions } from '../slices';
-import { Ammunition, Drug, Permission, Role, Weapon } from '../../../shared/interfaces/sharedInterfaces';
+import { Permission } from '../../permission';
+import { Drug } from '../../drug';
+import { Ammunition } from '../../ammunition';
+import { Weapon } from '../../weapon';
+import { Role } from '../../rol';
 
 export const startLoadingRoles = () => {
     return async (dispatch: Dispatch) => {
@@ -20,7 +24,7 @@ export const startLoadingRoles = () => {
             // setTimeout(() => {
             //     dispatch( clearErrorMessage() );
             // }, 2000);
-            console.log('hubo un error');
+            console.log(error);
 
         }
     }

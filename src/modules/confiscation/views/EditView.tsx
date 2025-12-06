@@ -1,8 +1,7 @@
-import { ConfiscationForm } from '../components'
+import { ConfiscationForm,SubConfiscations } from '../components'
 import { GrapLayout } from '../../../shared/layout/GraphLayout'
 import { BackFloatingButton } from '../../../components'
 import {  useParams } from 'react-router'
-import { SubConfiscations } from '../components';
 import Grid from '@mui/material/Grid2';
 import { useConfiscationForm } from '../hooks';
 import { useEffect } from 'react';

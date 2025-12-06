@@ -1,8 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
-import { TableOptions, Ammunition, AmmunitionState } from '../../../shared/interfaces/sharedInterfaces';
-
-
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
+import { Ammunition, AmmunitionState } from '../';
 
 const ammunition: Ammunition = {
     descripcion: '',
@@ -74,9 +72,9 @@ export const ammunitionSlice = createSlice({
             });
             state.activeAmmunition = ammunition;
         },
-        onDeleteAmmunition: (state) => {
+        onDeleteAmmunition: (state, { payload }: PayloadAction<string>) => {
             if (state.activeAmmunition) {
-                state.ammunitions = state.ammunitions.filter(ammunition => ammunition.id !== state.activeAmmunition.id);
+                state.ammunitions = state.ammunitions.filter(ammunition => ammunition.id !== payload);
                 state.activeAmmunition = ammunition;
             }
         }

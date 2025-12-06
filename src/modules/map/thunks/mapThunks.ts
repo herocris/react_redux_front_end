@@ -1,7 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
 import { onLoading, onSetErrorMessage,setMapitems } from '../slices';
-import { MapForm } from '../../../shared/interfaces/sharedInterfaces';
+import { MapForm } from '../';
 
 
 export const startLoadingMapItems = (data: MapForm) => {

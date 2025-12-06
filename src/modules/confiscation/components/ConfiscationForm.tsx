@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
-import Box from '@mui/material/Box';
-import { Typography } from '@mui/material';
+import { Typography,Box } from '@mui/material';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -17,7 +16,6 @@ export const ConfiscationForm = () => {
         onSaveOrUptdate,
         handleOpenMap,
         loading,
-        modalTitle,
         activeConfiscation
     } = useConfiscationForm()
 
@@ -26,7 +24,7 @@ export const ConfiscationForm = () => {
         handleSubmit,
         setError,
         formState: { errors, },
-        control,
+        control,        
     } = useForm<FormFields>({
         defaultValues: activeConfiscation,
         resolver: zodResolver(confiscationSchema)
@@ -60,7 +58,7 @@ export const ConfiscationForm = () => {
                 boxShadow: 24,
                 p: 4,
             }}>
-                <Typography variant='h5' sx={{ mb: 1 }}>{modalTitle}</Typography>
+                <Typography variant='h5' sx={{ mb: 1 }}>{activeConfiscation.identificador?'Editar decomiso':'Crear decomiso'}</Typography>
                 {openMap ?
                     <ConfiscationMap handleOpen={handleOpenMap} lat={activeConfiscation.latitud} lng={activeConfiscation.longitud} nameLat={'latitud'} nameLng={'longitud'} nameDepto={'departamento'} nameMuni={'municipalidad'} control={control} />
                     :

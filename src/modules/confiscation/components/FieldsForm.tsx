@@ -1,7 +1,7 @@
 import { Button, TextField, Zoom } from '@mui/material'
 import Grid from '@mui/material/Grid2';
 import { Map, Save } from '@mui/icons-material';
-import { FieldsFormProps } from '../../../shared/interfaces/sharedInterfaces';
+import { FieldsFormProps } from '../';
 import { DatePickerField } from '../../../components';
 
 export const FieldsForm = ({ handleSubmit, onSubmit, loading, register, errors, handleOpenMap, control }: FieldsFormProps) => {

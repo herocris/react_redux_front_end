@@ -1,5 +1,6 @@
 import { createSlice,PayloadAction } from '@reduxjs/toolkit'
-import { TableOptions, Confiscation, ConfiscationState } from '../../../shared/interfaces/sharedInterfaces';
+import { TableOptions} from '../../../shared/interfaces/sharedInterfaces';
+import { Confiscation, ConfiscationState } from '../';
 
 const confiscation: Confiscation = {
     fecha: '',
@@ -76,9 +77,9 @@ export const confiscationSlice = createSlice({
             });
             state.activeConfiscation = payload;
         },
-        onDeleteConfiscation: (state) => {
+        onDeleteConfiscation: (state, { payload }: PayloadAction<string>) => {
             if (state.activeConfiscation) {
-                state.confiscations = state.confiscations.filter(confiscation => confiscation.id !== state.activeConfiscation.id);
+                state.confiscations = state.confiscations.filter(confiscation => confiscation.id !== payload);
                 state.activeConfiscation = confiscation;
             }
         }

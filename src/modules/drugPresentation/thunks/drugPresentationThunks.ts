@@ -1,7 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
-import { setDrugPresentations, onSetActiveDrugPresentation, onAddNewDrugPresentation, onUpdateDrugPresentation, onDeleteDrugPresentation, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
-import { DrugPresentation } from '../../../shared/interfaces/sharedInterfaces';
+import { setDrugPresentations, onAddNewDrugPresentation, onUpdateDrugPresentation, onDeleteDrugPresentation, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
+import { DrugPresentation } from '../';
 
 
 export const startLoadingDrugPresentations = (page: number, sortBy: string, orderType: string, per_page: number, search_by: string, valueSearch: string) => {
@@ -27,7 +27,6 @@ export const startLoadingDrugPresentations = (page: number, sortBy: string, orde
 export const startSaveDrugPresentation = (drugPresentation: DrugPresentation) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActiveDrugPresentation({ ...drugPresentation, logo:'' }))
         try {
             const { data } = await calendarApi.post('/drugPresentation', drugPresentation, {
                 headers: {
@@ -79,10 +78,9 @@ export const startUpdateDrugPresentation = (drugPresentation: DrugPresentation) 
 export const startDeleteDrugPresentation = (drugPresentation: DrugPresentation) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActiveDrugPresentation(drugPresentation))
         try {
             await calendarApi.delete(`/drugPresentation/${drugPresentation.id}`,);
-            dispatch(onDeleteDrugPresentation())
+            dispatch(onDeleteDrugPresentation(drugPresentation.id as string))
         } catch (error) {
             return handleApiError(error, dispatch);
         } finally {

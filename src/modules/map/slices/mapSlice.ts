@@ -1,11 +1,5 @@
 import { createSlice,PayloadAction } from '@reduxjs/toolkit'
-import { MapState, MapItem } from '../../../shared/interfaces/sharedInterfaces';
-
-
-
-// const map: Map = {
-//     name: '',
-// }
+import { MapState, MapItem } from '../';
 
 const initialState: MapState = {
     Mapitems: [],

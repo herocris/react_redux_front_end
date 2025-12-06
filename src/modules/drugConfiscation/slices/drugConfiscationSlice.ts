@@ -1,8 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { TableOptions, DrugConfiscation, DrugConfiscationState } from '../../../shared/interfaces/sharedInterfaces';
-
-
+import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
+import { DrugConfiscation, DrugConfiscationState } from '../';
 
 const drugConfiscation: DrugConfiscation = {
     cantidad: 0,
@@ -78,9 +77,9 @@ export const drugConfiscationSlice = createSlice({
             });
             state.activeDrugConfiscation = drugConfiscation;
         },
-        onDeleteDrugConfiscation: (state) => {
+        onDeleteDrugConfiscation: (state, { payload }: PayloadAction<string>) => {
             if (state.activeDrugConfiscation) {
-                state.drugConfiscations = state.drugConfiscations.filter(drugConfiscation => drugConfiscation.identificador !== state.activeDrugConfiscation.identificador);
+                state.drugConfiscations = state.drugConfiscations.filter(drugConfiscation => drugConfiscation.identificador !== payload);
                 state.activeDrugConfiscation = drugConfiscation;
             }
         }

@@ -1,8 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
-import { TableOptions, WeaponConfiscation, WeaponConfiscationState } from '../../../shared/interfaces/sharedInterfaces';
-
-
+import { createSlice,PayloadAction } from '@reduxjs/toolkit'
+import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
+import { WeaponConfiscation, WeaponConfiscationState } from '../';
 
 const weaponConfiscation: WeaponConfiscation = {
     cantidad: 0,
@@ -76,9 +74,9 @@ export const weaponConfiscationSlice = createSlice({
             });
             state.activeWeaponConfiscation = weaponConfiscation;
         },
-        onDeleteWeaponConfiscation: (state) => {
+        onDeleteWeaponConfiscation: (state, { payload }: PayloadAction<string>) => {
             if (state.activeWeaponConfiscation) {
-                state.weaponConfiscations = state.weaponConfiscations.filter(weaponConfiscation => weaponConfiscation.identificador !== state.activeWeaponConfiscation.identificador);
+                state.weaponConfiscations = state.weaponConfiscations.filter(weaponConfiscation => weaponConfiscation.identificador !== payload);
                 state.activeWeaponConfiscation = weaponConfiscation;
             }
         }

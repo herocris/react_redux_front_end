@@ -1,9 +1,12 @@
-import { AmmunitionConfiscation, DrugConfiscation, WeaponConfiscation } from '../../../shared/interfaces/sharedInterfaces'
-import { getEnvVariables } from '../../../helpers/getEnvVariables';
+//import { getEnvVariables } from '../../../helpers/getEnvVariables';
 import { Button, Card, CardActions, CardContent, CardMedia, Typography } from '@mui/material';
 import { Link } from 'react-router';
+import { AmmunitionConfiscation } from '../../ammunitionConfiscation';
+import { DrugConfiscation } from '../../drugConfiscation';
+import { WeaponConfiscation } from '../../weaponConfiscation';
+import { CardMarkerContentProps } from '../';
 
-const { VITE_LOCAL_PHOTOS_URL } = getEnvVariables();
+//const { VITE_LOCAL_PHOTOS_URL } = getEnvVariables();
 
 const isDrugConfiscation = (item: any): item is DrugConfiscation =>
   'droga_nombre' in item
@@ -14,9 +17,6 @@ const isWeaponConfiscation = (item: any): item is WeaponConfiscation =>
 const isAmmunitionConfiscation = (item: any): item is AmmunitionConfiscation =>
   'municion_nombre' in item
 
-interface CardMarkerContentProps {
-    itemSubConfiscation: DrugConfiscation | WeaponConfiscation | AmmunitionConfiscation
-}
 export const CardMarkerContent = ({ itemSubConfiscation }: CardMarkerContentProps) => {
 
     return (

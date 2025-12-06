@@ -1,43 +1,41 @@
 import { useEffect } from 'react';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
+import { Box, Modal, Button, TextField, Typography, Zoom } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import { Button, TextField, Typography, Zoom } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-
-import { WeaponFormModalProps } from '../../../shared/interfaces/sharedInterfaces';
 import { SubmitHandler, useForm } from "react-hook-form";
 import { weaponSchema } from '../validators';
 import { boxStyleFormModal } from '../../../helpers/boxStyle';
-import { PhotoInput } from '../../../components/PhotoInput';
+import { PhotoInput } from '../../../components/';
+import { WeaponFormModalProps } from '../';
 
 
 
 type FormFields = z.infer<typeof weaponSchema>;
-export const WeaponFormModal = ({ open, handleOpen, loading, onSaveOrUptdate, modalTitle, titleFormModal, activeWeapon, errorMessage }: WeaponFormModalProps) => {
-    const { 
-        register, 
-        handleSubmit, 
-        setError, 
-        formState: { errors, }, 
-        reset, 
-        control 
+export const WeaponFormModal = ({
+    handleOpen,
+    loading,
+    onSaveOrUptdate,
+    activeWeapon,
+    errorMessage
+}: WeaponFormModalProps) => {
+    const {
+        register,
+        handleSubmit,
+        setError,
+        formState: { errors, },
+        reset,
+        control
     } = useForm<FormFields>({
-        defaultValues: activeWeapon, 
+        defaultValues: activeWeapon,
         resolver: zodResolver(weaponSchema)
     });
 
     const onSubmit: SubmitHandler<z.infer<typeof weaponSchema>> = async (data) => {
         await onSaveOrUptdate(data)
+        reset()
     };
-
-    useEffect(() => {
-        titleFormModal()
-        reset(activeWeapon)
-    }, [activeWeapon])
 
     useEffect(() => {
         if (typeof errorMessage === 'object') {
@@ -53,16 +51,16 @@ export const WeaponFormModal = ({ open, handleOpen, loading, onSaveOrUptdate, mo
     return (
         <>
             <Modal
-                open={open}
+                open={true}
                 onClose={() => {
-                    handleOpen()
+                    handleOpen(false)
                     reset()
                 }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={boxStyleFormModal}>
-                    <Typography variant='h5' sx={{ mb: 1 }}>{modalTitle}</Typography>
+                    <Typography variant='h5' sx={{ mb: 1 }}>{activeWeapon.id ? 'Editar arma' : 'Crear arma'}</Typography>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Zoom in={true} style={{ transitionDelay: '150ms' }}>
                             <Grid container sx={{ alignItems: 'center', alignContent: 'center', display: 'flex' }}>

@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { TableOptions, ActivityState, Activity } from '../../../shared/interfaces/sharedInterfaces';
-
+import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
+import { Activity, ActivityState } from '../';
 
 const tableOptions: TableOptions = {
     current_page: 1,

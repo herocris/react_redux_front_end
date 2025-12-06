@@ -1,18 +1,13 @@
-
 import { Button, TextField, Typography } from '@mui/material';
-import { AuthLayout } from '../layout';
 import Grid from '@mui/material/Grid2';
-import { RootState } from '../../../store';
-import { startCreatingUserWithEmailPassword } from '../thunks';
-import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
+import { AuthLayout } from '../layout';
 import { Link } from 'react-router';
 import { useAuth } from '../hooks';
+import { authRegisterSchema } from '../validators';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
-import { authRegisterSchema } from '../validators';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { PasswordField } from '../components';
-
 
 
 const formData = {

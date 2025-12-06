@@ -1,7 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
 import { setConfiscations, onSetActiveConfiscation, onAddNewConfiscation, onUpdateConfiscation, onDeleteConfiscation, onSetTableOptions, onLoading, onSetErrorMessage, clearActiveConfiscation } from '../slices';
-import { Confiscation } from '../../../shared/interfaces/sharedInterfaces';
+import { Confiscation } from '../';
 
 
 export const startLoadingConfiscations = (page: number, sortBy: string, orderType: string, per_page: number, search_by: string, valueSearch: string) => {
@@ -44,11 +44,11 @@ export const startLoadingConfiscation = (idConfiscation: string) => {
 export const startSaveConfiscation = (confiscation: Confiscation) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActiveConfiscation(confiscation))
         try {
             const { data } = await calendarApi.post('/confiscation', confiscation);
             const { identificador: id, ...resto } = data;
             dispatch(onAddNewConfiscation({ id, ...resto }))
+            return id
         }
         catch (error: any) {
             return handleApiError(error, dispatch);
@@ -79,10 +79,9 @@ export const startUpdateConfiscation = (confiscation: Confiscation) => {
 export const startDeleteConfiscation = (confiscation: Confiscation) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActiveConfiscation(confiscation))
         try {
             await calendarApi.delete(`/confiscation/${confiscation.id}`,);
-            dispatch(onDeleteConfiscation())
+            dispatch(onDeleteConfiscation(confiscation.id as string))
         } catch (error) {
             return handleApiError(error, dispatch);
         } finally {

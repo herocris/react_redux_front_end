@@ -1,19 +1,6 @@
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
-import Drawer from '@mui/material/Drawer';
-
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import  {IconButton, styled,AppBar,Box,CssBaseline,Divider,Drawer,List,ListItem,ListItemButton,ListItemIcon,ListItemText,Toolbar,Typography} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import { ReactNode, useState } from 'react';
-import { IconButton, styled } from '@mui/material';
 import { AccountCircle, Logout, Person, RecentActors, Map, ContactEmergency, SignalCellularAlt, Inventory2, FormatListBulleted, HomeRepairServiceOutlined, Vaccines, AllInbox, Category } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
 import { RootState } from '../../store';
@@ -21,9 +8,6 @@ import { startLogout } from '../../modules/auth/thunks';
 import { useNavigate, useLocation } from 'react-router';
 import { useThemeContext } from '../../theme/ThemeContext';
 import { Brightness4, Brightness7 } from "@mui/icons-material";
-
-
-
 
 const drawerWidth = 240;
 
@@ -86,15 +70,11 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
     const displayMenuOptions = [
         { name: 'Graphs', url: '/graph', icon: <SignalCellularAlt /> },
         { name: 'Map', url: '/map', icon: <Map /> },
-
-
     ]
 
     const drawer = (
         <div>
-
-
-            <Toolbar><AccountCircle sx={{ marginRight: '10px' }} fontSize="large" />{user.name}</Toolbar>
+            <Toolbar><AccountCircle sx={{ marginRight: '10px' }} fontSize="large" />{user.nombre}</Toolbar>
             <Divider />
             <List>
                 {authMenuOptions.map((opt, index) => (
@@ -146,8 +126,8 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
             <AppBar
                 position="fixed"
                 sx={{
-                    width: { sm: `calc(100% - ${drawerWidth}px)` },
-                    ml: { sm: `${drawerWidth}px` },
+                    width: { md: `calc(100% - ${drawerWidth}px)` },
+                    ml: { md: `${drawerWidth}px` },
                 }}
             >
                 <Toolbar>
@@ -156,7 +136,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                         aria-label="open drawer"
                         edge="start"
                         onClick={handleDrawerToggle}
-                        sx={{ mr: 2, display: { sm: 'none' } }}
+                        sx={{ mr: 2, display: { md: 'none' } }}
                     >
                         <MenuIcon />
                     </IconButton>
@@ -182,7 +162,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
             </AppBar>
             <Box
                 component="nav"
-                sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+                sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
                 aria-label="mailbox folders"
             >
                 {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
@@ -193,7 +173,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                     onTransitionEnd={handleDrawerTransitionEnd}
                     onClose={handleDrawerClose}
                     sx={{
-                        display: { xs: 'block', sm: 'none' },
+                        display: { xs: 'block', md: 'none' },
                         '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
                     }}
                     slotProps={{
@@ -207,7 +187,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                 <Drawer
                     variant="permanent"
                     sx={{
-                        display: { xs: 'none', sm: 'block' },
+                        display: { xs: 'none', md: 'block' },
                         '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
                     }}
                     open

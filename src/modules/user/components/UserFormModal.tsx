@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import Grid from '@mui/material/Grid2';
-import {Box, Button, TextField, Typography, Zoom,Modal } from '@mui/material';
+import { Box, Button, TextField, Typography, Zoom, Modal } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { UserFormModalProps, User } from '../../../shared/interfaces/sharedInterfaces';
+import { UserFormModalProps, User } from '../';
 import { SubmitHandler, useForm } from "react-hook-form";
 import { MultipleSelectButton } from '../../../components';
 import { userSchema } from '../validators';
@@ -12,7 +12,15 @@ import { boxStyleFormModal } from '../../../helpers/boxStyle';
 
 
 type FormFields = z.infer<typeof userSchema>;
-export const UserFormModal = ({ open, handleOpen, permisos, roles, loading, onSaveOrUptdate, titulo, titleFormModal, activeUser, errorMessage }: UserFormModalProps) => {
+export const UserFormModal = ({
+    handleOpen,
+    permisos,
+    roles,
+    loading,
+    onSaveOrUptdate,
+    activeUser,
+    errorMessage
+}: UserFormModalProps) => {
     const {
         register,
         handleSubmit,
@@ -26,14 +34,8 @@ export const UserFormModal = ({ open, handleOpen, permisos, roles, loading, onSa
 
     const onSubmit: SubmitHandler<User> = async (data) => {
         console.log(data);
-
         await onSaveOrUptdate(data)
     };
-
-    useEffect(() => {
-        titleFormModal()
-        reset(activeUser)
-    }, [activeUser])
 
     useEffect(() => {
         if (typeof errorMessage === 'object') {
@@ -49,16 +51,16 @@ export const UserFormModal = ({ open, handleOpen, permisos, roles, loading, onSa
     return (
         <>
             <Modal
-                open={open}
+                open={true}
                 onClose={() => {
-                    handleOpen()
+                    handleOpen(false)
                     reset()
                 }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={boxStyleFormModal}>
-                    <Typography variant='h5' sx={{ mb: 1 }}>{titulo}</Typography>
+                    <Typography variant='h5' sx={{ mb: 1 }}>{activeUser.id ? 'Editar Usuario' : 'Crear Usuario'}</Typography>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Zoom in={true} style={{ transitionDelay: '150ms' }}>
                             <Grid container>

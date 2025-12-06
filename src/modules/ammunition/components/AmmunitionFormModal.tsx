@@ -1,19 +1,25 @@
-import { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import Grid from '@mui/material/Grid2';
 import { Box, Modal, Button, TextField, Typography, Zoom } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { AmmunitionFormModalProps } from '../../../shared/interfaces/sharedInterfaces';
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ammunitionSchema } from '../validators';
+import { AmmunitionFormModalProps } from '../';
 import { boxStyleFormModal } from '../../../helpers/boxStyle';
 import { PhotoInput } from '../../../components';
 
 
 
 type FormFields = z.infer<typeof ammunitionSchema>;
-export const AmmunitionFormModal = ({ open, handleOpen, loading, onSaveOrUptdate, modalTitle, titleFormModal, activeAmmunition, errorMessage }: AmmunitionFormModalProps) => {
+export const AmmunitionFormModal = memo(({
+    handleOpen,
+    loading,
+    onSaveOrUptdate,
+    activeAmmunition,
+    errorMessage
+}: AmmunitionFormModalProps) => {
     const {
         register,
         handleSubmit,
@@ -29,12 +35,8 @@ export const AmmunitionFormModal = ({ open, handleOpen, loading, onSaveOrUptdate
 
     const onSubmit: SubmitHandler<z.infer<typeof ammunitionSchema>> = async (data) => {
         await onSaveOrUptdate(data)
+        reset()
     };
-
-    useEffect(() => {
-        titleFormModal()
-        reset(activeAmmunition)
-    }, [activeAmmunition])
 
     useEffect(() => {
         if (typeof errorMessage === 'object') {
@@ -50,16 +52,16 @@ export const AmmunitionFormModal = ({ open, handleOpen, loading, onSaveOrUptdate
     return (
         <>
             <Modal
-                open={open}
+                open={true}
                 onClose={() => {
-                    handleOpen()
-                    reset()
+                    handleOpen(false)
+                    reset(activeAmmunition)
                 }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={boxStyleFormModal}>
-                    <Typography variant='h5' sx={{ mb: 1 }}>{modalTitle}</Typography>
+                    <Typography variant='h5' sx={{ mb: 1 }}>{activeAmmunition.id ? 'Editar municion' : 'Crear municion'}</Typography>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Zoom in={true} style={{ transitionDelay: '150ms' }}>
                             <Grid container sx={{ alignItems: 'center', alignContent: 'center', display: 'flex' }}>
@@ -94,5 +96,5 @@ export const AmmunitionFormModal = ({ open, handleOpen, loading, onSaveOrUptdate
             </Modal>
         </>
     );
-}
+})
 

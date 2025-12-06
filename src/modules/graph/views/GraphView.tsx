@@ -1,10 +1,7 @@
 import { GrapLayout } from "../../../shared/layout/GraphLayout"
 import Grid from '@mui/material/Grid2';
-import { FormGraph } from "../components";
 import { useGraph } from "../hooks";
-import { BarGraph } from "../components";
-import { LineGraph } from "../components";
-import { PieGraph } from "../components";
+import { BarGraph,LineGraph,PieGraph,FormGraph } from "../components";
 
 export const GraphView = () => {
     const { 

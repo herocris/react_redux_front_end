@@ -1,8 +1,10 @@
 import { Avatar, List, ListItemText, ListItemAvatar, Badge, Box, Button, ListItemButton, Typography, Zoom } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { AmmunitionConfiscation, DrugConfiscation, WeaponConfiscation } from '../../../shared/interfaces/sharedInterfaces';
 import { getEnvVariables } from '../../../helpers/getEnvVariables';
 import { memo } from 'react';
+import { AmmunitionConfiscation } from '../../ammunitionConfiscation';
+import { WeaponConfiscation } from '../../weaponConfiscation';
+import { DrugConfiscation } from '../../drugConfiscation';
 
 
 interface ListSubConfiscationProps {

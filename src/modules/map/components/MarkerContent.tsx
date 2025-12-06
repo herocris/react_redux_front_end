@@ -1,12 +1,13 @@
-import { AmmunitionConfiscation, DrugConfiscation, MapItem, WeaponConfiscation } from '../../../shared/interfaces/sharedInterfaces'
-import { getEnvVariables } from '../../../helpers/getEnvVariables';
+//import { getEnvVariables } from '../../../helpers/getEnvVariables';
 import { CardMarkerContent } from './';
+import { MarkerContentProps } from '../';
+import { DrugConfiscation } from '../../drugConfiscation';
+import { AmmunitionConfiscation } from '../../ammunitionConfiscation';
+import { WeaponConfiscation } from '../../weaponConfiscation';
 
 
-interface MarkerContentProps {
-    marker: MapItem
-}
-const { VITE_LOCAL_PHOTOS_URL } = getEnvVariables();
+
+//const { VITE_LOCAL_PHOTOS_URL } = getEnvVariables();
 
 export const MarkerContent = ({ marker }: MarkerContentProps) => {
     return (

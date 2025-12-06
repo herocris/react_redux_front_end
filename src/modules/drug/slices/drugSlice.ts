@@ -1,8 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
-import { TableOptions, Drug, DrugState } from '../../../shared/interfaces/sharedInterfaces';
-
-
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
+import { Drug, DrugState } from '../';
 
 const drug: Drug = {
     descripcion: '',
@@ -74,9 +72,9 @@ export const drugSlice = createSlice({
             });
             state.activeDrug = drug;
         },
-        onDeleteDrug: (state) => {
+        onDeleteDrug: (state, { payload }: PayloadAction<string>) => {
             if (state.activeDrug) {
-                state.drugs = state.drugs.filter(drug => drug.id !== state.activeDrug.id);
+                state.drugs = state.drugs.filter(drug => drug.id !== payload);
                 state.activeDrug = drug;
             }
         }

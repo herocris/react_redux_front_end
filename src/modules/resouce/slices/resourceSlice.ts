@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { Drug, DrugPresentation, Permission, ResourceState, Role, SelectOptions, SelectResourceState } from '../../../shared/interfaces/sharedInterfaces';
+import { SelectOptions} from '../../../shared/interfaces/sharedInterfaces';
+import { ResourceState } from '../';
 
 
 const initialState: ResourceState = {

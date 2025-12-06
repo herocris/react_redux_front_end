@@ -6,7 +6,7 @@ import { Button, TextField, Typography, Zoom } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { DrugPresentationFormModalProps } from '../../../shared/interfaces/sharedInterfaces';
+import { DrugPresentationFormModalProps } from '../';
 import { SubmitHandler, useForm } from "react-hook-form";
 import { drugPresentationSchema } from '../validators';
 import { boxStyleFormModal } from '../../../helpers/boxStyle';
@@ -15,7 +15,13 @@ import { PhotoInput } from '../../../components';
 
 
 type FormFields = z.infer<typeof drugPresentationSchema>;
-export const DrugPresentationFormModal = ({ open, handleOpen, loading, onSaveOrUptdate, modalTitle, titleFormModal, activeDrugPresentation, errorMessage }: DrugPresentationFormModalProps) => {
+export const DrugPresentationFormModal = ({
+    handleOpen,
+     loading,
+     onSaveOrUptdate,
+     activeDrugPresentation,
+     errorMessage 
+    }: DrugPresentationFormModalProps) => {
     const { 
         register, 
         handleSubmit, 
@@ -30,12 +36,8 @@ export const DrugPresentationFormModal = ({ open, handleOpen, loading, onSaveOrU
 
     const onSubmit: SubmitHandler<z.infer<typeof drugPresentationSchema>> = async (data) => {
         await onSaveOrUptdate(data)
+        reset()
     };
-
-    useEffect(() => {
-        titleFormModal()
-        reset(activeDrugPresentation)
-    }, [activeDrugPresentation])
 
     useEffect(() => {
         if (typeof errorMessage === 'object') {
@@ -51,16 +53,16 @@ export const DrugPresentationFormModal = ({ open, handleOpen, loading, onSaveOrU
     return (
         <>
             <Modal
-                open={open}
+                open={true}
                 onClose={() => {
-                    handleOpen()
+                    handleOpen(false)
                     reset()
                 }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={boxStyleFormModal}>
-                    <Typography variant='h5' sx={{ mb: 1 }}>{modalTitle}</Typography>
+                    <Typography variant='h5' sx={{ mb: 1 }}>{activeDrugPresentation.id?'Editar presentación':'Crear presentación'}</Typography>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Zoom in={true} style={{ transitionDelay: '150ms' }}>
                             <Grid container sx={{ alignItems: 'center', alignContent: 'center', display: 'flex' }}>

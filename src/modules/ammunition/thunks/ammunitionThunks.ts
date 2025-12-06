@@ -1,7 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
-import { setAmmunitions, onSetActiveAmmunition, onAddNewAmmunition, onUpdateAmmunition, onDeleteAmmunition, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
-import { Ammunition } from '../../../shared/interfaces/sharedInterfaces';
+import { setAmmunitions, onAddNewAmmunition, onUpdateAmmunition, onDeleteAmmunition, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
+import { Ammunition } from '../';
 
 
 export const startLoadingAmmunitions = (page: number, sortBy: string, orderType: string, per_page: number, search_by: string, valueSearch: string) => {
@@ -27,7 +27,6 @@ export const startLoadingAmmunitions = (page: number, sortBy: string, orderType:
 export const startSaveAmmunition = (ammunition: Ammunition) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActiveAmmunition({ ...ammunition, logo:'' }))
         try {
             const { data } = await calendarApi.post('/ammunition', ammunition, {
                 headers: {
@@ -48,7 +47,6 @@ export const startSaveAmmunition = (ammunition: Ammunition) => {
 export const startUpdateAmmunition = (ammunition: Ammunition) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-
         const formData = new FormData();
         formData.append('descripcion', ammunition.descripcion);
         // Si el archivo existe (por ejemplo, desde tu componente PhotoInput)
@@ -79,10 +77,9 @@ export const startUpdateAmmunition = (ammunition: Ammunition) => {
 export const startDeleteAmmunition = (ammunition: Ammunition) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        dispatch(onSetActiveAmmunition(ammunition))
         try {
             await calendarApi.delete(`/ammunition/${ammunition.id}`,);
-            dispatch(onDeleteAmmunition())
+            dispatch(onDeleteAmmunition(ammunition.id as string))
         } catch (error) {
             return handleApiError(error, dispatch);
         } finally {

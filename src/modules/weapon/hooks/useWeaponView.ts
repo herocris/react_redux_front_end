@@ -3,17 +3,16 @@ import { clearActiveWeapon, onSetActiveWeapon} from "../slices";
 import {startDeleteWeapon, startLoadingWeapons, startSaveWeapon, startUpdateWeapon } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { Weapon } from "../../../shared/interfaces/sharedInterfaces";
+import { Weapon } from "../";
 
 export const useWeaponView = () => {
   const { activeWeapon, weapons, tableOptions, loading, errorMessage } = useAppSelector((state: RootState) => state.weapon);
   const dispatch = useAppDispatch();
 
-  const [modalTitle, setModalTitle] = useState('')
   const [open, setOpen] = useState(false);
-  const handleOpen = () => {
-    if (open !== false) dispatch(clearActiveWeapon())
-    setOpen(!open);
+  const handleOpen = (valOp:boolean) => {
+    if (open) dispatch(clearActiveWeapon())
+    setOpen(valOp);
   }
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -35,17 +34,15 @@ export const useWeaponView = () => {
     console.log(weapon);
     if (activeWeapon.id === undefined) {
       await dispatch(startSaveWeapon(weapon)).then(() => {
-        handleOpen()
+        handleOpen(false)
       })
     } else {
       await dispatch(startUpdateWeapon({ ...weapon, id: activeWeapon.id })).then(() => {
-        handleOpen()
+        handleOpen(false)
       })
     }
      dispatch(clearActiveWeapon())
   }
-
-  const titleFormModal = () => activeWeapon.id === undefined ? setModalTitle('Crear municion') : setModalTitle('Editar municion')
 
 
   const LoadingEntities = (
@@ -59,16 +56,6 @@ export const useWeaponView = () => {
     dispatch(startLoadingWeapons(page, sortBy, sortType, pageSize, filterField, filterValue))
   }
 
-  const onSubmitForm = (formState: any) => {
-    if (activeWeapon.id === undefined) {
-      dispatch(startSaveWeapon(formState))
-    } else {
-      console.log(activeWeapon.id);
-      dispatch(startUpdateWeapon(formState))
-    }
-    dispatch(clearActiveWeapon())
-  }
-
   const columnsTable = ['id', 'descripcion', 'logo']
 
   return {
@@ -79,15 +66,12 @@ export const useWeaponView = () => {
     columnsTable,
     weapons,
     activeWeapon,
-    modalTitle,
     errorMessage,
     handleOpen,
     handleOpenDialog,
     setIdWeapon,
     DeleteWeapon,
     LoadingEntities,
-    onSubmitForm,
     onSaveOrUptdate,
-    titleFormModal,
   }
 }

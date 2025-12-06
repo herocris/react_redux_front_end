@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { TableOptions, AmmunitionConfiscation, AmmunitionConfiscationState } from '../../../shared/interfaces/sharedInterfaces';
+import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
+import { AmmunitionConfiscation, AmmunitionConfiscationState } from '../';
 
 
 
@@ -76,9 +77,9 @@ export const ammunitionConfiscationSlice = createSlice({
             });
             state.activeAmmunitionConfiscation = ammunitionConfiscation;
         },
-        onDeleteAmmunitionConfiscation: (state) => {
+        onDeleteAmmunitionConfiscation: (state, { payload }: PayloadAction<string>) => {
             if (state.activeAmmunitionConfiscation) {
-                state.ammunitionConfiscations = state.ammunitionConfiscations.filter(ammunitionConfiscation => ammunitionConfiscation.identificador !== state.activeAmmunitionConfiscation.identificador);
+                state.ammunitionConfiscations = state.ammunitionConfiscations.filter(ammunitionConfiscation => ammunitionConfiscation.identificador !== payload);
                 state.activeAmmunitionConfiscation = ammunitionConfiscation;
             }
         }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { Role } from "../../../shared/interfaces/sharedInterfaces";
+import { Role } from "../";
 import { startLoadingPermissions } from "../../resouce/thunks";
 import { clearActiveRole, onSetActiveRole } from "../slices";
 import { startDeleteRol, startLoadingRoles, startSaveRol, startUpdateRol } from "../thunks";
@@ -11,12 +11,11 @@ export const useRoleView = () => {
   const { permisosCollection: permisos } = useAppSelector((state: RootState) => state.resource);
   const dispatch = useAppDispatch();
 
-  const [modalTitle, setModalTitle] = useState('')
   const [open, setOpen] = useState(false);
 
-  const handleOpen = () => {
-    if (open !== false) dispatch(clearActiveRole())
-    setOpen(!open);
+  const handleOpen = (valOp:boolean) => {
+    if (open) dispatch(clearActiveRole())
+    setOpen(valOp);
   }
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -38,17 +37,14 @@ export const useRoleView = () => {
     console.log(role);
     if (activeRole.id === undefined) {
       await dispatch(startSaveRol(role)).then(() => {
-        handleOpen()
+        handleOpen(false)
       })
     } else {
       await dispatch(startUpdateRol({ ...role, id: activeRole.id })).then(() => {
-        handleOpen()
+        handleOpen(false)
       })
     }
-     dispatch(clearActiveRole())
   }
-
-  const titleFormModal = () => activeRole.id === undefined ? setModalTitle('Crear rol') : setModalTitle('Editar rol')
 
   useEffect(() => {
     dispatch(startLoadingPermissions());
@@ -65,16 +61,6 @@ export const useRoleView = () => {
     dispatch(startLoadingRoles(page, sortBy, sortType, pageSize, filterField, filterValue))
   }
 
-  const onSubmitForm = (formState: any) => {
-    if (activeRole.id === undefined) {
-      dispatch(startSaveRol(formState))
-    } else {
-      console.log(activeRole.id);
-      dispatch(startUpdateRol(formState))
-    }
-    dispatch(clearActiveRole())
-  }
-
   const columnsTable = ['id', 'nombre']
 
   return {
@@ -86,15 +72,12 @@ export const useRoleView = () => {
     columnsTable,
     permisos,
     activeRole,
-    titulo: modalTitle,
     errorMessage,
     handleOpen,
     handleOpenDialog,
     setIdRole,
     DeleteRole,
     LoadingEntities,
-    onSubmitForm,
     onSaveOrUptdate,
-    titleFormModal,
   }
 }

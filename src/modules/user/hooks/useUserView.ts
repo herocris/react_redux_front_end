@@ -3,7 +3,7 @@ import { clearActiveUser, onSetActiveUser } from "../slices";
 import { startDeleteUser, startLoadingUsers, startSaveUser, startUpdateUser } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { User } from "../../../shared/interfaces/sharedInterfaces";
+import { User } from "../";
 import { startLoadingPermissions, startLoadingRoles } from "../../resouce/thunks";
 
 export const useUserView = () => {
@@ -11,11 +11,10 @@ export const useUserView = () => {
   const { permisosCollection: permisos, rolesCollection: roles } = useAppSelector((state: RootState) => state.resource);
   const dispatch = useAppDispatch();
 
-  const [titulo, setTitulo] = useState('')
   const [open, setOpen] = useState(false);
-  const handleOpen = () => {
-    if (open !== false) dispatch(clearActiveUser())
-    setOpen(!open);
+  const handleOpen = (valOp:boolean) => {
+    if (open) dispatch(clearActiveUser())
+    setOpen(valOp);
   }
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -37,17 +36,14 @@ export const useUserView = () => {
     console.log(user);
     if (activeUser.id === undefined) {
       await dispatch(startSaveUser(user)).then(() => {
-        handleOpen()
+        handleOpen(false)
       })
     } else {
       await dispatch(startUpdateUser({ ...user, id: activeUser.id })).then(() => {
-        handleOpen()
+        handleOpen(false)
       })
     }
-     dispatch(clearActiveUser())
   }
-
-  const titleFormModal = () => activeUser.id === undefined ? setTitulo('Crear usuario') : setTitulo('Editar usuario')
 
   useEffect(() => {
     dispatch(startLoadingRoles());
@@ -65,16 +61,6 @@ export const useUserView = () => {
     dispatch(startLoadingUsers(page, sortBy, sortType, pageSize, filterField, filterValue))
   }
 
-  const onSubmitForm = (formState: any) => {
-    if (activeUser.id === undefined) {
-      dispatch(startSaveUser(formState))
-    } else {
-      console.log(activeUser.id);
-      dispatch(startUpdateUser(formState))
-    }
-    dispatch(clearActiveUser())
-  }
-
   const columnsTable = ['id', 'nombre', 'correo']
 
   return {
@@ -87,15 +73,12 @@ export const useUserView = () => {
     permisos,
     roles,
     activeUser,
-    titulo,
     errorMessage,
     handleOpen,
     handleOpenDialog,
     setIdUser,
     DeleteUser,
     LoadingEntities,
-    onSubmitForm,
     onSaveOrUptdate,
-    titleFormModal,
   }
 }

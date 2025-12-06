@@ -3,7 +3,7 @@ import { clearActiveWeaponConfiscation, onSetActiveWeaponConfiscation } from "..
 import { startDeleteWeaponConfiscation, startLoadingWeaponConfiscations, startSaveWeaponConfiscation, startUpdateWeaponConfiscation } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { WeaponConfiscation } from '../../../shared/interfaces/sharedInterfaces';
+import { WeaponConfiscation } from '../';
 import { useParams } from "react-router";
 import { startLoadingWeaponNames } from "../../resouce/thunks";
 

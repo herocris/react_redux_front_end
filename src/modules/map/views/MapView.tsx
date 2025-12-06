@@ -1,8 +1,8 @@
 import { GrapLayout } from "../../../shared/layout/GraphLayout"
 import Grid from '@mui/material/Grid2';
-import { FormMap } from "../components/FormMap";
-import { useMap } from "../hooks/useMap";
-import { MapComponent } from "../components/MapComponent";
+import { FormMap ,MapComponent} from "../components";
+import { useMap } from "../hooks";
+
 
 
 export const MapView = () => {
