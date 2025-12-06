@@ -5,17 +5,10 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
 import { mapSchema } from '../validators';
-import { SelectOptions } from '../../../shared/interfaces/sharedInterfaces';
 import { MultipleSelectButton, DatePickerField, OptionSelector } from '../../../components';
-import { useState } from 'react';
+//import { useState } from 'react';
+import { FormGraphProps } from '../';
 
-interface FormGraphProps {
-    drugCollection: SelectOptions[]
-    weaponCollection: SelectOptions[]
-    ammunitionCollection: SelectOptions[]
-    setMapType: Function
-    getMapData: Function
-}
 type FormFields = z.infer<typeof mapSchema>;
 const initStateForm: FormFields = { //asingandole tipo FormFields (mapSchema) para que no de problemas al ponerlo en defaultValues del useForm
     typeMap: 'location',
@@ -42,13 +35,13 @@ const graphIconList = [
 ]
 
 export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection, setMapType, getMapData }: FormGraphProps) => {
-    const [confiscationSelected, setConfiscationSelected] = useState('Drogas')
+    //const [confiscationSelected, setConfiscationSelected] = useState('Drogas')
 
     const {
         handleSubmit,
         formState: { errors, },
         control,
-        setValue
+        //setValue
     } = useForm<FormFields>({
         defaultValues: initStateForm,
         resolver: zodResolver(mapSchema)

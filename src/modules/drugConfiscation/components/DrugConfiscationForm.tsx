@@ -1,29 +1,17 @@
 import { Box, Button, IconButton, TextField, Zoom } from '@mui/material'
 import Grid from '@mui/material/Grid2';
 import  {Save,Cancel,Delete } from '@mui/icons-material';
-import { PhotoInput } from '../../../components';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
 import { drugConfiscationSchema } from '../validators';
-import { DrugConfiscation, SelectOptions } from '../../../shared/interfaces/sharedInterfaces';
-import { MultipleSelectButton } from '../../../components';
+import { MultipleSelectButton,PhotoInput } from '../../../components';
 import { memo } from 'react';
+import { DrugConfiscationFormProps } from '../';
 
 type FormFields = z.infer<typeof drugConfiscationSchema>;
 
-interface DrugConfiscationForm {
-    activeDrugConfiscation: DrugConfiscation
-    handleOpen: Function
-    onSaveOrUptdate: Function
-    drugCollection: SelectOptions[]
-    drugPresentationCollection: SelectOptions[]
-    handleOpenDialog: Function
-}
-
-
-
-export const DrugConfiscationForm = memo(({ activeDrugConfiscation, handleOpen, onSaveOrUptdate, drugCollection, drugPresentationCollection, handleOpenDialog }: DrugConfiscationForm) => {
+export const DrugConfiscationForm = memo(({ activeDrugConfiscation, handleOpen, onSaveOrUptdate, drugCollection, drugPresentationCollection, handleOpenDialog }: DrugConfiscationFormProps) => {
     const {
         register,
         handleSubmit,

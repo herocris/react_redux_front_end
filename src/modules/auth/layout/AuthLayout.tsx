@@ -1,13 +1,6 @@
 import { Grow, Typography } from '@mui/material';
-
-
-import { ReactNode } from 'react';
 import Grid from '@mui/material/Grid2';
-
-interface AuthLayoutProps {
-    children: ReactNode;
-    title?: string;
-}
+import { AuthLayoutProps } from '../';
 
 export const AuthLayout = ({ children, title = '' }: AuthLayoutProps) => {
     return (
@@ -33,16 +26,10 @@ export const AuthLayout = ({ children, title = '' }: AuthLayoutProps) => {
                         padding: 3,
                         borderRadius: 2
                     }}>
-
                     <Typography variant='h5' sx={{ mb: 1 }}>{title}</Typography>
-
-
                     {children}
-
                 </Grid>
             </Grow>
         </Grid >
-
-
     )
 }

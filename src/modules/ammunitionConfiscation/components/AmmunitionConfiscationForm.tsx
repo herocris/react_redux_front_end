@@ -6,20 +6,11 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
 import { ammunitionConfiscationSchema } from '../validators';
-import { AmmunitionConfiscation, SelectOptions } from '../../../shared/interfaces/sharedInterfaces';
-
+import { AmmunitionConfiscationFormProps } from '../';
 
 type FormFields = z.infer<typeof ammunitionConfiscationSchema>;
 
-interface AmmunitionConfiscationForm {
-    activeAmmunitionConfiscation: AmmunitionConfiscation
-    handleOpen: Function
-    onSaveOrUptdate: Function
-    ammunitionCollection: SelectOptions[]
-    handleOpenDialog: Function
-}
-
-export const AmmunitionConfiscationForm = ({ activeAmmunitionConfiscation, handleOpen, onSaveOrUptdate, ammunitionCollection, handleOpenDialog }: AmmunitionConfiscationForm) => {
+export const AmmunitionConfiscationForm = ({ activeAmmunitionConfiscation, handleOpen, onSaveOrUptdate, ammunitionCollection, handleOpenDialog }: AmmunitionConfiscationFormProps) => {
     const {
         register,
         handleSubmit,

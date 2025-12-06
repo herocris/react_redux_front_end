@@ -1,15 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Zoom, Box } from '@mui/material';
-import { MapItem } from '../../../shared/interfaces/sharedInterfaces';
-import { MarkerContent } from './';
+import { MapComponentProps, MapItem,MarkerContent } from '../';
 import { HeatmapLayer } from 'react-leaflet-heatmap-layer-v3';
-
-
-
-interface MapComponentProps {
-  Mapitems: MapItem[]
-  typeMap: string
-}
 
 export const MapComponent = ({ Mapitems, typeMap }: MapComponentProps) => {
   return (

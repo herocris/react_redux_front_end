@@ -1,28 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
-export interface Roles {
-    name: string,
-}
-export interface Permissionss {
-    name: string,
-}
-export interface User {
-    name: string,
-    email: string,
-    roles: Roles[],
-    permissions: Permissionss[]
-}
+import { createSlice,PayloadAction } from '@reduxjs/toolkit'
+import { AuthState } from '../'
+import { User } from '../../user'
 
-export interface AuthState {
-    status: string,
-    user: User,
-    errorMessage: {} | undefined
-}
 const user: User = {
-    name: '', 
-    email: '',
+    nombre: '', 
+    correo: '',
     roles:[],
-    permissions:[], 
+    permisos:[], 
 }
 const initialState: AuthState = {
     status: 'checking',

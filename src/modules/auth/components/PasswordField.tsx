@@ -1,28 +1,22 @@
-import { Button, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material';
+import {  FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, Typography } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useState } from 'react';
+import { PasswordFieldProps } from '../types';
 
 
-interface PasswordFieldProps {
-    name:string
-    errorMessage: string|undefined
-    hasError:boolean
-    register:Function
-}
-
-export const PasswordField = ({name,errorMessage,hasError=false,register}:PasswordFieldProps) => {
+export const PasswordField = ({ name, errorMessage, hasError = false, register }: PasswordFieldProps) => {
     const [showPassword, setShowPassword] = useState(false)
-        const handleClickShowPassword = () => setShowPassword((show) => !show);
-        const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-            event.preventDefault();
-        };
-    
-        const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-            event.preventDefault();
-        };
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+    const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+    };
+
+    const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+    };
     return (
         <FormControl sx={{ width: '100%' }} variant="outlined">
-            <InputLabel htmlFor={name} color={hasError?'error':'info'}>Password</InputLabel>
+            <InputLabel htmlFor={name} color={hasError ? 'error' : 'info'}>Password</InputLabel>
             <OutlinedInput
                 id={name}
                 label="Password"
@@ -45,7 +39,7 @@ export const PasswordField = ({name,errorMessage,hasError=false,register}:Passwo
                     </InputAdornment>
                 }
             />
-            {hasError&& (
+            {hasError && (
                 <Typography color="error" variant="caption">
                     {errorMessage}
                 </Typography>
