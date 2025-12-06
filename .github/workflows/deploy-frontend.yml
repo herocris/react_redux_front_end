@@ -12,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Cache para node_modules (acelera muchísimo el pipeline)
+      # Cache para node_modules (acelera muchísimo el pipeline )
       - name: Cache node modules
         uses: actions/cache@v3
         with:
