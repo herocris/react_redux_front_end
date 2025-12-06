@@ -1,11 +1,11 @@
 import Box from '@mui/material/Box';
-import { DataGrid, useGridApiRef, gridClasses, GridAutosizeOptions } from '@mui/x-data-grid';
+import { DataGrid} from '@mui/x-data-grid';
 import { Grow } from '@mui/material';
 import { EntityListProps } from '../shared/interfaces/sharedInterfaces';
 import { useEntityList } from '../hooks/useEntityList';
-import { useEffect } from 'react';
+import { memo } from 'react';
 
-export const EntityList = ({
+export const EntityList = memo(({
     handleOpen,
     handleOpenDialog,
     EntityCollection,
@@ -87,4 +87,4 @@ export const EntityList = ({
         </Grow>
 
     );
-}
+})

@@ -35,7 +35,7 @@ export const OptionSelector = memo(({ name, iconList, setOption=()=>{}, control 
                         <BottomNavigation
                             //showLabels
                             value={value}
-                            onChange={(event: React.SyntheticEvent, newValue: number) => {
+                            onChange={(_event: React.SyntheticEvent, newValue: number) => {
                                 field.onChange(iconList[newValue].value);
                                 handleChange(newValue)
                             }}

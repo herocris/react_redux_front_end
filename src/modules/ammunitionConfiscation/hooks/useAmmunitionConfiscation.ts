@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { startDeleteAmmunitionConfiscation, startLoadingAmmunitionConfiscations, startSaveAmmunitionConfiscation, startUpdateAmmunitionConfiscation } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { AmmunitionConfiscation } from '../../../shared/interfaces/sharedInterfaces';
+import { AmmunitionConfiscation } from '../';
 import { useParams } from "react-router";
 import { clearActiveAmmunitionConfiscation, onSetActiveAmmunitionConfiscation } from "../slices";
 import { startLoadingAmmunitionNames } from "../../resouce/thunks";
@@ -10,8 +10,8 @@ import { startLoadingAmmunitionNames } from "../../resouce/thunks";
 
 export const useAmmunitionConfiscation = () => {
   const { confiscationId } = useParams();
-  
-  const { activeAmmunitionConfiscation, ammunitionConfiscations,loading, errorMessage } = useAppSelector((state: RootState) => state.ammunitionConfiscation);
+
+  const { activeAmmunitionConfiscation, ammunitionConfiscations, loading, errorMessage } = useAppSelector((state: RootState) => state.ammunitionConfiscation);
   const { ammunitionCollection } = useAppSelector((state: RootState) => state.resource);
   const { activeConfiscation } = useAppSelector((state: RootState) => state.confiscation);
 
@@ -25,7 +25,7 @@ export const useAmmunitionConfiscation = () => {
     }
     //if ( activeAmmunitionConfiscation.identificador) dispatch(clearActiveAmmunitionConfiscation())
     setOpenAmmunitionConfiscationForm(open);
-  },[openAmmunitionConfiscationForm])
+  }, [openAmmunitionConfiscationForm])
 
   const [openDialogAmmunitionConfiscation, setOpenDialogAmmunitionConfiscation] = useState(false);
   const handleOpenDialogAmmunitionConfiscation = () => {
@@ -39,10 +39,10 @@ export const useAmmunitionConfiscation = () => {
     } else {
       const ammunitionConfiscation = ammunitionConfiscations.find((row: AmmunitionConfiscation) => row.identificador === id);
       console.log(ammunitionConfiscations);
-      
+
       dispatch(onSetActiveAmmunitionConfiscation(ammunitionConfiscation as AmmunitionConfiscation))
     }
-  },[activeAmmunitionConfiscation,ammunitionConfiscations]);
+  }, [activeAmmunitionConfiscation, ammunitionConfiscations]);
 
   const onDeleteAmmunitionConfiscation = async () => {
     await dispatch(startDeleteAmmunitionConfiscation(activeAmmunitionConfiscation));

@@ -1,10 +1,11 @@
 import { Box, Fab } from "@mui/material"
 import AddIcon from '@mui/icons-material/Add';
+import { memo } from "react";
 
 interface AddFloatingButtonProps {
-    handleOpen: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    handleOpen: Function;
 }
-export const AddFloatingButton = ({ handleOpen }: AddFloatingButtonProps) => {
+export const AddFloatingButton = memo(({ handleOpen }: AddFloatingButtonProps) => {
     return (
         <Box
             sx={{
@@ -14,9 +15,9 @@ export const AddFloatingButton = ({ handleOpen }: AddFloatingButtonProps) => {
                 width: '100%'
             }}
         >
-            <Fab color="primary" aria-label="add" onClick={handleOpen}>
+            <Fab color="primary" aria-label="add" onClick={()=>handleOpen(true)}>
                 <AddIcon />
             </Fab>
         </Box>
     )
-}
+})

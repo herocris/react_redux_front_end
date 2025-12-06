@@ -1,5 +1,3 @@
-
-import { Theme } from '@mui/material/styles';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -36,7 +34,7 @@ interface MultiSelectProps {
     sizeSmall?: boolean
 }
 
-export const MultipleSelectButton = memo(({ name, label, options, control, defaultValues = [], multiple = false, error = false, errorMessage = '', sizeSmall = false }:MultiSelectProps) => {
+export const MultipleSelectButton = memo(({ name, label, options, control, multiple = false, error = false, errorMessage = '', sizeSmall = false }:MultiSelectProps) => {
     //const theme = useTheme();
     const selectValue = (field: ControllerRenderProps<FieldValues, string>) => {//formateando valor si es multiple o no
         console.log(field);
