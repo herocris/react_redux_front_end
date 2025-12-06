@@ -30,6 +30,7 @@ export const LoginView = () => {
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         onLogin(data);
     }
+    
     return (
         <AuthLayout title="Login">
             <form onSubmit={handleSubmit(onSubmit)} >
