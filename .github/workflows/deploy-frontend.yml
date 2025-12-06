@@ -12,45 +12,40 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Cache para node_modules (acelera muchísimo el pipeline )
+      # Cache npm
       - name: Cache node modules
         uses: actions/cache@v3
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('react-frontend-app/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
-      # Instalar dependencias en la carpeta frontend
+      # Instalar dependencias desde la raíz del repo
       - name: Install dependencies
-        working-directory: ./react-frontend-app
         run: npm ci
 
-      # # (OPCIONAL) Ejecutar tests si existe script "test"
+      # # Ejecutar tests si existen
       # - name: Run tests
-      #   working-directory: ./react-frontend-app
-      #   if: contains(steps.check_scripts.outputs.has_test, 'true')
       #   run: npm test -- --watch=false
+      #   continue-on-error: true # opcional si no tienes test
 
       # Build de producción
       - name: Build project
-        working-directory: ./react-frontend-app
         run: npm run build
 
-      # Crear archivo ZIP con el dist
+      # Crear ZIP del dist
       - name: Create deployment package
-        run: |
-          cd react-frontend-app
-          zip -r dist.zip dist
+        run: zip -r dist.zip dist
 
-      # Subir dist al droplet
+      # Subir dist.zip al droplet
       - name: Upload frontend package
         uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.DROPLET_HOST }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
-          source: "react-frontend-app/dist.zip"
+          source: "dist.zip"
           target: "/root/laravel_react_js_app"
 
       # Reemplazar dist en el servidor
@@ -70,5 +65,5 @@ jobs:
             unzip dist.zip -d react-frontend-app
             rm dist.zip
 
-            # reiniciar nginx (si estuviera en un contenedor)
+            # reiniciar nginx si está en docker
             docker compose restart nginx || true
