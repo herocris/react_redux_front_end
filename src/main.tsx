@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+//import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
 import { App } from './App'
@@ -11,7 +11,7 @@ import 'leaflet/dist/leaflet.css';
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
   <Provider store={store}>
-    <BrowserRouter>
+    <BrowserRouter basename="/"> 
       <App />
     </BrowserRouter>
   </Provider>
