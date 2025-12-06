@@ -3,8 +3,7 @@ import { RegisterView ,LoginView} from '../views';
 
 
 export const AuthRoutes = () => {
-  console.log('AuthRoutes');
-  
+
   return (
     <Routes>
         {/* <Route path='login' element={<LoginPage/>} /> */}
