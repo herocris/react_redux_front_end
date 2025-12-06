@@ -1,1 +1,1 @@
-export * from './ammunitionThunks'
+export * from './ammunitionConfiscationThunks'
