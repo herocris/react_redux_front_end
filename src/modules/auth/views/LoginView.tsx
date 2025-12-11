@@ -62,6 +62,8 @@ export const LoginView = () => {
                         <Typography component={Link} color='info' to="/auth/register">
                             Registrar
                         </Typography>
+                        <Typography sx={{ mr: 1 }}>Documentación de api backend:</Typography>
+                        <Typography component={Link} color='info' to="https://crisdemo.xyz/api/documentation">Documentation</Typography>
                     </Grid>
                 </Grid>
             </form>
