@@ -32,7 +32,7 @@ export const LoginView = () => {
     }
     
     return (
-        <AuthLayout title="Login">
+        <AuthLayout title="React Redux App">
             <form onSubmit={handleSubmit(onSubmit)} >
                 <Grid container>
                     <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
@@ -54,7 +54,7 @@ export const LoginView = () => {
                     </Typography>
                     <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 2, mt: 2 }}>
                         <Button variant='contained' fullWidth type="submit">
-                            Loginn
+                            Login with default user
                         </Button>
                     </Grid>
                     <Grid container direction='row' justifyContent='end'>
