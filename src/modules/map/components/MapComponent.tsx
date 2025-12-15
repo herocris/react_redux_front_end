@@ -3,10 +3,11 @@ import { Zoom, Box } from '@mui/material';
 import { MapComponentProps, MapItem, MarkerContent } from '../';
 import { HeatmapLayer } from 'react-leaflet-heatmap-layer-v3';
 import { Icon } from 'leaflet';
+import locationIcon from '/src/modules/map/icons/location_icon2.png';
 
 export const MapComponent = ({ Mapitems, typeMap, heightMap = "75vh" }: MapComponentProps) => {
   const customIcon = new Icon({
-    iconUrl: 'src/modules/map/icons/location_icon2.png',
+    iconUrl: locationIcon,
     iconSize: [40, 40],// Ancho, alto 
   });
   return (
