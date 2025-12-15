@@ -15,6 +15,10 @@ export const MapView = () => {
         setMapType, 
         getMapData
     } = useMap()
+
+    console.log(Mapitems);
+    console.log(typeMap);
+    
     return (
         <GrapLayout>
             <Grid container spacing={3}>

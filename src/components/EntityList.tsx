@@ -55,7 +55,7 @@ export const EntityList = memo(({
             style={{ transformOrigin: '1 0 0' }}
             {...{ timeout: 1000 }}
         >
-            <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', maxHeight: '60%' }} >
+            <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', maxHeight: '100%' }} >
 
                 <DataGrid
                     //disableAutosize ={true}
@@ -67,6 +67,7 @@ export const EntityList = memo(({
                     //     },
                     // }}
                     //apiRef={apiRef}
+                    density="compact"
                     rows={EntityCollection}
                     loading={loading}
                     columns={TableColumns}

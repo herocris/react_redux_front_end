@@ -101,7 +101,7 @@ export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection
                                         multiple={true}
                                         error={!!errors?.drugs}
                                         errorMessage={errors.drugs?.message}
-                                        sizeSmall={false}
+                                        sizeSmall={true}
                                     />
                                 }
                                 {weaponCollection.length > 0 &&
@@ -113,7 +113,7 @@ export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection
                                         multiple={true}
                                         error={!!errors?.weapons}
                                         errorMessage={errors.weapons?.message}
-                                        sizeSmall={false}
+                                        sizeSmall={true}
                                     />
                                 }
                                 {ammunitionCollection.length > 0 &&
@@ -125,7 +125,7 @@ export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection
                                         multiple={true}
                                         error={!!errors?.ammunitions}
                                         errorMessage={errors.ammunitions?.message}
-                                        sizeSmall={false}
+                                        sizeSmall={true}
                                     />
                                 }
                             </Grid>

@@ -14,6 +14,7 @@ export const GraphView = () => {
         setGraphType, 
         getGraphData 
     } = useGraph()
+    
     return (
         <GrapLayout>
             <Grid container spacing={3}>

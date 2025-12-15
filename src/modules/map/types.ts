@@ -41,6 +41,7 @@ export interface FormGraphProps {
 export interface MapComponentProps {
   Mapitems: MapItem[]
   typeMap: string
+  heightMap?: string
 }
 
 export interface MarkerContentProps {

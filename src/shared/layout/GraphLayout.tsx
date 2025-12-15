@@ -1,4 +1,4 @@
-import  {IconButton, styled,AppBar,Box,CssBaseline,Divider,Drawer,List,ListItem,ListItemButton,ListItemIcon,ListItemText,Toolbar,Typography} from '@mui/material';
+import { IconButton, styled, AppBar, Box, CssBaseline, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { ReactNode, useState } from 'react';
 import { AccountCircle, Logout, Person, RecentActors, Map, ContactEmergency, SignalCellularAlt, Inventory2, FormatListBulleted, HomeRepairServiceOutlined, Vaccines, AllInbox, Category } from '@mui/icons-material';
@@ -74,7 +74,9 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
 
     const drawer = (
         <div>
-            <Toolbar><AccountCircle sx={{ marginRight: '10px' }} fontSize="large" />{user.nombre}</Toolbar>
+            <Toolbar onClick={() => navigate('/dashboard')} sx={{ cursor: 'pointer', fontWeight: 'bold', fontSize: '1.2rem' }}>
+                <AccountCircle sx={{ marginRight: '10px' }} fontSize="large" />{user.nombre}
+            </Toolbar>
             <Divider />
             <List>
                 {authMenuOptions.map((opt, index) => (

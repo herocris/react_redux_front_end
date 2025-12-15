@@ -3,7 +3,7 @@ import { Zoom, Box } from '@mui/material';
 import { MapComponentProps, MapItem,MarkerContent } from '../';
 import { HeatmapLayer } from 'react-leaflet-heatmap-layer-v3';
 
-export const MapComponent = ({ Mapitems, typeMap }: MapComponentProps) => {
+export const MapComponent = ({ Mapitems, typeMap, heightMap="75vh" }: MapComponentProps) => {
   return (
     <>
       <Zoom in={true} style={{ transitionDelay: '150ms' }}  >
@@ -11,7 +11,7 @@ export const MapComponent = ({ Mapitems, typeMap }: MapComponentProps) => {
           <MapContainer
             center={[14.2654645, -86.5689548]}
             zoom={9}
-            style={{ height: '75vh', width: '100%' }}
+            style={{ height: heightMap, width: '100%' }}
           >
             {typeMap == 'hot' &&
               <HeatmapLayer

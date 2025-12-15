@@ -37,6 +37,7 @@ export const DatePickerField = React.memo(({
               textField: {
                 fullWidth: true,
                 error: !!error,
+                size: "small",
                 helperText: error?.message,
               },
             }}

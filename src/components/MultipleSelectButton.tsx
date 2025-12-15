@@ -44,7 +44,7 @@ export const MultipleSelectButton = memo(({ name, label, options, control, multi
 console.log('carga componente select',options);
 
     return (
-        <FormControl sx={{ mb: sizeSmall ? 1 : 2, width: '100%' }} error={error}>
+        <FormControl sx={{ mb: sizeSmall ? 0 : 2, width: '100%' }} error={error}>
             <InputLabel id={`${name}-label`}>{label}</InputLabel>
             <Controller
                 name={name}
