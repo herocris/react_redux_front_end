@@ -1,9 +1,14 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Zoom, Box } from '@mui/material';
-import { MapComponentProps, MapItem,MarkerContent } from '../';
+import { MapComponentProps, MapItem, MarkerContent } from '../';
 import { HeatmapLayer } from 'react-leaflet-heatmap-layer-v3';
+import { Icon } from 'leaflet';
 
-export const MapComponent = ({ Mapitems, typeMap, heightMap="75vh" }: MapComponentProps) => {
+export const MapComponent = ({ Mapitems, typeMap, heightMap = "75vh" }: MapComponentProps) => {
+  const customIcon = new Icon({
+    iconUrl: 'src/modules/map/icons/location_icon2.png',
+    iconSize: [40, 40],// Ancho, alto 
+  });
   return (
     <>
       <Zoom in={true} style={{ transitionDelay: '150ms' }}  >
@@ -32,7 +37,7 @@ export const MapComponent = ({ Mapitems, typeMap, heightMap="75vh" }: MapCompone
             />
             {typeMap == 'location' &&
               Mapitems?.map((marker, index) => (
-                <Marker key={index} position={[marker.latitud, marker.longitud]}>
+                <Marker key={index} position={[marker.latitud, marker.longitud]} icon={customIcon}>
                   <Popup>
                     <MarkerContent marker={marker} />
                   </Popup>
