@@ -1,4 +1,4 @@
-import { IconButton, styled, AppBar, Box, CssBaseline, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
+import { IconButton, styled, AppBar, Box, CssBaseline, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography, Link } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { ReactNode, useState } from 'react';
 import { AccountCircle, Logout, Person, RecentActors, Map, ContactEmergency, SignalCellularAlt, Inventory2, FormatListBulleted, HomeRepairServiceOutlined, Vaccines, AllInbox, Category } from '@mui/icons-material';
@@ -145,6 +145,17 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         Responsive drawer
                     </Typography>
+                    <Link
+                        href="https://github.com/herocris/react_redux_front_end"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        underline="hover"
+                        variant="h6"
+                        color="inherit"
+                        sx={{ flexGrow: 1 }}
+                    >
+                        Repo: https://github.com/herocris/react_redux_front_end
+                    </Link>
                     <IconButton
                         sx={{ ml: 1 }}
                         onClick={toggleMode}
