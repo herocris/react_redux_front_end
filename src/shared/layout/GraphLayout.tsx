@@ -1,4 +1,4 @@
-import { IconButton, styled, AppBar, Box, CssBaseline, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography, Link } from '@mui/material';
+import { IconButton, styled, AppBar, Box, CssBaseline, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Link } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { ReactNode, useState } from 'react';
 import { AccountCircle, Logout, Person, RecentActors, Map, ContactEmergency, SignalCellularAlt, Inventory2, FormatListBulleted, HomeRepairServiceOutlined, Vaccines, AllInbox, Category } from '@mui/icons-material';
@@ -144,7 +144,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                     >
                         <MenuIcon />
                     </IconButton>
-                    
+
                     <Link
                         href="https://github.com/herocris/react_redux_front_end"
                         target="_blank"
