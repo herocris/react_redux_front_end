@@ -144,6 +144,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                     >
                         <MenuIcon />
                     </IconButton>
+                    
                     <Link
                         href="https://github.com/herocris/react_redux_front_end"
                         target="_blank"
