@@ -57,13 +57,13 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
         { name: 'Users', url: '/user', icon: <Person /> },
         { name: 'Roles', url: '/rol', icon: <RecentActors /> },
         { name: 'Permission', url: '/permiso', icon: <ContactEmergency /> },
-        { name: 'Activities', url: '/actividad', icon: <FormatListBulleted /> }
+        { name: 'Event logs', url: '/actividad', icon: <FormatListBulleted /> }
     ]
     const menuOptions = [
         { name: 'Ammunitions', url: '/ammunition', icon: <HomeRepairServiceOutlined /> },
         { name: 'Drug', url: '/drug', icon: <Vaccines /> },
         { name: 'Weapon', url: '/weapon', icon: <AllInbox /> },
-        { name: 'DrugPresentations', url: '/drugPresentation', icon: <Category /> },
+        { name: 'Drug presentations', url: '/drugPresentation', icon: <Category /> },
         { name: 'Confiscations', url: '/confiscation', icon: <Inventory2 /> },
 
     ]
@@ -77,6 +77,19 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
             <Toolbar onClick={() => navigate('/dashboard')} sx={{ cursor: 'pointer', fontWeight: 'bold', fontSize: '1.2rem' }}>
                 <AccountCircle sx={{ marginRight: '10px' }} fontSize="large" />{user.nombre}
             </Toolbar>
+            <Divider />
+            <List>
+                {displayMenuOptions.map((opt, index) => (
+                    <ListItem key={index} disablePadding >
+                        <ListItemButton onClick={() => navigate(opt.url)} selected={pathname == opt.url}>
+                            <ListItemIcon>
+                                {opt.icon}
+                            </ListItemIcon>
+                            <ListItemText primary={opt.name} />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
+            </List>
             <Divider />
             <List>
                 {authMenuOptions.map((opt, index) => (
@@ -104,18 +117,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                 ))}
             </List>
             <Divider />
-            <List>
-                {displayMenuOptions.map((opt, index) => (
-                    <ListItem key={index} disablePadding >
-                        <ListItemButton onClick={() => navigate(opt.url)} selected={pathname == opt.url}>
-                            <ListItemIcon>
-                                {opt.icon}
-                            </ListItemIcon>
-                            <ListItemText primary={opt.name} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
-            </List>
+            
         </div>
     );
 

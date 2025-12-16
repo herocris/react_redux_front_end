@@ -20,19 +20,6 @@ export const DashBoardView = () => {
   return (
     <>
       <GrapLayout>
-        <Typography variant='h4' sx={{ mb: 3 }}>Demo Dashboard</Typography>
-        <Typography variant='h5' sx={{ mb: 3 }}>Material UI DataGrid</Typography>
-        <EntityList
-          handleOpen={() => { }}
-          handleOpenDialog={() => { }}
-          LoadingEntities={LoadingEntities}
-          setIdEntity={() => { }}
-          EntityCollection={drugs}
-          tableOptions={tableOptions}
-          loading={loading}
-          columnsTable={columnsTable}
-          editable={false}
-        />
         <Typography variant='h5' sx={{ mb: 3,mt: 3 }}>Rechart Charts</Typography>
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, md: 12, lg: 6 }}>
@@ -52,6 +39,20 @@ export const DashBoardView = () => {
             <MapComponent Mapitems={Mapitems} typeMap='hot' heightMap="50vh" />
           </Grid>
         </Grid>
+        <Typography variant='h4' sx={{ mb: 3 }}>Demo Dashboard</Typography>
+        <Typography variant='h5' sx={{ mb: 3 }}>Material UI DataGrid</Typography>
+        <EntityList
+          handleOpen={() => { }}
+          handleOpenDialog={() => { }}
+          LoadingEntities={LoadingEntities}
+          setIdEntity={() => { }}
+          EntityCollection={drugs}
+          tableOptions={tableOptions}
+          loading={loading}
+          columnsTable={columnsTable}
+          editable={false}
+        />
+        
       </GrapLayout>
     </>
   )
