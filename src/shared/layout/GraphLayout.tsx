@@ -144,9 +144,6 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        Responsive drawer
-                    </Typography>
                     <Link
                         href="https://github.com/herocris/react_redux_front_end"
                         target="_blank"
