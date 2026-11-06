@@ -1,19 +1,12 @@
-//import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './styles.css'
-import { App } from './App'
-import { BrowserRouter } from 'react-router'
-import { Provider } from 'react-redux'
-import { store } from './store'
-import 'leaflet/dist/leaflet.css';
+// Register before importing any module that loads React or React DOM.
+async function bootstrap() {
+  if (import.meta.env.DEV) {
+    await import('react-devtools-cdt-mcp/register')
+  }
 
+  await import('./bootstrap')
+}
 
-createRoot(document.getElementById('root')!).render(
-  // <StrictMode>
-  <Provider store={store}>
-    <BrowserRouter basename="/"> 
-      <App />
-    </BrowserRouter>
-  </Provider>
-  // </StrictMode>,
-)
+void bootstrap().catch((error: unknown) => {
+  console.error('No se pudo iniciar la aplicación', error)
+})

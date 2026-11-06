@@ -1,0 +1,14 @@
+# Codex carga esta configuración solo en proyectos de confianza.
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
+startup_timeout_sec = 60
+
+[mcp_servers.chrome_devtools]
+command = "node"
+args = ["scripts/run-mcp.mjs", "chrome_devtools"]
+startup_timeout_sec = 120
+
+[mcp_servers.playwright]
+command = "node"
+args = ["scripts/run-mcp.mjs", "playwright"]
+startup_timeout_sec = 120

@@ -1,0 +1,18 @@
+{
+  "servers": {
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "chrome_devtools": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${workspaceFolder}/scripts/run-mcp.mjs", "chrome_devtools"]
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${workspaceFolder}/scripts/run-mcp.mjs", "playwright"]
+    }
+  }
+}
