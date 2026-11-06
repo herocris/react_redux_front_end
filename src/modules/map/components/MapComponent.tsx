@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Zoom, Box } from '@mui/material';
 import { MapComponentProps, MapItem, MarkerContent } from '../';
-import { HeatmapLayer } from 'react-leaflet-heatmap-layer-v3';
+import { HeatmapLayer } from './HeatmapLayer';
 import { Icon } from 'leaflet';
 import locationIcon from '/src/modules/map/icons/location_icon2.png';
 
@@ -21,15 +21,10 @@ export const MapComponent = ({ Mapitems, typeMap, heightMap = "75vh" }: MapCompo
           >
             {typeMap == 'hot' &&
               <HeatmapLayer
-                // fitBoundsOnLoad
-                fitBoundsOnUpdate
                 points={Mapitems.map((ite: MapItem) => {
                   return { lat: ite.latitud, lng: ite.longitud, intensity: 0.9 }
                 })
                 }
-                longitudeExtractor={(p: any) => p.lng}
-                latitudeExtractor={(p: any) => p.lat}
-                intensityExtractor={(p: any) => p.intensity}
               />
             }
             <TileLayer
