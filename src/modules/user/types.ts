@@ -1,3 +1,4 @@
+import type { ApiErrorMessage } from '../../api/apiErrors';
 import { SelectOptions, TableOptions } from "../../shared/interfaces/sharedInterfaces";
 import { Permission } from "../permission";
 import { Role } from "../rol";
@@ -19,7 +20,7 @@ export interface UserFormModalProps {
     loading: boolean
     activeUser: User
     onSaveOrUptdate: Function
-    errorMessage: object | string
+    errorMessage: ApiErrorMessage
 }
 
 export interface UserState {
@@ -27,7 +28,7 @@ export interface UserState {
     activeUser: User,
     tableOptions: TableOptions,
     loading: boolean
-    errorMessage: object
+    errorMessage: ApiErrorMessage
 }
 
 export interface userUseForm {

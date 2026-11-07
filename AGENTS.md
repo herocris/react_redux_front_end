@@ -43,6 +43,9 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
   para operaciones asíncronas; slices para transiciones de estado.
 - Usar hooks Redux tipados y el cliente HTTP compartido. Preservar campos,
   endpoints y tratamiento de credenciales del backend.
+- El interceptor conserva los rechazos y entrega el cuerpo del error HTTP cuando
+  existe. Usar `src/api/apiErrors.ts` para mensajes de UI; los thunks que rechazan
+  conservan la causa y sus consumidores manejan el rechazo sin cerrar por éxito.
 - Tipar props, formularios y respuestas; preferir `unknown` y narrowing a `any`.
 - Mantener carga, éxito, error y vacío coherentes, también ante fallos. Evitar
   peticiones duplicadas y actualizaciones obsoletas.
@@ -62,8 +65,8 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
 - `npm ci`: instalación; `npm run dev`: desarrollo; `npm run lint`: ESLint;
   `npm run build`: TypeScript y build; `npm run preview`: revisar producción.
   En PowerShell usar `npm.cmd` si se bloquea el archivo `.ps1`.
-- No hay script de tests actualmente. Añadir pruebas de comportamiento cuando la
-  complejidad lo justifique; no afirmar que existen comprobaciones inexistentes.
+- `npm test`: pruebas de comportamiento con Node y el cargador SSR de Vite, sin
+  backend real. Añadir cobertura cuando la complejidad del cambio lo justifique.
 - Para cambios de código ejecutar lint y build. Distinguir fallos previos de los
   introducidos y describir las comprobaciones pendientes.
 - Verificar cambios visuales y flujos con Playwright MCP, consola y red. Usar

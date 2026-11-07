@@ -28,27 +28,31 @@ export const useUserView = () => {
   };
 
   const DeleteUser = async () => {
-    await dispatch(startDeleteUser(activeUser));
-    setOpenDialog(!openDialog);
+    try {
+      await dispatch(startDeleteUser(activeUser));
+      setOpenDialog(false);
+    } catch {
+      // El thunk ya publicó el error; se conserva el diálogo para reintentar.
+    }
   }
 
   const onSaveOrUptdate = async (user: User) => {
-    console.log(user);
-    if (activeUser.id === undefined) {
-      await dispatch(startSaveUser(user)).then(() => {
-        handleOpen(false)
-      })
-    } else {
-      await dispatch(startUpdateUser({ ...user, id: activeUser.id })).then(() => {
-        handleOpen(false)
-      })
+    try {
+      if (activeUser.id === undefined) {
+        await dispatch(startSaveUser(user));
+      } else {
+        await dispatch(startUpdateUser({ ...user, id: activeUser.id }));
+      }
+      handleOpen(false);
+    } catch {
+      // El thunk ya publicó el error; se conserva el formulario.
     }
   }
 
   useEffect(() => {
     dispatch(startLoadingRoles());
     dispatch(startLoadingPermissions());
-  }, [])
+  }, [dispatch])
 
   const LoadingEntities = (
     page: number,
@@ -58,7 +62,9 @@ export const useUserView = () => {
     filterField: string,
     filterValue: string
   ) => {
-    dispatch(startLoadingUsers(page, sortBy, sortType, pageSize, filterField, filterValue))
+    void dispatch(startLoadingUsers(page, sortBy, sortType, pageSize, filterField, filterValue)).catch(() => {
+      // El error está disponible en el estado del módulo.
+    });
   }
 
   const columnsTable = ['id', 'nombre', 'correo']

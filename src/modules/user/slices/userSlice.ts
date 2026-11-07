@@ -1,3 +1,4 @@
+import type { ApiErrorMessage } from '../../../api/apiErrors';
 import { createSlice,PayloadAction } from '@reduxjs/toolkit'
 import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
 import { User, UserState } from '../types';
@@ -40,7 +41,7 @@ export const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        onSetErrorMessage: (state, { payload }: PayloadAction<object>) => {
+        onSetErrorMessage: (state, { payload }: PayloadAction<ApiErrorMessage>) => {
             state.errorMessage = payload;
         },
         onClearErrorMessage: (state) => {

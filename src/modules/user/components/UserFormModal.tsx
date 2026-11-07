@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import Grid from '@mui/material/Grid2';
-import { Box, Button, TextField, Typography, Zoom, Modal } from '@mui/material';
+import { Alert, Box, Button, TextField, Typography, Zoom, Modal } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -41,11 +41,11 @@ export const UserFormModal = ({
         if (typeof errorMessage === 'object') {
             for (const formValue of Object.keys(errorMessage)) {
                 setError(formValue as keyof FormFields, {
-                    message: (errorMessage as Record<string, string[]>)[formValue].toString()
+                    message: errorMessage[formValue].toString()
                 });
             }
         }
-    }, [errorMessage]);
+    }, [errorMessage, setError]);
 
 
     return (
@@ -62,6 +62,7 @@ export const UserFormModal = ({
                 <Box sx={boxStyleFormModal}>
                     <Typography variant='h5' sx={{ mb: 1 }}>{activeUser.id ? 'Editar Usuario' : 'Crear Usuario'}</Typography>
                     <form onSubmit={handleSubmit(onSubmit)}>
+                        {typeof errorMessage === 'string' && <Alert severity="error">{errorMessage}</Alert>}
                         <Zoom in={true} style={{ transitionDelay: '150ms' }}>
                             <Grid container>
                                 <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>

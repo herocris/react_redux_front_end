@@ -58,7 +58,8 @@ para autenticación en otros clientes. No sustituir el endpoint por claves en UR
   DevTools MCP, configurado con `--category-experimental-third-party`.
 - Chrome DevTools y Playwright abren perfiles independientes: no comparten
   automáticamente el login del navegador habitual ni sus sesiones entre sí.
-- Validar con `npm run lint` y `npm run build`. No existe script de tests aún.
+- Validar con `npm run lint`, `npm run build` y `npm test`. Las pruebas de errores
+  HTTP usan un transporte simulado y no necesitan acceso al backend.
 - No confundir configuración con conexión: comprobar los servidores después de
   reiniciar el cliente y verificar los flujos con el backend disponible.
 - Para actualizar las skills, revisar cambios y ejecutar desde la raíz:

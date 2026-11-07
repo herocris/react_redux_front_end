@@ -1,3 +1,4 @@
+import { Alert } from '@mui/material';
 
 
 import { useUserView } from "../hooks";
@@ -28,6 +29,7 @@ export const UserView = () => {
   return (
     <>
       <GrapLayout>
+        {!open && typeof errorMessage === 'string' && <Alert severity="error">{errorMessage}</Alert>}
         <EntityList
           handleOpen={handleOpen}
           handleOpenDialog={handleOpenDialog}
@@ -50,7 +52,7 @@ export const UserView = () => {
         {openDialog &&
           <AlertDialog
             title='Borrar'
-            dialogMessage="Deseas borrar el usuario?"
+            dialogMessage={typeof errorMessage === 'string' ? `Deseas borrar el usuario? ${errorMessage}` : 'Deseas borrar el usuario?'}
             DeleteEntity={DeleteUser}
             handleOpen={handleOpenDialog} />
         }

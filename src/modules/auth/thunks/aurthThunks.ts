@@ -1,3 +1,4 @@
+import { getApiErrorText } from '../../../api/apiErrors';
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
 import { onChecking, onLogin, onLogout, clearErrorMessage } from '../slices';
@@ -15,9 +16,9 @@ export const startCreatingUserWithEmailPassword = ({ name, email, password }: Re
         try {
             const { data } = await calendarApi.post('/register', { name, email, password });
             dispatch(onLogin(data.user));
-        } catch (error: any) {
+        } catch (error) {
             console.log(error);
-            const errorMessage = error?.error?.email ?? ''
+            const errorMessage = getApiErrorText(error);
             dispatch(onLogout(errorMessage));
             setTimeout(() => {
                 dispatch(clearErrorMessage());
@@ -39,10 +40,10 @@ export const startLoginWithEmailPassword = ({ email, password }: LoginData) => {
                 roles: data.roles,
                 permisos: data.permissions,
             }));
-        } catch (error: any) {
+        } catch (error) {
             console.log(error);
             
-            dispatch(onLogout(error.error));
+            dispatch(onLogout(getApiErrorText(error)));
             setTimeout(() => {
                 dispatch(clearErrorMessage());
             }, 4000);
