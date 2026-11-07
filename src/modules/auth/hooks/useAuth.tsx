@@ -8,10 +8,10 @@ export const useAuth = () => {
     const dispatch = useAppDispatch();
     
     const onLogin = async (data:LoginData)=>{
-        dispatch(startLoginWithEmailPassword(data));
+        await dispatch(startLoginWithEmailPassword(data));
     }
     const onRegister = async (data:RegisterData)=>{
-        dispatch(startCreatingUserWithEmailPassword(data));
+        await dispatch(startCreatingUserWithEmailPassword(data));
     }
     return {
         onLogin,

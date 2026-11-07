@@ -110,4 +110,26 @@ test('errores HTTP y thunks con el cliente real y un transporte simulado', async
             }
         }
     });
+
+    await t.test('login y registro mantienen la ruta pública durante la petición y autentican al terminar', async () => {
+        for (const thunk of [
+            auth.startLoginWithEmailPassword({ email: user.correo, password: 'test' }),
+            auth.startCreatingUserWithEmailPassword({ name: user.nombre, email: user.correo, password: 'test' }),
+        ]) {
+            const store = configureStore({ reducer: authSlice.reducer });
+            store.dispatch(authSlice.actions.onLogout());
+            let finish;
+            api.defaults.adapter = config => new Promise(resolve => {
+                finish = () => resolve({ data: { user: { name: user.nombre, email: user.correo }, roles: [], permissions: [] },
+                    status: 200, statusText: 'OK', headers: {}, config });
+            });
+            const request = store.dispatch(thunk);
+            await Promise.resolve();
+            await Promise.resolve();
+            assert.equal(store.getState().status, 'not-authenticated');
+            finish();
+            await request;
+            assert.equal(store.getState().status, 'authenticated');
+        }
+    });
 });

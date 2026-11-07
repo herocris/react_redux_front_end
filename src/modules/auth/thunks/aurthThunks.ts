@@ -12,7 +12,7 @@ export const checkingAuthentication = () => {
 
 export const startCreatingUserWithEmailPassword = ({ name, email, password }: RegisterData) => {
     return async (dispatch: Dispatch) => {
-        dispatch(onChecking());
+        dispatch(clearErrorMessage());
         try {
             const { data } = await calendarApi.post('/register', { name, email, password });
             dispatch(onLogin(data.user));
@@ -30,7 +30,7 @@ export const startCreatingUserWithEmailPassword = ({ name, email, password }: Re
 
 export const startLoginWithEmailPassword = ({ email, password }: LoginData) => {
     return async (dispatch: Dispatch) => {
-        dispatch(onChecking());
+        dispatch(clearErrorMessage());
         try {
             const { data } = await calendarApi.post('/login', { email, password });
             //localStorage.setItem('token', data.access_token);

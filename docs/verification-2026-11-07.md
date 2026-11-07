@@ -118,5 +118,6 @@ y volvieron a pasar sin excepciones no controladas. Se regeneró la caché de Vi
 antes de las pruebas para evitar el resolver antiguo precargado.
 
 El fallo de validación local descrito en el hallazgo inicial queda corregido.
-La pérdida de valores del registro al pasar por `checking` sigue pendiente; es
-un problema independiente del router y no se modificó en este bloque.
+La pérdida de valores del registro al pasar por `checking` quedó pendiente al
+cerrar este bloque. Se corrigió después, como se documenta en
+[Autenticación y carga de listados](verification-auth-lists-2026-11-07.md).

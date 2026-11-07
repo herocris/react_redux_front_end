@@ -13,7 +13,7 @@ import { useAuth } from '../hooks';
 
 type FormFields = z.infer<typeof authLoginSchema>;
 export const LoginView = () => {
-    const [defaultValue, _setdefaultValue] = useState({
+    const [defaultValue] = useState({
         email: 'cris_itg@yahoo.es',
         password: 'password'
     })
@@ -22,18 +22,19 @@ export const LoginView = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors, },
+        formState: { errors, isSubmitting },
     } = useForm<FormFields>({
         defaultValues: defaultValue, resolver: zodResolver(authLoginSchema)
     });
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
-        onLogin(data);
+        await onLogin(data);
     }
     
     return (
         <AuthLayout title="React Redux App">
-            <form onSubmit={handleSubmit(onSubmit)} >
+            <form onSubmit={handleSubmit(onSubmit)} aria-busy={isSubmitting}>
+                <fieldset disabled={isSubmitting} aria-label="Acceso" style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
                 <Grid container>
                     <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
                         <TextField
@@ -50,10 +51,10 @@ export const LoginView = () => {
                         <PasswordField name='password' register={register} errorMessage={errors.password?.message} hasError={!!errors.password} />
                     </Grid>
                     <Typography color="error" variant="h6">
-                        {errorMessage as String}
+                        {typeof errorMessage === 'string' ? errorMessage : undefined}
                     </Typography>
                     <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 2, mt: 2 }}>
-                        <Button variant='contained' fullWidth type="submit">
+                        <Button variant='contained' fullWidth type="submit" loading={isSubmitting}>
                             Login
                         </Button>
                     </Grid>
@@ -67,6 +68,7 @@ export const LoginView = () => {
                         {/* <Typography component={Link} color='info' to="https://crisdemo.xyz/api/documentation">Documentation</Typography> */}
                     </Grid>
                 </Grid>
+                </fieldset>
             </form>
         </AuthLayout>
     )

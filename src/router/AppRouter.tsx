@@ -24,7 +24,7 @@ export const AppRouter = () => {
     const dispatch = useAppDispatch();
     useEffect(() => {
         dispatch(checkAuthToken())
-    }, [])
+    }, [dispatch])
 
 
 

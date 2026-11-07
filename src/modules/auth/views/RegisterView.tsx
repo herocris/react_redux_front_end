@@ -23,17 +23,18 @@ export const RegisterView = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors, },
+        formState: { errors, isSubmitting },
     } = useForm<FormFields>({
         defaultValues: formData, resolver: zodResolver(authRegisterSchema)
     });
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
-        onRegister(data);
+        await onRegister(data);
     }
     return (
         <AuthLayout title="Register">
-            <form onSubmit={handleSubmit(onSubmit)} >
+            <form onSubmit={handleSubmit(onSubmit)} aria-busy={isSubmitting}>
+                <fieldset disabled={isSubmitting} aria-label="Registro" style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
                 <Grid container>
                     <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
                         <TextField
@@ -66,7 +67,7 @@ export const RegisterView = () => {
                         {typeof errorMessage === 'string' ? errorMessage : undefined}
                     </Typography>
                     <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 2, mt: 2 }}>
-                        <Button variant='contained' fullWidth type="submit">
+                        <Button variant='contained' fullWidth type="submit" loading={isSubmitting}>
                             Login
                         </Button>
                     </Grid>
@@ -77,6 +78,7 @@ export const RegisterView = () => {
                         </Typography>
                     </Grid>
                 </Grid>
+                </fieldset>
             </form>
         </AuthLayout>
     )
