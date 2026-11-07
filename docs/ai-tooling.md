@@ -18,7 +18,7 @@
 
 1. Instalar Node.js compatible con el campo `engines` de Vite y los MCP
    (recomendado Node 22.12+ dentro de la rama 22 o una LTS posterior compatible),
-   npm y Google Chrome. Las versiones efectivas están en el lockfile.
+   npm y Google Chrome o Brave. Las versiones efectivas están en el lockfile.
 2. Clonar el repo, ejecutar `npm ci` y configurar localmente `VITE_API_URL` en
    `.env` para apuntar al backend. No guardar credenciales en Git.
 3. Abrir el repositorio como carpeta raíz en Codex y marcarlo como proyecto de
@@ -35,6 +35,22 @@ En PowerShell usar `npm.cmd` y `npx.cmd` si la política de scripts bloquea `.ps
 Los MCP locales se descargan con `npx` en el primer arranque de cada equipo:
 necesitan red y permisos para la caché de npm. No se instalan globalmente ni se
 añaden a las dependencias de la aplicación.
+
+### Brave en Windows
+
+El lanzador detecta Brave en
+`C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe`.
+Si existe, Chrome DevTools MCP lo recibe con `--executablePath` y Playwright MCP
+con `--executable-path`; en otros equipos se conserva la búsqueda de Chrome.
+Ambos usan `--isolated` para crear perfiles de pruebas temporales, sin utilizar
+el perfil personal de Brave. No hace falta instalar Chrome en esta configuración.
+En Windows se invoca `npx-cli.js` con Node para conservar completa la ruta con
+espacios; no se interpone `cmd.exe` ni se añaden comillas al argumento de la ruta.
+
+Después de modificar el lanzador, reiniciar ambos servidores MCP o la sesión de
+Codex y comprobar que abren Brave. Los procesos ya iniciados conservan los
+argumentos anteriores. La detección del ejecutable no garantiza por sí sola que
+las herramientas React experimentales funcionen con Brave.
 
 ## Context7 y credenciales
 
