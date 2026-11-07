@@ -41,6 +41,8 @@ export const RegisterView = () => {
                             placeholder='nombre'
                             fullWidth
                             {...register("name")}
+                            error={!!errors.name}
+                            helperText={errors.name?.message}
                         />
                     </Grid>
                     <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
@@ -50,6 +52,8 @@ export const RegisterView = () => {
                             placeholder='correo@google.com'
                             fullWidth
                             {...register("email")}
+                            error={!!errors.email}
+                            helperText={errors.email?.message}
                         />
                     </Grid>
                     <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
@@ -59,7 +63,7 @@ export const RegisterView = () => {
                         <PasswordField name='passwordConfirmation' register={register} errorMessage={errors.passwordConfirmation?.message} hasError={!!errors.passwordConfirmation} />
                     </Grid>
                     <Typography color="error" variant="h6">
-                        {errorMessage as String}
+                        {typeof errorMessage === 'string' ? errorMessage : undefined}
                     </Typography>
                     <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 2, mt: 2 }}>
                         <Button variant='contained' fullWidth type="submit">

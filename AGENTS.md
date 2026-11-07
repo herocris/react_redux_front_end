@@ -47,6 +47,8 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
   existe. Usar `src/api/apiErrors.ts` para mensajes de UI; los thunks que rechazan
   conservan la causa y sus consumidores manejan el rechazo sin cerrar por éxito.
 - Tipar props, formularios y respuestas; preferir `unknown` y narrowing a `any`.
+- Si un esquema transforma valores, distinguir `z.input` de `z.output` en los
+  genéricos de `useForm`; el submit recibe los valores ya validados y convertidos.
 - Mantener carga, éxito, error y vacío coherentes, también ante fallos. Evitar
   peticiones duplicadas y actualizaciones obsoletas.
 - Efectos para sincronización externa, con dependencias correctas y limpieza.

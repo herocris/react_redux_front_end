@@ -9,13 +9,14 @@ import { weaponConfiscationSchema } from '../validators';
 import { WeaponConfiscationFormProps } from '../';
 
 type FormFields = z.infer<typeof weaponConfiscationSchema>;
+type FormInput = z.input<typeof weaponConfiscationSchema>;
 export const WeaponConfiscationForm = ({ activeWeaponConfiscation, handleOpen, onSaveOrUptdate, weaponCollection, handleOpenDialog }: WeaponConfiscationFormProps) => {
     const {
         register,
         handleSubmit,
         formState: { errors, },
         control
-    } = useForm<FormFields>({
+    } = useForm<FormInput, unknown, FormFields>({
         defaultValues: { ...activeWeaponConfiscation, identificador: activeWeaponConfiscation.identificador?.toString() },
         resolver: zodResolver(weaponConfiscationSchema)
     });

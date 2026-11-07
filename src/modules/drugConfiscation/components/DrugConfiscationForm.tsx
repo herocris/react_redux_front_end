@@ -10,6 +10,7 @@ import { memo } from 'react';
 import { DrugConfiscationFormProps } from '../';
 
 type FormFields = z.infer<typeof drugConfiscationSchema>;
+type FormInput = z.input<typeof drugConfiscationSchema>;
 
 export const DrugConfiscationForm = memo(({ activeDrugConfiscation, handleOpen, onSaveOrUptdate, drugCollection, drugPresentationCollection, handleOpenDialog }: DrugConfiscationFormProps) => {
     const {
@@ -17,7 +18,7 @@ export const DrugConfiscationForm = memo(({ activeDrugConfiscation, handleOpen, 
         handleSubmit,
         formState: { errors, },
         control
-    } = useForm<FormFields>({
+    } = useForm<FormInput, unknown, FormFields>({
         defaultValues: { ...activeDrugConfiscation, identificador: activeDrugConfiscation.identificador?.toString() },
         resolver: zodResolver(drugConfiscationSchema)
     });

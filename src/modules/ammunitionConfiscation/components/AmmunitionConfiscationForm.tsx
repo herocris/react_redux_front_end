@@ -9,6 +9,7 @@ import { ammunitionConfiscationSchema } from '../validators';
 import { AmmunitionConfiscationFormProps } from '../';
 
 type FormFields = z.infer<typeof ammunitionConfiscationSchema>;
+type FormInput = z.input<typeof ammunitionConfiscationSchema>;
 
 export const AmmunitionConfiscationForm = ({ activeAmmunitionConfiscation, handleOpen, onSaveOrUptdate, ammunitionCollection, handleOpenDialog }: AmmunitionConfiscationFormProps) => {
     const {
@@ -16,7 +17,7 @@ export const AmmunitionConfiscationForm = ({ activeAmmunitionConfiscation, handl
         handleSubmit,
         formState: { errors, },
         control
-    } = useForm<FormFields>({
+    } = useForm<FormInput, unknown, FormFields>({
         defaultValues: { ...activeAmmunitionConfiscation, identificador: activeAmmunitionConfiscation.identificador?.toString() },
         resolver: zodResolver(ammunitionConfiscationSchema)
     });

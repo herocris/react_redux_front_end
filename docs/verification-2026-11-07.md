@@ -85,3 +85,38 @@ comprobó una descarga real de imágenes existentes del backend.
 La inspección visual se complementó con captura del formulario de registro y
 las comprobaciones DOM de los recorridos. No constituye una auditoría general
 de accesibilidad ni de diseño adaptable.
+
+## Tercer bloque: compatibilidad de validación corregida
+
+Se actualizó `@hookform/resolvers` de 4.1.3 a 5.9.2 y React Hook Form de 7.54.2
+a 7.55.0, mínimo requerido por el nuevo resolver. Zod permanece en 4.6.7.
+Context7 cubre el resolver 5.9.2 y se verificaron los requisitos de versiones en
+npm. El lockfile recoge las dos actualizaciones y la reorganización de
+dependencias transitivas que realiza npm; no cambian endpoints ni esquemas.
+
+Los formularios de decomisos de drogas, armas y municiones declaran por separado
+entrada y salida del esquema en `useForm`, de modo que el submit sigue recibiendo
+números tras las coerciones. El registro presenta ahora también los errores de
+nombre y correo mediante los `helperText` de MUI.
+
+`tests/form-validation.test.mjs` reprodujo el fallo con las versiones anteriores:
+tres subcasos de datos inválidos lanzaban `ZodError`; los datos válidos pasaban.
+Con las versiones nuevas pasan los seis subcasos de validación, que incluyen
+contraseñas distintas, entradas numéricas de texto, conservación de fotos y
+formateo de fechas. Junto a las comprobaciones de errores HTTP, `npm test`
+informa 13 pruebas satisfactorias, contando los grupos padre.
+
+En Brave con Playwright MCP se verificaron además estos cuatro recorridos:
+
+- Registro vacío: los cuatro mensajes de campo son visibles.
+- Contraseñas diferentes: error asociado a la confirmación.
+- Corrección del registro: alcanza el servidor simulado.
+- Login vacío: errores visibles sin excepción no controlada.
+
+Los 17 recorridos de regresión anteriores se repitieron con las nuevas versiones
+y volvieron a pasar sin excepciones no controladas. Se regeneró la caché de Vite
+antes de las pruebas para evitar el resolver antiguo precargado.
+
+El fallo de validación local descrito en el hallazgo inicial queda corregido.
+La pérdida de valores del registro al pasar por `checking` sigue pendiente; es
+un problema independiente del router y no se modificó en este bloque.
