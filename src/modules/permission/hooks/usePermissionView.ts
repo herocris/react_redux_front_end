@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from 'react';
 import { clearActivePermission, onSetActivePermission } from "../slices";
 import {startDeletePermission, startLoadingPermissions, startSavePermission, startUpdatePermission } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
@@ -44,16 +44,20 @@ export const usePermissionView = () => {
   }
 
 
-  const LoadingEntities = (
+  const LoadingEntities = useCallback((
     page: number,
     sortBy: string,
     sortType: string,
     pageSize: number,
     filterField: string,
-    filterValue: string
+    filterValue: string,
+    signal?: AbortSignal
   ) => {
-    dispatch(startLoadingPermissions(page, sortBy, sortType, pageSize, filterField, filterValue))
-  }
+    return dispatch(startLoadingPermissions(page, sortBy, sortType, pageSize, filterField, filterValue, signal))
+      .catch(() => {
+        // The thunk records errors in the module state.
+      });
+  }, [dispatch]);
 
   const columnsTable = ['id', 'nombre']
 

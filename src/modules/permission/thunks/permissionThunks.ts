@@ -1,15 +1,20 @@
+import { createLatestListRequest } from '../../../api/latestListRequest';
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
 import { Permission } from '../';
 import { onAddNewPermission, onDeletePermission, onLoading, onSetErrorMessage, onSetTableOptions, onUpdatePermission, setPermissions } from '../slices';
 
 
-export const startLoadingPermissions = (page: number, sortBy: string, orderType: string, per_page: number, search_by: string, valueSearch: string) => {
+const beginListRequest = createLatestListRequest();
+
+export const startLoadingPermissions = (page: number, sortBy: string, orderType: string, per_page: number, search_by: string, valueSearch: string, signal?: AbortSignal) => {
     return async (dispatch: Dispatch) => {
+        const request = beginListRequest(dispatch, signal);
         dispatch(onLoading(true));
         sortBy = sortBy === 'id' ? 'identificador' : sortBy;
         try {
-            const { data: { data, ...optionsTable } } = await calendarApi.get(`/permission?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`);
+            const { data: { data, ...optionsTable } } = await calendarApi.get(`/permission?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
+            if (!request.isCurrent()) return;
             const permissions = data.map((permission: Permission) => {
                 const { identificador: id, ...resto } = permission;
                 return { id, ...resto }
@@ -17,9 +22,10 @@ export const startLoadingPermissions = (page: number, sortBy: string, orderType:
             dispatch(onSetTableOptions(optionsTable));
             dispatch(setPermissions(permissions));
         } catch (error) {
+            if (request.signal.aborted) return;
             return handleApiError(error, dispatch);
         } finally {
-            dispatch(onLoading(false));
+            if (request.finish()) dispatch(onLoading(false));
         }
     }
 }

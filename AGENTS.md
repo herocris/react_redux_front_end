@@ -51,6 +51,9 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
   genéricos de `useForm`; el submit recibe los valores ya validados y convertidos.
 - Mantener carga, éxito, error y vacío coherentes, también ante fallos. Evitar
   peticiones duplicadas y actualizaciones obsoletas.
+- Los callbacks de carga de `EntityList` son estables y aceptan un `AbortSignal`
+  opcional. Los thunks de listado usan `createLatestListRequest` para cancelar
+  cargas sustituidas y publicar datos y fin de carga solo para la vigente.
 - Efectos para sincronización externa, con dependencias correctas y limpieza.
   Derivar valores durante render y manejar acciones de usuario en sus eventos.
 - Componer cuando simplifique el uso. No añadir contextos, abstracciones o

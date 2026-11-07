@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from 'react';
 import { startDeleteDrug, startLoadingDrugs, startSaveDrug, startUpdateDrug } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
@@ -44,16 +44,20 @@ export const useDrugView = () => {
     dispatch(clearActiveDrug())
   }
 
-  const LoadingEntities = (
+  const LoadingEntities = useCallback((
     page: number,
     sortBy: string,
     sortType: string,
     pageSize: number,
     filterField: string,
-    filterValue: string
+    filterValue: string,
+    signal?: AbortSignal
   ) => {
-    dispatch(startLoadingDrugs(page, sortBy, sortType, pageSize, filterField, filterValue))
-  }
+    return dispatch(startLoadingDrugs(page, sortBy, sortType, pageSize, filterField, filterValue, signal))
+      .catch(() => {
+        // The thunk records errors in the module state.
+      });
+  }, [dispatch]);
 
   const columnsTable = ['id', 'descripcion', 'logo']
 

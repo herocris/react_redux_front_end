@@ -41,11 +41,17 @@ export const useEntityList = ({ handleOpen, handleOpenDialog, setIdEntity, colum
 
     const { VITE_LOCAL_PHOTOS_URL } = getEnvVariables();
 
+    const { page, pageSize } = paginationModel;
+    const sortField = sortModel[0]?.field || 'identificador';
+    const sortDirection = sortModel[0]?.sort || 'asc';
+    const filterField = filterModel.items[0]?.field || '';
+    const filterValue = String(filterModel.items[0]?.value ?? '');
+
     useEffect(() => {
-        LoadingEntities(paginationModel.page + 1, sortModel[0]?.field || 'identificador', sortModel[0]?.sort || 'asc', paginationModel.pageSize, filterModel.items[0]?.field || '', filterModel.items[0]?.value || '')
-        console.log('cargando colección');
-        //navigate(location.pathname, { replace: true })
-    }, [paginationModel, sortModel, filterModel])
+        const controller = new AbortController();
+        void LoadingEntities(page + 1, sortField, sortDirection, pageSize, filterField, filterValue, controller.signal);
+        return () => controller.abort();
+    }, [LoadingEntities, page, pageSize, sortField, sortDirection, filterField, filterValue]);
     
     
 
@@ -97,7 +103,7 @@ export const useEntityList = ({ handleOpen, handleOpenDialog, setIdEntity, colum
             align: "center",
             headerAlign: "center",
             renderCell: (
-                params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>
+                params: GridRenderCellParams<{ name?: string; nombre?: string }, unknown, unknown, GridTreeNodeWithRender>
             ) => {
                 const value = params.value;
                 const name = params.row.name || params.row.nombre || "N/A";

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
 import { Confiscation } from "../";
@@ -55,16 +55,20 @@ export const useConfiscationView = () => {
 
 
 
-  const LoadingEntities = async (
+  const LoadingEntities = useCallback((
     page: number,
     sortBy: string,
     sortType: string,
     pageSize: number,
     filterField: string,
-    filterValue: string
+    filterValue: string,
+    signal?: AbortSignal
   ) => {
-    await dispatch(startLoadingConfiscations(page, sortBy, sortType, pageSize, filterField, filterValue))
-  }
+    return dispatch(startLoadingConfiscations(page, sortBy, sortType, pageSize, filterField, filterValue, signal))
+      .catch(() => {
+        // The thunk records errors in the module state.
+      });
+  }, [dispatch]);
 
   const columnsTable = [
     "id",

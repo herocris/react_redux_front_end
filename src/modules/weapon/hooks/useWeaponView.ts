@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from 'react';
 import { clearActiveWeapon, onSetActiveWeapon} from "../slices";
 import {startDeleteWeapon, startLoadingWeapons, startSaveWeapon, startUpdateWeapon } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
@@ -45,16 +45,20 @@ export const useWeaponView = () => {
   }
 
 
-  const LoadingEntities = (
+  const LoadingEntities = useCallback((
     page: number,
     sortBy: string,
     sortType: string,
     pageSize: number,
     filterField: string,
-    filterValue: string
+    filterValue: string,
+    signal?: AbortSignal
   ) => {
-    dispatch(startLoadingWeapons(page, sortBy, sortType, pageSize, filterField, filterValue))
-  }
+    return dispatch(startLoadingWeapons(page, sortBy, sortType, pageSize, filterField, filterValue, signal))
+      .catch(() => {
+        // The thunk records errors in the module state.
+      });
+  }, [dispatch]);
 
   const columnsTable = ['id', 'descripcion', 'logo']
 

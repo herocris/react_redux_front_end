@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 import { clearActiveUser, onSetActiveUser } from "../slices";
 import { startDeleteUser, startLoadingUsers, startSaveUser, startUpdateUser } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
@@ -54,18 +54,20 @@ export const useUserView = () => {
     dispatch(startLoadingPermissions());
   }, [dispatch])
 
-  const LoadingEntities = (
+  const LoadingEntities = useCallback((
     page: number,
     sortBy: string,
     sortType: string,
     pageSize: number,
     filterField: string,
-    filterValue: string
+    filterValue: string,
+    signal?: AbortSignal
   ) => {
-    void dispatch(startLoadingUsers(page, sortBy, sortType, pageSize, filterField, filterValue)).catch(() => {
-      // El error está disponible en el estado del módulo.
-    });
-  }
+    return dispatch(startLoadingUsers(page, sortBy, sortType, pageSize, filterField, filterValue, signal))
+      .catch(() => {
+        // The thunk records errors in the module state.
+      });
+  }, [dispatch]);
 
   const columnsTable = ['id', 'nombre', 'correo']
 

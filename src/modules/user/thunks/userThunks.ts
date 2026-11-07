@@ -1,3 +1,4 @@
+import { createLatestListRequest } from '../../../api/latestListRequest';
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
 import { setUsers,onAddNewUser,onUpdateUser,onDeleteUser, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices/userSlice';
@@ -5,13 +6,17 @@ import type { User } from '../types';
 import { getApiErrorMessage } from '../../../api/apiErrors';
 
 
-export const startLoadingUsers = (page:number,sortBy:string,orderType:string,per_page:number,search_by:string, valueSearch: string) => {
+const beginListRequest = createLatestListRequest();
+
+export const startLoadingUsers = (page:number,sortBy:string,orderType:string,per_page:number,search_by:string, valueSearch: string, signal?: AbortSignal) => {
     return async( dispatch:Dispatch ) => {
+        const request = beginListRequest(dispatch, signal);
         dispatch( onLoading( true ));
         dispatch(onSetErrorMessage({}));
         sortBy = sortBy === 'id' ? 'identificador' : sortBy;
         try {
-            const {data:{data,...optionsTable}} = await calendarApi.get(`/user?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`);
+            const {data:{data,...optionsTable}} = await calendarApi.get(`/user?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
+            if (!request.isCurrent()) return;
             const users = data.map((user:User) => {
                 const { identificador: id, ...resto } = user;
                 return {  id, ...resto }
@@ -21,9 +26,10 @@ export const startLoadingUsers = (page:number,sortBy:string,orderType:string,per
             dispatch( onSetTableOptions( optionsTable ));
             dispatch( setUsers( users ));
         } catch (error) {
+            if (request.signal.aborted) return;
             return handleApiError(error, dispatch);
         }finally { 
-            dispatch( onLoading( false ));
+            if (request.finish()) dispatch(onLoading(false));
          }
     }
 }

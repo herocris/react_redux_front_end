@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
@@ -8,16 +9,20 @@ export const useActivityView = () => {
   const dispatch = useAppDispatch();
 
 
-  const LoadingEntities = (
+  const LoadingEntities = useCallback((
     page: number,
     sortBy: string,
     sortType: string,
     pageSize: number,
     filterField: string,
-    filterValue: string
+    filterValue: string,
+    signal?: AbortSignal
   ) => {
-    dispatch(startLoadingActivities(page, sortBy, sortType, pageSize, filterField, filterValue))
-  }
+    return dispatch(startLoadingActivities(page, sortBy, sortType, pageSize, filterField, filterValue, signal))
+      .catch(() => {
+        // The thunk records errors in the module state.
+      });
+  }, [dispatch]);
 
   const columnsTable = ['id', 'tipo_de_evento','descripcion','id_usuario','usuario','cambios','fecha']
 

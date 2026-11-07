@@ -50,11 +50,14 @@ export const useAmmunitionView = () => {
     sortType: string,
     pageSize: number,
     filterField: string,
-    filterValue: string
+    filterValue: string,
+    signal?: AbortSignal
   ) => {
-    dispatch(startLoadingAmmunitions(page, sortBy, sortType, pageSize, filterField, filterValue))
-  },[ammunitions])
-
+    return dispatch(startLoadingAmmunitions(page, sortBy, sortType, pageSize, filterField, filterValue, signal))
+      .catch(() => {
+        // The thunk records errors in the module state.
+      });
+  }, [dispatch]);
 
   const columnsTable = useMemo(() => ['id', 'descripcion', 'logo'], []);
 

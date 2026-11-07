@@ -44,10 +44,15 @@ export interface TableOptions {
     order: string,
     filterValue: string
 }
+export type LoadEntities = (
+    page: number, sortBy: string, sortType: string, pageSize: number,
+    filterField: string, filterValue: string, signal?: AbortSignal
+) => void | Promise<void>;
+
 export interface EntityListProps {
     handleOpen: Function
     handleOpenDialog: Function
-    LoadingEntities: Function
+    LoadingEntities: LoadEntities
     setIdEntity: Function
     EntityCollection: Object[]
     tableOptions: TableOptions
@@ -63,7 +68,7 @@ export interface useEntityListProps {
     handleOpenDialog: Function
     setIdEntity: Function
     columnsTable: string[]
-    LoadingEntities: Function,
+    LoadingEntities: LoadEntities,
     editable: boolean,
     tableOptions: TableOptions
 }
