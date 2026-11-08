@@ -1,16 +1,10 @@
 import { z } from "zod";
+import { imageSchema } from "../../../shared/validators/imageValidation";
 
 export const weaponSchema = z.object({
     identificador: z.string().optional(),
     descripcion: z.string().min(1, "La descripcion es requerido"),
-    logo: z.union([
-        z.instanceof(File, { message: "El logo es requerido" })
-            .refine(file => !file || file.size !== 0 || file.size <= 5000000, { message: "Max size exceeded" }),
-        z.string().min(1, "El logo es requerido como texto") // to hold default image
-    ])
-        .refine(value => value instanceof File || typeof value === "string", {
-            message: "Image is required"
-        }),
+    logo: imageSchema,
 });
 
 // import { z } from "zod";

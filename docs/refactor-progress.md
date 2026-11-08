@@ -8,8 +8,8 @@ las instrucciones para continuar en conversaciones independientes.
 dependencias ni se crearon services nuevos en esta preparación.
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1 y 2 completados**; siguiente paso pendiente:
-**3, validación de archivos**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1, 2 y 3 completados**; siguiente paso pendiente:
+**4, convenciones de arquitectura**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -83,7 +83,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | --- | --- | --- |
 | 1. Consolidar referencia | Completado | Código, contratos, informes y logs reconciliados el 8 de noviembre; referencia reutilizada sin cambios funcionales. |
 | 2. Guardado de formularios | Completado | Formularios conservados durante envío/fallo, errores, bloqueo y reintentos verificados con HTTP simulado. |
-| 3. Archivos | Pendiente | Condiciones actuales no aplican correctamente el límite de tamaño. |
+| 3. Archivos | Completado | Siete esquemas con máximo efectivo de 5.000.000 bytes, rechazo de archivos vacíos y conservación de imágenes existentes; pruebas automatizadas. |
 | 4. Convenciones | Pendiente | Guía y plan iniciales preparados; consolidar sin repetir lo vigente. |
 | 5. Autenticación | Pendiente | Thunks/slice actuales; falta authService y mejora de tipos. |
 | 6. TanStack Query | Pendiente | No instalado ni configurado. |
@@ -120,8 +120,9 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 - Guardado de confiscaciones y subdecomisos corregido en el paso 2: el cierre
   espera el éxito y `EditView` separa carga inicial de envío. Véase su registro
   y [verificación](verification-confiscation-save-2026-11-08.md).
-- `file.size !== 0 || file.size <= 5000000` no impone un máximo efectivo.
-  Corregir límites conservando imágenes existentes en el paso 3.
+- Validación de imágenes corregida en el paso 3: regla común para los siete
+  esquemas; archivos nuevos entre 1 y 5.000.000 bytes, referencias existentes
+  conservadas sin restricciones nuevas de formato.
 - La carga diferida ya está implementada; el coste de código compartido y los
   renders requieren medición. No repetir la separación de rutas por rutina.
 
@@ -269,6 +270,62 @@ y geocodificación sin repetir recorridos no afectados. Context7 consultado para
 RHF 7.55.0: sin versión exacta en su catálogo, se usó documentación oficial
 general de `handleSubmit` y `isSubmitting`; no se actualizaron APIs/dependencias.
 No se verificó backend real ni persistencia. Paso 3 pendiente, sin iniciarlo.
+
+### Paso 3 — Validación de archivos (8 de noviembre de 2026)
+
+Al comenzar, HEAD `1f1539e` y workspace limpio; los pasos 1 y 2 ya estaban
+incorporados. Se ejecutó únicamente el prompt del paso 3, sin cambios en
+componentes, thunks, dependencias, configuración ni arquitectura del paso 4.
+
+**Cambios y decisiones.** Los cuatro catálogos (presentaciones, armas,
+municiones y drogas) y los tres subdecomisos tenían exactamente la misma regla
+para `logo`/`foto`. Ahora consumen
+[`imageSchema`](../src/shared/validators/imageValidation.ts): se distingue un
+`File` nuevo de una referencia de texto existente. Se conserva el umbral de
+**5.000.000 bytes inclusive**, corrigiendo la condición con OR que aceptaba
+cualquier tamaño. Se rechaza cero bytes con error de campo: los siete esquemas
+exigen imagen y la condición anterior ya intentaba comprobar `size !== 0`;
+no existe un uso de archivo vacío como marcador de imagen previa (se usa texto).
+Se conserva `File | string`, sin convertir valores ni añadir restricciones de
+MIME, extensión o URL. Se elimina la comprobación redundante del tipo posterior
+a la unión. No se modifican payloads, endpoints, cookies ni `_method=PUT`.
+
+**Comprobaciones nuevas.**
+
+- [`tests/image-validation.test.mjs`](../tests/image-validation.test.mjs):
+  11 conteos aprobados (grupo padre y diez subpruebas). Los siete esquemas se
+  prueban mediante el resolver de RHF con 0, 1, 4.999.999, 5.000.000 y 5.000.001
+  bytes; comprueban error en el campo, identidad del archivo válido, referencias
+  existentes intactas, ausencia/valor falso y ausencia de restricciones nuevas
+  de formato. Tres pruebas adicionales conectan validación y edición multipart
+  de subdecomisos: omisión de `foto` al conservar la referencia y reemplazo con
+  archivo en el máximo, campos y relaciones conservados.
+- `npm.cmd test`: **125 aprobadas**, cero fallos, canceladas u omitidas (114
+  anteriores más 11 nuevos conteos). Incluye las pruebas vigentes de multipart
+  y conservación de imágenes de los cuatro catálogos, sin duplicar esas pruebas.
+- `npm.cmd run build`: correcto; persiste el aviso anterior de chunks mayores
+  de 500 kB. Se restauró `tsconfig.app.tsbuildinfo` a su contenido inicial.
+- `npm.cmd run lint -- --format json --output-file ...`: falla por deuda previa,
+  **87 errores y 24 advertencias**, como en el paso 2; cero incidencias en los
+  siete esquemas modificados, la regla común y el nuevo archivo de pruebas.
+- `git diff --check`: correcto al cierre. Logs locales no versionados:
+  `%TEMP%/graphdata-step3-tests.txt`, `%TEMP%/graphdata-step3-lint.json` y
+  `%TEMP%/graphdata-step3-build.txt`.
+
+**Documentación y reutilización.** Zod **4.6.7**, contrastado con el lockfile;
+Context7 consultado en `/colinhacks/zod/v4.6.7` para `instanceof`, `refine` y
+uniones, con [documentación de esa versión](https://github.com/colinhacks/zod/blob/v4.6.7/packages/docs/content/api.mdx).
+No se necesitó cambiar APIs de React ni responsabilidades de componentes.
+Se reutiliza la evidencia de navegador anterior para guardado/reintentos,
+previsualización y conservación de imágenes con archivos válidos: esos
+escenarios y controles no cambian. No se repitió Playwright ni se comprobó su
+disponibilidad actual; el prompt de este paso permite pruebas automatizadas
+sin navegador cuando no cambia la interacción. La nueva política de tamaños
+y vacío queda cubierta por pruebas nuevas, no por los recorridos históricos.
+No se comprobó backend real, persistencia ni validación del servidor.
+
+Paso 3 cerrado. Paso 4 pendiente, sin iniciarlo; continúan la deuda global de
+lint y el aviso de bundle documentados. El plan conserva su alcance original.
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,

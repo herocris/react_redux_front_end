@@ -1,18 +1,12 @@
 import { z } from "zod";
+import { imageSchema } from "../../../shared/validators/imageValidation";
 
 export const ammunitionConfiscationSchema = z.object({
     identificador: z.string().optional(),
     cantidad: z.coerce.number().min(1, "Debe haber al menos uno"),
     decomiso: z.number().positive("Debe haber un decomiso"),
     municion: z.coerce.number().positive("Debe haber una municion"),
-    foto: z.union([
-        z.instanceof(File, { message: "El logo es requerido" })
-            .refine(file => !file || file.size !== 0 || file.size <= 5000000, { message: "Max size exceeded" }),
-        z.string().min(1, "El logo es requerido como texto") // to hold default image
-    ])
-        .refine(value => value instanceof File || typeof value === "string", {
-            message: "Image is required"
-        }),
+    foto: imageSchema,
 });
 
 // import { z } from "zod";
