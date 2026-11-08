@@ -1,48 +1,53 @@
 import { useCallback, useState } from 'react';
+import { clearActiveDrug, onClearErrorMessage, onSetActiveDrug} from "../slices";
 import { startDeleteDrug, startLoadingDrugs, startSaveDrug, startUpdateDrug } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { Drug } from "../";
-import { clearActiveDrug, onSetActiveDrug } from "../slices";
+import type { Drug } from '../types';
 
 export const useDrugView = () => {
   const { activeDrug, drugs, tableOptions, loading, errorMessage } = useAppSelector((state: RootState) => state.drug);
   const dispatch = useAppDispatch();
 
   const [open, setOpen] = useState(false);
-  const handleOpen = (valOp: boolean) => {
-    if (open) dispatch(clearActiveDrug())
+  const handleOpen = (valOp:boolean) => {
+    if (loading) return;
+    dispatch(onClearErrorMessage());
+    if (!valOp) dispatch(clearActiveDrug())
     setOpen(valOp);
   }
 
   const [openDialog, setOpenDialog] = useState(false);
   const handleOpenDialog = () => {
-    setOpenDialog(!openDialog);
+    if (loading) return;
+    dispatch(onClearErrorMessage());
+    if (openDialog) dispatch(clearActiveDrug());
+    setOpenDialog(value => !value);
   }
 
   const setIdDrug = (id: string) => {
     const drug = drugs.find((row: Drug) => row.id === id);
-    dispatch(onSetActiveDrug(drug as Drug))
+    if (drug) dispatch(onSetActiveDrug(drug))
   };
 
   const DeleteDrug = async () => {
-    await dispatch(startDeleteDrug(activeDrug));
-    setOpenDialog(!openDialog);
-  }
+    if (activeDrug.id === undefined) return;
+    try {
+      await dispatch(startDeleteDrug({ ...activeDrug, id: activeDrug.id }));
+      setOpenDialog(false);
+    } catch {
+      // The thunk publishes the error; keep the dialog open for a retry.
+    }
+  };
 
   const onSaveOrUptdate = async (drug: Drug) => {
-    console.log(drug);
     if (activeDrug.id === undefined) {
-      await dispatch(startSaveDrug(drug)).then(() => {
-        handleOpen(false)
-      })
+      await dispatch(startSaveDrug(drug));
     } else {
-      await dispatch(startUpdateDrug({ ...drug, id: activeDrug.id })).then(() => {
-        handleOpen(false)
-      })
+      await dispatch(startUpdateDrug({ ...drug, id: activeDrug.id }));
     }
-    dispatch(clearActiveDrug())
-  }
+    handleOpen(false);
+  };
 
   const LoadingEntities = useCallback((
     page: number,

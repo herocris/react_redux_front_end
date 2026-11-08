@@ -1,7 +1,6 @@
-
-
-
-import { AddFloatingButton, AlertDialog, EntityList, } from '../../../components';
+import { DrugError } from '../components/DrugError';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { AddFloatingButton, EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { DrugFormModal } from '../components';
 import { useDrugView } from '../hooks';
@@ -26,6 +25,7 @@ export const DrugView = () => {
   return (
     <>
       <GrapLayout>
+        {!open && !openDialog && <DrugError message={errorMessage} />}
         <EntityList
           handleOpen={handleOpen}
           handleOpenDialog={handleOpenDialog}
@@ -44,11 +44,17 @@ export const DrugView = () => {
             errorMessage={errorMessage} />
         }
         {openDialog &&
-          <AlertDialog
-            title='Borrar'
-            dialogMessage="Deseas borrar la munición?"
-            DeleteEntity={DeleteDrug}
-            handleOpen={handleOpenDialog} />
+          <Dialog open onClose={() => { if (!loading) handleOpenDialog(); }} aria-labelledby="delete-drug-title" aria-describedby="delete-drug-description">
+            <DialogTitle id="delete-drug-title">Borrar droga</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="delete-drug-description">¿Deseas borrar la droga?</DialogContentText>
+              <DrugError message={errorMessage} />
+            </DialogContent>
+            <DialogActions>
+              <Button disabled={loading} onClick={handleOpenDialog}>Cancelar</Button>
+              <Button loading={loading} onClick={DeleteDrug} color="error">Borrar</Button>
+            </DialogActions>
+          </Dialog>
         }
         <AddFloatingButton handleOpen={handleOpen} />
       </GrapLayout>

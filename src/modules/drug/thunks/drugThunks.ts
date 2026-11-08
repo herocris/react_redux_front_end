@@ -1,8 +1,9 @@
 import { createLatestListRequest } from '../../../api/latestListRequest';
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
-import { setDrugs, onAddNewDrug, onUpdateDrug, onDeleteDrug, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
-import { Drug } from '../';
+import { setDrugs, onAddNewDrug, onUpdateDrug, onDeleteDrug, onSetTableOptions, onLoading, onClearErrorMessage, onSetErrorMessage } from '../slices';
+import type { Drug, DrugListResponse, DrugResponse } from '../types';
+import { getApiErrorMessage } from '../../../api/apiErrors';
 
 
 const beginListRequest = createLatestListRequest();
@@ -11,11 +12,12 @@ export const startLoadingDrugs = (page: number, sortBy: string, orderType: strin
     return async (dispatch: Dispatch) => {
         const request = beginListRequest(dispatch, signal);
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         sortBy = sortBy === 'id' ? 'identificador' : sortBy;
         try {
-            const { data: { data, ...optionsTable } } = await calendarApi.get(`/drug?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
+            const { data: { data, ...optionsTable } } = await calendarApi.get<DrugListResponse>(`/drug?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
             if (!request.isCurrent()) return;
-            const drugs = data.map((drug: Drug) => {
+            const drugs = data.map((drug) => {
                 const { identificador: id, ...resto } = drug;
                 return { id, ...resto }
             })
@@ -33,8 +35,9 @@ export const startLoadingDrugs = (page: number, sortBy: string, orderType: strin
 export const startSaveDrug = (drug: Drug) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         try {
-            const { data } = await calendarApi.post('/drug', drug, {
+            const { data } = await calendarApi.post<DrugResponse>('/drug', drug, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -42,7 +45,7 @@ export const startSaveDrug = (drug: Drug) => {
             const { identificador: id, ...resto } = data;
             dispatch(onAddNewDrug({ id, ...resto }))
         }
-        catch (error: any) {
+        catch (error) {
             return handleApiError(error, dispatch);
         } finally {
             dispatch(onLoading(false));
@@ -50,29 +53,27 @@ export const startSaveDrug = (drug: Drug) => {
     }
 }
 
-export const startUpdateDrug = (drug: Drug) => {
+export const startUpdateDrug = (drug: Drug & { id: string }) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-
-        const formData = new FormData();
-        formData.append('descripcion', drug.descripcion);
-        // Si el archivo existe (por ejemplo, desde tu componente PhotoInput)
-        if (drug.logo instanceof File) {
-            formData.append('logo', drug.logo);
-        }
-        // Si quieres enviar un método PUT (Laravel lo reconocerá si el form usa POST):
-        formData.append('_method', 'PUT');
+        dispatch(onClearErrorMessage());
 
         try {
-            const { data } = await calendarApi.post(`/drug/${drug.id}`, formData, {
+            const formData = new FormData();
+            formData.append('descripcion', drug.descripcion);
+            if (drug.logo instanceof File) {
+                formData.append('logo', drug.logo);
+            }
+            formData.append('_method', 'PUT');
+
+            const { data } = await calendarApi.post<DrugResponse>(`/drug/${drug.id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
             const { identificador: id, ...resto } = data;
             dispatch(onUpdateDrug({ id, ...resto }))
-        } catch (error: any) {
-            console.log(error);
+        } catch (error) {
 
             return handleApiError(error, dispatch);
         } finally {
@@ -81,12 +82,13 @@ export const startUpdateDrug = (drug: Drug) => {
     }
 }
 
-export const startDeleteDrug = (drug: Drug) => {
+export const startDeleteDrug = (drug: Drug & { id: string }) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         try {
             await calendarApi.delete(`/drug/${drug.id}`,);
-            dispatch(onDeleteDrug(drug.id as string))
+            dispatch(onDeleteDrug(drug.id))
         } catch (error) {
             return handleApiError(error, dispatch);
         } finally {
@@ -95,10 +97,7 @@ export const startDeleteDrug = (drug: Drug) => {
     }
 }
 
-const handleApiError = (error: any, dispatch: Dispatch) => {
-    if (error?.hasOwnProperty('error')) {
-        dispatch(onSetErrorMessage(error.error));
-    }
-    return Promise.reject();
+const handleApiError = (error: unknown, dispatch: Dispatch) => {
+    dispatch(onSetErrorMessage(getApiErrorMessage(error)));
+    return Promise.reject(error);
 };
-
