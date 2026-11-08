@@ -1,6 +1,8 @@
 import { EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { useActivityView } from '../hooks';
+import { Button } from '@mui/material';
+import { ActivityError } from '../components/ActivityError';
 
 export const ActivityView = () => {
   const {
@@ -8,11 +10,17 @@ export const ActivityView = () => {
     LoadingEntities,
     columnsTable,
     loading,
-    tableOptions
+    tableOptions,
+    errorMessage,
+    retryLoading
   } = useActivityView()
   return (
     <>
       <GrapLayout>
+        <ActivityError message={errorMessage} />
+        {(typeof errorMessage === 'string' ? !!errorMessage : Object.keys(errorMessage).length > 0) &&
+          <Button disabled={loading} onClick={retryLoading}>Reintentar carga</Button>
+        }
         <EntityList
           handleOpen={()=>{}}
           handleOpenDialog={()=>{}}

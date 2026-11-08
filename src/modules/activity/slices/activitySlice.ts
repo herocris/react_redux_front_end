@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
-import { Activity, ActivityState } from '../';
+import type { Activity, ActivityState } from '../types';
+import type { ApiErrorMessage } from '../../../api/apiErrors';
 
 const tableOptions: TableOptions = {
     current_page: 1,
@@ -31,7 +32,7 @@ export const activitySlice = createSlice({
     name: 'activities',
     initialState,
     reducers: {
-        onSetErrorMessage: (state, { payload }: PayloadAction<object>) => {
+        onSetErrorMessage: (state, { payload }: PayloadAction<ApiErrorMessage>) => {
             state.errorMessage = payload;
         },
         onClearErrorMessage: (state) => {
