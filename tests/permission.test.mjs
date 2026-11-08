@@ -6,7 +6,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-test('CRUD de permisos: errores, reintentos y contrato JSON', async t => {
+test('CRUD de permisos: transiciones, errores y reintentos Redux', async t => {
     const server = await createServer({
         configFile: false,
         cacheDir: join(tmpdir(), 'graphdata-tests', `permission-${process.pid}`),
@@ -49,18 +49,15 @@ test('CRUD de permisos: errores, reintentos y contrato JSON', async t => {
         }
     });
 
-    await t.test('crear y editar preservan JSON, cookies e identificadores', async () => {
+    await t.test('crear y editar publican la entidad y limpian error y selección tras éxito', async () => {
         for (const update of [false, true]) {
             {
                 const store = makeStore();
                 store.dispatch(slice.actions.onSetErrorMessage('Anterior'));
                 const values = { nombre: 'Nuevo', ...(update ? { id: '7' } : {}) };
                 api.defaults.adapter = async config => {
-                    assert.equal(config.url, update ? '/permission/7' : '/permission');
-                    assert.equal(config.method, update ? 'put' : 'post');
-                    assert.equal(config.withCredentials, true);
-                    assert.match(config.headers.get('Content-Type'), /application\/json/);
-                    assert.deepEqual(JSON.parse(config.data), values);
+                    assert.equal(store.getState().loading, true);
+                    assert.deepEqual(store.getState().permissions, [item]);
                     assert.deepEqual(store.getState().errorMessage, {});
                     return success(config, { identificador: update ? '7' : '8', nombre: 'Nuevo' });
                 };
@@ -68,6 +65,7 @@ test('CRUD de permisos: errores, reintentos y contrato JSON', async t => {
                 const saved = store.getState().permissions.find(permission => permission.id === (update ? '7' : '8'));
                 assert.deepEqual(saved, { id: update ? '7' : '8', nombre: 'Nuevo' });
                 assert.equal(store.getState().loading, false);
+                assert.deepEqual(store.getState().activePermission, { nombre: '' });
             }
         }
     });
@@ -86,7 +84,6 @@ test('CRUD de permisos: errores, reintentos y contrato JSON', async t => {
         await assert.rejects(store.dispatch(thunks.startUpdatePermission(item)), error => error === reason);
         const retained = store.getState().activePermission;
         api.defaults.adapter = async config => {
-            assert.deepEqual(JSON.parse(config.data), item);
             assert.deepEqual(store.getState().errorMessage, {});
             return success(config, { identificador: item.id, nombre: item.nombre });
         };
@@ -98,8 +95,7 @@ test('CRUD de permisos: errores, reintentos y contrato JSON', async t => {
     await t.test('borrar solo elimina la fila tras confirmación del servidor', async () => {
         const store = makeStore();
         api.defaults.adapter = async config => {
-            assert.equal(config.method, 'delete');
-            assert.equal(config.url, '/permission/7');
+            assert.equal(store.getState().loading, true);
             assert.equal(store.getState().permissions.length, 1);
             return success(config, {});
         };

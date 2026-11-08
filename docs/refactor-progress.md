@@ -8,8 +8,8 @@ La preparación inicial no instaló dependencias ni creó services. **El paso 6
 ya incorpora la infraestructura de TanStack Query; ningún CRUD está migrado.**
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1, 2, 3, 4, 5 y 6 completados**; siguiente paso pendiente:
-**7, service de permisos**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1, 2, 3, 4, 5, 6 y 7 completados**; siguiente paso pendiente:
+**8, adaptación de EntityList**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -87,7 +87,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | 4. Convenciones | Completado | Guía contrastada con código/plan; convivencia, propietarios, retirada y límites de cancelación documentados. |
 | 5. Autenticación | Completado | authService, contratos de sesión separados, selectores tipados y thunks Redux; contratos y transiciones probados, acceso/registro verificados en navegador. |
 | 6. TanStack Query | Completado | Cliente/proveedor estables, política explícita y aislamiento de sesión con convivencia Redux; pruebas y navegador con HTTP simulado. |
-| 7. Service de permisos | Pendiente | HTTP todavía dentro de thunks. |
+| 7. Service de permisos | Completado | Service tipado, contratos HTTP probados y thunks compatibles; pantalla y opciones siguen en Redux. |
 | 8. EntityList | Pendiente | Sigue usando callback de carga y contratos compartidos amplios. |
 | 9. Piloto de permisos | Pendiente | CRUD y opciones aún usan Redux manual. |
 | 10. Componentes comunes | Pendiente | Hay alertas/confirmaciones repetidas y campos con tipos amplios. |
@@ -588,6 +588,86 @@ promete reversión remota. La cobertura de infraestructura no acredita todavía
 invalidación, catálogos completos o formularios de un CRUD migrado. Continúan
 la deuda de lint y el aviso de bundle. Paso 6 cerrado; plan sin cambios y paso 7
 pendiente, sin iniciarlo.
+
+### Paso 7 — Service de permisos (8 de noviembre de 2026)
+
+Al comenzar, HEAD `68f3ce1` y workspace limpio. Se leyeron AGENTS.md, plan y
+progreso y se contrastaron con permisos, sus consumidores en `resouce`, cliente
+HTTP, infraestructura de sesión y pruebas. Se ejecutó únicamente el prompt del
+paso 7; sin cambios de dependencias, pantalla, EntityList ni consultas Query.
+
+**Cambios y decisiones.**
+
+- [`permissionService`](../src/modules/permission/services/permissionService.ts)
+  concentra listado, creación, actualización y borrado con el cliente HTTP
+  compartido. Centraliza los seis parámetros del listado, el orden `id` →
+  `identificador` y la adaptación de respuestas `identificador` → `id`. Devuelve
+  entidades y metadatos separados sin alterar los identificadores, los campos
+  adicionales recibidos ni el objeto de entrada. No añade efectos visuales,
+  dependencias Redux/React/Query ni caché propia; propaga los rechazos originales.
+- [`types.ts`](../src/modules/permission/types.ts) distingue respuesta HTTP,
+  entidad con id obligatorio, valores de formulario, parámetros y resultado de
+  lista. Conserva `Permission` y los exports públicos anteriores compatibles
+  con selección, formularios y opciones de `resouce`. Los tipos describen el
+  contrato existente; no son validación runtime ni evidencia del backend real.
+- Se preservan rutas, métodos, cookies y payloads JSON, incluidos `id` e
+  `identificador` cuando los aporta el consumidor. Se conserva también la
+  serialización literal del listado antiguo, incluido el filtro vacío `&=`;
+  no se introduce un cambio de codificación de parámetros en esta extracción.
+  Las cuatro operaciones admiten señal opcional y mantienen su combinación
+  con la señal de sesión en el interceptor compartido.
+- Los thunks consumen el service y siguen coordinando carga, errores, selección
+  y publicación Redux. Se conserva `createLatestListRequest`, su señal y los
+  controles de petición vigente y fin de carga. No se migra el HTTP de opciones
+  en `resouce`; catálogo completo e invalidación corresponden al paso 9.
+
+**Comprobaciones nuevas.**
+
+- [`permission-service.test.mjs`](../tests/permission-service.test.mjs): seis
+  conteos (grupo y cinco subpruebas) sin Redux verifican parámetros y orden,
+  listado vacío, metadatos, adaptación sin coerción (`007`), campos adicionales,
+  JSON/cookies, ambos identificadores del payload, borrado sin cuerpo, causas
+  HTTP/red/desconocidas y aborto en las cuatro operaciones.
+- Se trasladaron las aserciones HTTP de
+  [`permission.test.mjs`](../tests/permission.test.mjs) al service. Se mantienen
+  las pruebas Redux de errores, datos/selección conservados, limpieza de error,
+  reintento y publicación solo tras éxito, y la prueba del esquema existente.
+- `node --test tests/permission-service.test.mjs tests/permission.test.mjs
+  tests/list-loading.test.mjs tests/query-session.test.mjs`: **69 aprobadas**,
+  cero fallos/canceladas/omitidas. Incluye cancelación por argumentos/desmontaje,
+  respuestas tardías y stores independientes de los nueve listados, además de
+  aislamiento de sesión con listado/opciones/escritura antiguos pendientes.
+- `npm.cmd run build`: correcto; persiste el aviso previo de chunks >500 kB.
+  Se restauró `tsconfig.app.tsbuildinfo` a sus bytes iniciales.
+- `npm.cmd run lint -- --format json --output-file ...`: deuda previa de
+  **85 errores y 24 advertencias**. Sin diagnósticos nuevos al comparar
+  archivo/regla/severidad/mensaje con el JSON final del paso 6; ningún
+  diagnóstico en los archivos de permisos ni sus pruebas.
+- `git diff --check`: correcto. Logs locales no versionados:
+  `%TEMP%/graphdata-step7-tests.txt`, `%TEMP%/graphdata-step7-build.txt`,
+  `%TEMP%/graphdata-step7-lint.json` y `%TEMP%/graphdata-step7-lint.txt`.
+
+**Reutilización y documentación.** No se repitió la suite completa de 144
+pruebas del paso 6: se ejecutaron los cuatro archivos afectados y se reutiliza
+la evidencia de los restantes, cuyo código/escenarios no cambia. Se reutiliza
+el [recorrido de permisos](verification-permission-2026-11-08.md) y la evidencia
+de navegador de sesión del paso 6: no cambian interacción, formularios ni
+proveedores, y la extracción se comprueba con transporte simulado. No se abrió
+navegador ni se comprobó disponibilidad actual de Playwright MCP.
+
+Se leyó la skill React y su regla de imports directos, sin rediseño de APIs de
+componentes ni optimización adicional. Lockfile reconfirmado: Axios 1.21.0,
+React 19.3.1, RTK 2.6.1 y Query 5.107.1. Context7 consultado para señales y
+configuración Axios; no ofrece 1.21.0 exacta. Se usó documentación general v1
+de [cancelación](https://github.com/axios/axios/blob/v1.x/docs/pages/advanced/cancellation.md)
+y [configuración](https://github.com/axios/axios/blob/v1.x/docs/pages/advanced/request-config.md),
+contrastada con tipos instalados, build y pruebas; no se atribuye a un tag exacto.
+
+**Límites y pendientes.** Sin backend real, persistencia ni cookies del servidor
+verificados. Abortar una petición no demuestra reversión de una escritura del
+servidor. No se acredita catálogo completo, caché ni invalidación del CRUD de
+permisos: aún no está migrado a Query. Continúan deuda de lint y aviso de bundle.
+Paso 7 cerrado, plan sin cambios y paso 8 sin iniciar.
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,
