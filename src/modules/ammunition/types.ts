@@ -1,4 +1,5 @@
-import { TableOptions } from "../../shared/interfaces/sharedInterfaces";
+import type { ApiErrorMessage } from '../../api/apiErrors';
+import { TableOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface Ammunition {
     id?: string,
@@ -6,17 +7,25 @@ export interface Ammunition {
     descripcion: string,
     logo: string | File
 }
+
 export interface AmmunitionState {
     ammunitions: Ammunition[],
     activeAmmunition: Ammunition,
     tableOptions: TableOptions,
     loading: boolean
-    errorMessage: object
+    errorMessage: ApiErrorMessage
 }
+
 export interface AmmunitionFormModalProps {
-    handleOpen: Function;
+    handleOpen: (open: boolean) => void;
     loading: boolean
     activeAmmunition: Ammunition
-    onSaveOrUptdate: Function
-    errorMessage: object | string
+    onSaveOrUptdate: (values: Ammunition) => Promise<void>
+    errorMessage: ApiErrorMessage
 }
+export type AmmunitionResponse = Omit<Ammunition, 'id' | 'identificador' | 'logo'> & {
+    identificador: string;
+    logo: string;
+};
+
+export type AmmunitionListResponse = TableOptions & { data: AmmunitionResponse[] };

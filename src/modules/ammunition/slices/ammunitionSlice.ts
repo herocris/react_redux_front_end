@@ -1,6 +1,9 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
 import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
-import { Ammunition, AmmunitionState } from '../';
+import type { Ammunition, AmmunitionState } from '../types';
+import type { ApiErrorMessage } from '../../../api/apiErrors';
+
 
 const ammunition: Ammunition = {
     descripcion: '',
@@ -36,7 +39,7 @@ export const ammunitionSlice = createSlice({
     name: 'ammunition',
     initialState,
     reducers: {
-        onSetErrorMessage: (state, { payload }: PayloadAction<object>) => {
+        onSetErrorMessage: (state, { payload }: PayloadAction<ApiErrorMessage>) => {
             state.errorMessage = payload;
         },
         onClearErrorMessage: (state) => {
