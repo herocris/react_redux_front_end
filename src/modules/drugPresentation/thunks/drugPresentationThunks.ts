@@ -1,8 +1,9 @@
 import { createLatestListRequest } from '../../../api/latestListRequest';
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
-import { setDrugPresentations, onAddNewDrugPresentation, onUpdateDrugPresentation, onDeleteDrugPresentation, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
-import { DrugPresentation } from '../';
+import { setDrugPresentations, onAddNewDrugPresentation, onUpdateDrugPresentation, onDeleteDrugPresentation, onSetTableOptions, onLoading, onClearErrorMessage, onSetErrorMessage } from '../slices';
+import type { DrugPresentation, DrugPresentationListResponse, DrugPresentationResponse } from '../types';
+import { getApiErrorMessage } from '../../../api/apiErrors';
 
 
 const beginListRequest = createLatestListRequest();
@@ -11,11 +12,12 @@ export const startLoadingDrugPresentations = (page: number, sortBy: string, orde
     return async (dispatch: Dispatch) => {
         const request = beginListRequest(dispatch, signal);
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         sortBy = sortBy === 'id' ? 'identificador' : sortBy;
         try {
-            const { data: { data, ...optionsTable } } = await calendarApi.get(`/drugPresentation?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
+            const { data: { data, ...optionsTable } } = await calendarApi.get<DrugPresentationListResponse>(`/drugPresentation?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
             if (!request.isCurrent()) return;
-            const drugPresentations = data.map((drugPresentation: DrugPresentation) => {
+            const drugPresentations = data.map((drugPresentation) => {
                 const { identificador: id, ...resto } = drugPresentation;
                 return { id, ...resto }
             })
@@ -33,8 +35,9 @@ export const startLoadingDrugPresentations = (page: number, sortBy: string, orde
 export const startSaveDrugPresentation = (drugPresentation: DrugPresentation) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         try {
-            const { data } = await calendarApi.post('/drugPresentation', drugPresentation, {
+            const { data } = await calendarApi.post<DrugPresentationResponse>('/drugPresentation', drugPresentation, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -42,7 +45,7 @@ export const startSaveDrugPresentation = (drugPresentation: DrugPresentation) =>
             const { identificador: id, ...resto } = data;
             dispatch(onAddNewDrugPresentation({ id, ...resto }))
         }
-        catch (error: any) {
+        catch (error) {
             return handleApiError(error, dispatch);
         } finally {
             dispatch(onLoading(false));
@@ -50,29 +53,27 @@ export const startSaveDrugPresentation = (drugPresentation: DrugPresentation) =>
     }
 }
 
-export const startUpdateDrugPresentation = (drugPresentation: DrugPresentation) => {
+export const startUpdateDrugPresentation = (drugPresentation: DrugPresentation & { id: string }) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-
-        const formData = new FormData();
-        formData.append('descripcion', drugPresentation.descripcion);
-        // Si el archivo existe (por ejemplo, desde tu componente PhotoInput)
-        if (drugPresentation.logo instanceof File) {
-            formData.append('logo', drugPresentation.logo);
-        }
-        // Si quieres enviar un método PUT (Laravel lo reconocerá si el form usa POST):
-        formData.append('_method', 'PUT');
+        dispatch(onClearErrorMessage());
 
         try {
-            const { data } = await calendarApi.post(`/drugPresentation/${drugPresentation.id}`, formData, {
+            const formData = new FormData();
+            formData.append('descripcion', drugPresentation.descripcion);
+            if (drugPresentation.logo instanceof File) {
+                formData.append('logo', drugPresentation.logo);
+            }
+            formData.append('_method', 'PUT');
+
+            const { data } = await calendarApi.post<DrugPresentationResponse>(`/drugPresentation/${drugPresentation.id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
             const { identificador: id, ...resto } = data;
             dispatch(onUpdateDrugPresentation({ id, ...resto }))
-        } catch (error: any) {
-            console.log(error);
+        } catch (error) {
 
             return handleApiError(error, dispatch);
         } finally {
@@ -81,12 +82,13 @@ export const startUpdateDrugPresentation = (drugPresentation: DrugPresentation) 
     }
 }
 
-export const startDeleteDrugPresentation = (drugPresentation: DrugPresentation) => {
+export const startDeleteDrugPresentation = (drugPresentation: DrugPresentation & { id: string }) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         try {
             await calendarApi.delete(`/drugPresentation/${drugPresentation.id}`,);
-            dispatch(onDeleteDrugPresentation(drugPresentation.id as string))
+            dispatch(onDeleteDrugPresentation(drugPresentation.id))
         } catch (error) {
             return handleApiError(error, dispatch);
         } finally {
@@ -95,10 +97,7 @@ export const startDeleteDrugPresentation = (drugPresentation: DrugPresentation) 
     }
 }
 
-const handleApiError = (error: any, dispatch: Dispatch) => {
-    if (error?.hasOwnProperty('error')) {
-        dispatch(onSetErrorMessage(error.error));
-    }
-    return Promise.reject();
+const handleApiError = (error: unknown, dispatch: Dispatch) => {
+    dispatch(onSetErrorMessage(getApiErrorMessage(error)));
+    return Promise.reject(error);
 };
-

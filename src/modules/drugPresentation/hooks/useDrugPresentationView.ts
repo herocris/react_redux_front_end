@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
-import { clearActiveDrugPresentation, onSetActiveDrugPresentation} from "../slices";
+import { clearActiveDrugPresentation, onClearErrorMessage, onSetActiveDrugPresentation} from "../slices";
 import { startDeleteDrugPresentation, startLoadingDrugPresentations, startSaveDrugPresentation, startUpdateDrugPresentation } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { DrugPresentation } from "../";
+import type { DrugPresentation } from '../types';
 
 export const useDrugPresentationView = () => {
   const { activeDrugPresentation, drugPresentations, tableOptions, loading, errorMessage } = useAppSelector((state: RootState) => state.drugPresentation);
@@ -11,37 +11,43 @@ export const useDrugPresentationView = () => {
 
   const [open, setOpen] = useState(false);
   const handleOpen = (valOp:boolean) => {
-    if (open) dispatch(clearActiveDrugPresentation())
+    if (loading) return;
+    dispatch(onClearErrorMessage());
+    if (!valOp) dispatch(clearActiveDrugPresentation())
     setOpen(valOp);
   }
 
   const [openDialog, setOpenDialog] = useState(false);
   const handleOpenDialog = () => {
-    setOpenDialog(!openDialog);
+    if (loading) return;
+    dispatch(onClearErrorMessage());
+    if (openDialog) dispatch(clearActiveDrugPresentation());
+    setOpenDialog(value => !value);
   }
 
   const setIdDrugPresentation = (id: string) => {
     const drugPresentation = drugPresentations.find((row: DrugPresentation) => row.id === id);
-    dispatch(onSetActiveDrugPresentation(drugPresentation as DrugPresentation))
+    if (drugPresentation) dispatch(onSetActiveDrugPresentation(drugPresentation))
   };
 
   const DeleteDrugPresentation = async () => {
-    await dispatch(startDeleteDrugPresentation(activeDrugPresentation));
-    setOpenDialog(!openDialog);
-  }
+    if (activeDrugPresentation.id === undefined) return;
+    try {
+      await dispatch(startDeleteDrugPresentation({ ...activeDrugPresentation, id: activeDrugPresentation.id }));
+      setOpenDialog(false);
+    } catch {
+      // The thunk publishes the error; keep the dialog open for a retry.
+    }
+  };
 
   const onSaveOrUptdate = async (drugPresentation: DrugPresentation) => {
-    console.log(drugPresentation);
     if (activeDrugPresentation.id === undefined) {
-      await dispatch(startSaveDrugPresentation(drugPresentation)).then(() => {
-        handleOpen(false)
-      })
+      await dispatch(startSaveDrugPresentation(drugPresentation));
     } else {
-      await dispatch(startUpdateDrugPresentation({ ...drugPresentation, id: activeDrugPresentation.id })).then(() => {
-        handleOpen(false)
-      })
+      await dispatch(startUpdateDrugPresentation({ ...drugPresentation, id: activeDrugPresentation.id }));
     }
-  }
+    handleOpen(false);
+  };
 
   const LoadingEntities = useCallback((
     page: number,

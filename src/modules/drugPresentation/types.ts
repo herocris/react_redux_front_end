@@ -1,3 +1,4 @@
+import type { ApiErrorMessage } from '../../api/apiErrors';
 import { TableOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface DrugPresentation {
@@ -12,13 +13,19 @@ export interface DrugPresentationState {
     activeDrugPresentation: DrugPresentation,
     tableOptions: TableOptions,
     loading: boolean
-    errorMessage: object
+    errorMessage: ApiErrorMessage
 }
 
 export interface DrugPresentationFormModalProps {
-    handleOpen: Function;
+    handleOpen: (open: boolean) => void;
     loading: boolean
     activeDrugPresentation: DrugPresentation
-    onSaveOrUptdate: Function
-    errorMessage: object | string
+    onSaveOrUptdate: (values: DrugPresentation) => Promise<void>
+    errorMessage: ApiErrorMessage
 }
+export type DrugPresentationResponse = Omit<DrugPresentation, 'id' | 'identificador' | 'logo'> & {
+    identificador: string;
+    logo: string;
+};
+
+export type DrugPresentationListResponse = TableOptions & { data: DrugPresentationResponse[] };

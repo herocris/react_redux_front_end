@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Grid from '@mui/material/Grid2';
@@ -6,7 +5,9 @@ import { Button, TextField, Typography, Zoom } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { DrugPresentationFormModalProps } from '../';
+import type { DrugPresentationFormModalProps } from '../types';
+import { DrugPresentationError } from './DrugPresentationError';
+import { getApiErrorMessage } from '../../../api/apiErrors';
 import { SubmitHandler, useForm } from "react-hook-form";
 import { drugPresentationSchema } from '../validators';
 import { boxStyleFormModal } from '../../../helpers/boxStyle';
@@ -26,44 +27,42 @@ export const DrugPresentationFormModal = ({
         register, 
         handleSubmit, 
         setError, 
-        formState: { errors, }, 
-        reset, 
+        formState: { errors, isSubmitting },
         control 
     } = useForm<FormFields>({
         defaultValues: activeDrugPresentation, 
         resolver: zodResolver(drugPresentationSchema)
     });
 
-    const onSubmit: SubmitHandler<z.infer<typeof drugPresentationSchema>> = async (data) => {
-        await onSaveOrUptdate(data)
-        reset()
-    };
-
-    useEffect(() => {
-        if (typeof errorMessage === 'object') {
-            for (const formValue of Object.keys(errorMessage)) {
-                setError(formValue as keyof FormFields, {
-                    message: (errorMessage as Record<string, string[]>)[formValue].toString()
-                });
+    const busy = loading || isSubmitting;
+    const onSubmit: SubmitHandler<FormFields> = async (data) => {
+        try {
+            await onSaveOrUptdate(data);
+        } catch (error) {
+            const message = getApiErrorMessage(error);
+            setError('root.server', { type: 'server', message: typeof message === 'string' ? message : Object.values(message).flat().join(' ') });
+            if (typeof message !== 'string') {
+                for (const field of ['descripcion', 'logo', 'identificador'] as const) {
+                    if (message[field]) setError(field, { type: 'server', message: message[field].join(' ') });
+                }
             }
         }
-    }, [errorMessage]);
-
+    };
 
     return (
         <>
             <Modal
                 open={true}
                 onClose={() => {
-                    handleOpen(false)
-                    reset()
+                    if (!busy) handleOpen(false);
                 }}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
+                aria-labelledby="drug-presentation-title"
             >
-                <Box sx={boxStyleFormModal}>
-                    <Typography variant='h5' sx={{ mb: 1 }}>{activeDrugPresentation.id?'Editar presentación':'Crear presentación'}</Typography>
+                <Box sx={boxStyleFormModal} role="dialog" aria-modal="true" aria-labelledby="drug-presentation-title">
+                    <Typography id='drug-presentation-title' variant='h5' sx={{ mb: 1 }}>{activeDrugPresentation.id?'Editar presentación':'Crear presentación'}</Typography>
+                    <DrugPresentationError message={errorMessage} />
                     <form onSubmit={handleSubmit(onSubmit)}>
+                        <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
                         <Zoom in={true} style={{ transitionDelay: '150ms' }}>
                             <Grid container sx={{ alignItems: 'center', alignContent: 'center', display: 'flex' }}>
                                 <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
@@ -86,12 +85,13 @@ export const DrugPresentationFormModal = ({
                                     />
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 2, mt: 2 }}>
-                                    <Button type='submit' variant='contained' fullWidth loading={loading}>
+                                    <Button type='submit' variant='contained' fullWidth loading={busy} aria-label='Guardar presentación'>
                                         <SaveIcon />
                                     </Button>
                                 </Grid>
                             </Grid>
                         </Zoom>
+                        </fieldset>
                     </form>
                 </Box>
             </Modal>

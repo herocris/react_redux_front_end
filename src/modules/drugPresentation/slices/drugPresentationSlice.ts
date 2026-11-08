@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
-import { DrugPresentation, DrugPresentationState } from '../';
+import type { DrugPresentation, DrugPresentationState } from '../types';
+import type { ApiErrorMessage } from '../../../api/apiErrors';
 
 
 const drugPresentation: DrugPresentation = {
@@ -38,7 +39,7 @@ export const drugPresentationSlice = createSlice({
     name: 'drugPresentation',
     initialState,
     reducers: {
-        onSetErrorMessage: (state, { payload }: PayloadAction<object>) => {
+        onSetErrorMessage: (state, { payload }: PayloadAction<ApiErrorMessage>) => {
             state.errorMessage = payload;
         },
         onClearErrorMessage: (state) => {
