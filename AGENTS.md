@@ -5,6 +5,59 @@
 Refactorizar y mejorar la app progresivamente, preservando flujos y contratos con
 el backend. Mantener los cambios dentro de la tarea solicitada.
 
+## Continuidad entre conversaciones
+
+- Leer [el plan](docs/refactor-plan.md) y [el progreso](docs/refactor-progress.md)
+  antes de ejecutar un paso. Este archivo contiene las instrucciones comunes;
+  el usuario no necesita volver a pegarlas en cada conversación.
+- Implementar únicamente el paso solicitado. Contrastar los documentos con el
+  código y `git status`; conservar cambios anteriores del workspace. No avanzar
+  a otro paso ni rehacer trabajo completado sin una necesidad concreta.
+- Actualizar el progreso al terminar: cambios, comprobaciones, decisiones y
+  pendientes. Mantener el plan si cambia el alcance acordado. No marcar como
+  completada una verificación no realizada ni confundir preparación con migración.
+- Los resultados previos pueden reutilizarse si corresponden al mismo código y
+  escenario; repetirlos cuando haya cambios relevantes, fallos o incertidumbres.
+- Entregar un resumen breve de cambios, verificación y pendientes, con enlaces a
+  los documentos. Guardar diagnósticos extensos fuera de la respuesta.
+
+## Arquitectura objetivo y transición
+
+- La migración acordada usa TanStack Query para datos remotos y conserva Redux
+  Toolkit para sesión y filtros aplicados compartidos entre mapas y gráficos.
+  Su incorporación se realiza por pasos; no instalar ni migrar todo por leer
+  esta guía. Consultar el progreso para conocer el estado real.
+- Services por dominio: acceso HTTP, parámetros, payloads JSON/multipart y
+  adaptación de respuestas. Independientes de React, Redux y TanStack Query;
+  devuelven datos tipados, propagan rechazos y aceptan AbortSignal cuando proceda.
+  No administran caché, navegación, diálogos ni mensajes visuales. El servicio
+  externo de geocodificación conserva su separación de credenciales del backend.
+- TanStack Query consume directamente los services. Sus consultas/mutaciones
+  administran resultados, carga, errores, vigencia e invalidación. Las claves
+  incluyen los argumentos que cambian la respuesta y el padre en listas anidadas.
+- Los thunks que permanecen consumen services y coordinan procesos globales,
+  especialmente autenticación. Los slices administran sus transiciones. Los
+  módulos antiguos conservan temporalmente su implementación hasta migrarse.
+- Un propietario por estado: evitar duplicar resultados de consultas en Redux
+  y mantener la sesión en Redux sin otra copia independiente en la caché.
+  React Hook Form administra edición/validación; los hooks de pantalla coordinan
+  acciones y navegación; diálogos y controles exclusivos de una vista son locales.
+- Redux recibe filtros compartidos al pulsar Aplicar; la edición pendiente del
+  formulario permanece separada. Sus valores son serializables. Los resultados
+  remotos y archivos no pertenecen a ese slice.
+- Coordinar cancelación y limpieza de datos de sesión al salir/cambiar de usuario,
+  evitando respuestas tardías de una sesión anterior. No asumir que introducir
+  una librería reproduce automáticamente la política de cancelación existente.
+- Extraer services al trabajar cada módulo, sin interponer thunks entre TanStack
+  Query y los services ni construir una capa manual destinada a desaparecer.
+  Retirar implementaciones anteriores solo cuando no tengan consumidores.
+- Preservar tipos y contratos públicos durante la transición; introducir DTO,
+  entidad, formulario y mapeadores cuando clarifiquen fronteras. No cambiar
+  identificadores o relaciones por deducción ni usar un genérico como validación.
+- Conservar las correcciones de errores, formularios, accesibilidad, geocodificación
+  y carga diferida. Borradores por pasos, lotes y exportaciones son ampliaciones
+  posteriores; no forman parte de esta migración.
+
 ## Stack y estructura
 
 - SPA con React 19, TypeScript estricto y Vite; no es Next.js.
@@ -39,8 +92,9 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
 
 - PascalCase para componentes y tipos, `useX` para hooks y camelCase para
   funciones y variables. Respetar el formato local, sin reformateos masivos.
-- Componentes para presentación; hooks para coordinar estado y acciones; thunks
-  para operaciones asíncronas; slices para transiciones de estado.
+- Componentes para presentación/formularios y hooks para coordinación. Aplicar
+  la arquitectura objetivo por pasos; conservar thunks y slices antiguos hasta
+  migrar sus consumidores, sin extender el patrón antiguo innecesariamente.
 - Usar hooks Redux tipados y el cliente HTTP compartido. Preservar campos,
   endpoints y tratamiento de credenciales del backend.
 - El interceptor conserva los rechazos y entrega el cuerpo del error HTTP cuando
@@ -51,9 +105,10 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
   genéricos de `useForm`; el submit recibe los valores ya validados y convertidos.
 - Mantener carga, éxito, error y vacío coherentes, también ante fallos. Evitar
   peticiones duplicadas y actualizaciones obsoletas.
-- Los callbacks de carga de `EntityList` son estables y aceptan un `AbortSignal`
-  opcional. Los thunks de listado usan `createLatestListRequest` para cancelar
-  cargas sustituidas y publicar datos y fin de carga solo para la vigente.
+- En el modelo antiguo, los callbacks de carga de `EntityList` son estables y
+  aceptan un `AbortSignal` opcional. Sus thunks usan `createLatestListRequest`
+  para publicar datos y fin de carga solo para la petición vigente. Al migrar,
+  conservar estas garantías y retirar el mecanismo solo sin consumidores.
 - Efectos para sincronización externa, con dependencias correctas y limpieza.
   Derivar valores durante render y manejar acciones de usuario en sus eventos.
 - Componer cuando simplifique el uso. No añadir contextos, abstracciones o
@@ -74,8 +129,11 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
   backend real. Añadir cobertura cuando la complejidad del cambio lo justifique.
 - Para cambios de código ejecutar lint y build. Distinguir fallos previos de los
   introducidos y describir las comprobaciones pendientes.
-- Verificar cambios visuales y flujos con Playwright MCP, consola y red. Usar
-  Chrome DevTools MCP y sus herramientas React para componentes y perfiles.
+- Verificar con Playwright MCP los cambios visuales y flujos que necesiten
+  navegador, usando recorridos breves en los hitos del plan. No repetir una
+  batería completa por cada extracción, tipo o módulo equivalente. Consultar
+  consola/red relevantes. Usar Chrome DevTools y herramientas React disponibles
+  cuando una investigación de componentes o rendimiento lo requiera.
 - Mantener React DevTools solo en desarrollo y registrarlo antes de cargar React.
 - No afirmar que un MCP funciona solo por figurar en la configuración. Si no está
   activo en la sesión, comunicar la limitación.
@@ -85,8 +143,12 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
 ## Uso eficiente del navegador
 
 - Ejecutar primero las pruebas automatizadas aplicables. Usar Playwright MCP para
-  explorar y verificar los flujos afectados; preferir Playwright Test para una
-  futura suite E2E repetible. Actualmente solo está instalado el runner de Node.
+  explorar y verificar los flujos afectados, ampliando solo ante fallos o cambios
+  relevantes. Pruebas de contrato en services, caché e invalidación en consultas y
+  transiciones globales en Redux; no añadir pruebas que solo reflejen detalles
+  de implementación. Preferir Playwright Test para una futura suite E2E repetible;
+  no es requisito inicial ni se instala solo por esta recomendación. Actualmente
+  solo está instalado el runner de Node.
 - Reutilizar la sesión y la página cuando no haga falta aislar el escenario;
   evitar navegaciones, snapshots y consultas de consola/red repetidos sin motivo.
 - Buscar elementos con `browser_find` y `maxResults` antes de pedir el árbol
