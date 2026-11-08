@@ -8,7 +8,8 @@ las instrucciones para continuar en conversaciones independientes.
 dependencias ni se crearon services nuevos en esta preparación.
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Siguiente paso: **1, consolidar/confirmar la referencia**.
+antes de ejecutar un paso. Paso **1 completado**; siguiente paso pendiente:
+**2, guardado y conservación de formularios**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -80,7 +81,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 
 | Paso | Estado | Nota |
 | --- | --- | --- |
-| 1. Consolidar referencia | Pendiente | Baseline preliminar y commits disponibles; reconciliar contratos y vigencia al comenzar. |
+| 1. Consolidar referencia | Completado | Código, contratos, informes y logs reconciliados el 8 de noviembre; referencia reutilizada sin cambios funcionales. |
 | 2. Guardado de formularios | Pendiente | Revisar cierre anticipado y desmontaje durante envío. |
 | 3. Archivos | Pendiente | Condiciones actuales no aplican correctamente el límite de tamaño. |
 | 4. Convenciones | Pendiente | Guía y plan iniciales preparados; consolidar sin repetir lo vigente. |
@@ -139,6 +140,90 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
   [actividad](verification-activity-2026-11-08.md).
 
 ## Registro de próximos pasos
+
+### Paso 1 — Consolidar el punto de partida (8 de noviembre de 2026)
+
+Alcance: revisión documental y del código, sin refactor, instalaciones ni cambios
+en pruebas o configuración. HEAD al comenzar: `9cea377`; `git status --short`
+estaba vacío. `git diff abd2d36 HEAD --stat` confirma que desde la última
+consolidación solo cambiaron AGENTS.md, el plan y este progreso. El diff de
+`src`, `tests`, `package.json` y `package-lock.json` entre ambos commits está
+vacío. Los doce commits de la tabla anterior existen en el historial.
+
+**Referencia vigente y comprobaciones reutilizadas.** Se leyeron los tres logs
+temporales indicados arriba: tests registra 109 aprobadas, cero fallos,
+canceladas, omitidas o pendientes; el JSON de lint suma 91 errores y 26
+advertencias; build termina correctamente y conserva el aviso de chunks mayores
+de 500 kB. Los conteos de Node incluyen grupos padre y subpruebas, no representan
+109 recorridos de navegador. Los 12 archivos `tests/*.test.mjs` cubren errores
+HTTP/auth, validación, nueve listados, geocodificación, siete CRUD y actividad.
+No se ejecutaron de nuevo test, lint ni build: el código, pruebas y dependencias
+son los mismos de la referencia y este paso solo modifica este documento.
+Se comprobó `git diff --check` sobre el cambio documental al cerrar el paso.
+
+Versiones resueltas contrastadas directamente con `package-lock.json`: React
+19.3.1, Redux Toolkit 2.6.1, Axios 1.21.0, React Hook Form 7.55.0, resolvers
+5.9.2, Zod 4.6.7 y Vite 8.3.5. TanStack Query sigue ausente del lockfile;
+las pantallas conservan Redux y HTTP en thunks. No se introdujeron ni modificaron
+APIs de librerías, por lo que no fue necesaria una consulta nueva a Context7.
+
+**Implementación confirmada y referencias históricas superadas.** Se
+contrastaron los informes `docs/verification*.md` con pruebas y consumidores:
+
+- La incompatibilidad inicial resolver/Zod y la pérdida de valores de acceso
+  ya están corregidas. Login/registro esperan el envío sin activar `checking`;
+  ese estado queda para la comprobación inicial. No son pendientes del paso 2.
+- Los siete CRUD de catálogos, roles, permisos y usuarios ya tienen tipado y
+  tratamiento de fallo/reintento; actividad tiene lectura, errores y reintento.
+  Las menciones antiguas a completar estos refactors no describen deuda actual.
+  Su migración a services/Query sí sigue pendiente.
+- La coordinación de listados ya está implementada: señal del efecto, callback
+  estable y una petición vigente por dominio/store mediante
+  `createLatestListRequest`. Las 36 subpruebas de concurrencia cubren cuatro
+  escenarios en nueve módulos; no prueban caché por argumentos ni aislamiento
+  entre sesiones. La geocodificación separada/cancelable y las doce entradas
+  protegidas diferidas también están implementadas; el store importa slices
+  directamente. No hay que repetir esas extracciones.
+- Los conteos antiguos de tests/lint de los informes corresponden a sus bloques;
+  la referencia global vigente es 109 / 91 errores / 26 advertencias. El espacio
+  final mencionado en el informe de armas fue eliminado en la consolidación.
+
+**Contratos y deuda real confirmados por lectura.** El cliente compartido
+mantiene URL de entorno, cookies y rechazo con cuerpo HTTP cuando existe.
+Los thunks conservan parámetros de página/orden/filtro y adaptación de
+`identificador` a `id`; permisos/roles/usuarios usan JSON y los cuatro catálogos
+con imagen conservan multipart y edición POST con `_method=PUT`, enviando logo
+nuevo solo si es archivo. Actividad sigue siendo GET `/activity`, sin CRUD.
+Estos son contratos del frontend y sus pruebas simuladas, no una validación
+independiente del servidor. Se mantienen `rol`, `resouce` y relaciones heredadas;
+`z.custom<T>()` sin predicado sigue sin validar su estructura.
+
+- Paso 2: los tres formularios de subdecomisos invocan `onSaveOrUptdate(data)`
+  y luego `handleOpen(false)` sin esperar; sus controles no bloquean el envío.
+  `confiscation/views/EditView.tsx` monta el formulario con `!loading`, mientras
+  detalle y escrituras comparten ese indicador. Los cuatro módulos de
+  confiscaciones rechazan con `Promise.reject()` sin causa. El formulario
+  principal sí espera el guardado: el problema no es idéntico al de los tres
+  subformularios. Falta comprobar la interacción de forma acotada en el paso 2.
+- Paso 3: los siete esquemas de imágenes (cuatro catálogos y tres subdecomisos)
+  mantienen la condición ineficaz de tamaño. Las pruebas de validación actuales
+  no acreditan un máximo efectivo ni resuelven la política de archivo vacío.
+- Pasos 7–9: permisos conserva HTTP en thunks, filas locales en el slice y
+  `EntityList` con protocolo de carga/diálogos; sus escrituras no recalculan
+  totales ni páginas. No existe todavía el piloto de consultas.
+- Pasos posteriores: `resouce` carga opciones separadas sin acreditar catálogo
+  completo y deja el fin de carga solo en éxito; persisten tipos amplios en
+  componentes compartidos, datos remotos en Redux y ausencia de slice de filtros
+  aplicados compartidos. No se retira infraestructura con consumidores.
+
+**Navegador y límites.** Se reutiliza la evidencia histórica descrita en los
+informes y scripts de `tests/browser/`; no se repitió Playwright porque no cambia
+el comportamiento ni hay un fallo nuevo que investigar en este paso. No se
+comprobó disponibilidad actual de MCP, backend real, persistencia, permisos,
+cookies del servidor ni rendimiento React. Los recorridos previos usan HTTP y
+autenticación simulados; no se presentan como ejecuciones nuevas. No se corrige
+la deuda global de lint ni el aviso de bundle. Paso 1 cerrado; paso 2 pendiente,
+sin iniciarlo y sin marcar completado ningún otro paso.
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,
