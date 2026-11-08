@@ -1,5 +1,7 @@
 import { Control, FieldErrors } from "react-hook-form"
 import { TableOptions } from "../../shared/interfaces/sharedInterfaces"
+import type { z } from 'zod';
+import type { confiscationSchema } from './validators';
 
 export interface Confiscation {
     id?: string,
@@ -29,7 +31,7 @@ export interface ConfiscationMapModalProps {
     nameLng: 'longitud',
     nameDepto: 'departamento',
     nameMuni: 'municipalidad',
-    control: Control<Omit<Confiscation, 'id'>>
+    control: Control<z.input<typeof confiscationSchema>, unknown, z.output<typeof confiscationSchema>>
 }
 
 export interface FieldsFormProps {

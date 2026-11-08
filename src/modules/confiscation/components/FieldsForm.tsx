@@ -7,7 +7,11 @@ import { DatePickerField } from '../../../components';
 export const FieldsForm = ({ handleSubmit, onSubmit, loading, register, errors, handleOpenMap, control }: FieldsFormProps) => {
     return (
         <Zoom in={true} style={{ transitionDelay: '150ms' }}  >
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={(event) => {
+                if (loading) { event.preventDefault(); return; }
+                void handleSubmit(onSubmit)(event);
+            }}>
+                <fieldset inert={loading} disabled={loading} style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
                 <Grid container sx={{ alignItems: 'center', alignContent: 'center', display: 'flex' }}>
                     <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
                         <DatePickerField name={'fecha'} control={control} />
@@ -57,16 +61,17 @@ export const FieldsForm = ({ handleSubmit, onSubmit, loading, register, errors, 
                         />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 1, mt: 2 }}>
-                        <Button variant='outlined' fullWidth aria-label="Seleccionar ubicación en el mapa" onClick={() => handleOpenMap(true)}>
+                        <Button disabled={loading} variant='outlined' fullWidth aria-label="Seleccionar ubicación en el mapa" onClick={() => handleOpenMap(true)}>
                             <Map />
                         </Button>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 2, mt: 2 }}>
-                        <Button type='submit' variant='contained' fullWidth loading={loading}>
+                        <Button aria-label="Guardar decomiso" type='submit' variant='contained' fullWidth loading={loading}>
                             <Save />
                         </Button>
                     </Grid>
                 </Grid>
+                </fieldset>
             </form>
         </Zoom>
     )

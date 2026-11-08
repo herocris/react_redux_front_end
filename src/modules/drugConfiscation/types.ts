@@ -23,7 +23,7 @@ export interface DrugConfiscationState {
 export interface DrugConfiscationFormProps {
     activeDrugConfiscation: DrugConfiscation
     handleOpen: Function
-    onSaveOrUptdate: Function
+    onSaveOrUptdate: (data: DrugConfiscation) => Promise<void>
     drugCollection: SelectOptions[]
     drugPresentationCollection: SelectOptions[]
     handleOpenDialog: Function

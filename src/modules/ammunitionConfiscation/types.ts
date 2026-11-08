@@ -19,7 +19,7 @@ export interface AmmunitionConfiscationState {
 export interface AmmunitionConfiscationFormProps {
     activeAmmunitionConfiscation: AmmunitionConfiscation
     handleOpen: Function
-    onSaveOrUptdate: Function
+    onSaveOrUptdate: (data: AmmunitionConfiscation) => Promise<void>
     ammunitionCollection: SelectOptions[]
     handleOpenDialog: Function
 }

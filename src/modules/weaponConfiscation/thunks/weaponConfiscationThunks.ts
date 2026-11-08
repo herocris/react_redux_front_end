@@ -101,6 +101,6 @@ const handleApiError = (error: any, dispatch: Dispatch) => {
     if (error?.hasOwnProperty('error')) {
         dispatch(onSetErrorMessage(error.error));
     }
-    return Promise.reject();
+    return Promise.reject(error);
 };
 

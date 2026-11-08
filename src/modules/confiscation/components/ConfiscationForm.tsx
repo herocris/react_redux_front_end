@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
-import { Typography,Box } from '@mui/material';
+import { useRef } from 'react';
+import { getApiErrorMessage, getApiErrorText } from '../../../api/apiErrors';
+import { Alert,Typography,Box } from '@mui/material';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -12,10 +13,8 @@ type FormFields = z.infer<typeof confiscationSchema>;
 export const ConfiscationForm = () => {
     const {
         openMap,
-        errorMessage,
         onSaveOrUptdate,
         handleOpenMap,
-        loading,
         activeConfiscation
     } = useConfiscationForm()
 
@@ -23,27 +22,34 @@ export const ConfiscationForm = () => {
         register,
         handleSubmit,
         setError,
-        formState: { errors, },
+        formState: { errors, isSubmitting },
         control,        
-    } = useForm<FormFields>({
+    } = useForm<z.input<typeof confiscationSchema>, unknown, FormFields>({
         defaultValues: activeConfiscation,
         resolver: zodResolver(confiscationSchema)
     });
     //console.log(activeConfiscation);
 
-    const onSubmit: SubmitHandler<z.infer<typeof confiscationSchema>> = async (data) => {
-        await onSaveOrUptdate(data)
-    };
-
-    useEffect(() => {
-        if (typeof errorMessage === 'object') {
-            for (const formValue of Object.keys(errorMessage)) {
-                setError(formValue as keyof FormFields, {
-                    message: (errorMessage as Record<string, string[]>)[formValue].toString()
-                });
+    const submitting = useRef(false);
+    const onSubmit: SubmitHandler<FormFields> = async (data) => {
+        if (submitting.current) return;
+        submitting.current = true;
+        try {
+            await onSaveOrUptdate(data);
+        } catch (error) {
+            setError('root.server', { message: getApiErrorText(error) });
+            const message = getApiErrorMessage(error);
+            if (typeof message === 'object') {
+                for (const [field, messages] of Object.entries(message)) {
+                    if (Object.prototype.hasOwnProperty.call(confiscationSchema.shape, field)) {
+                        setError(field as keyof FormFields, { message: messages.join(' ') });
+                    }
+                }
             }
+        } finally {
+            submitting.current = false;
         }
-    }, [errorMessage]);
+    };
 
     return (
         <>
@@ -59,10 +65,11 @@ export const ConfiscationForm = () => {
                 p: 4,
             }}>
                 <Typography variant='h5' sx={{ mb: 1 }}>{activeConfiscation.identificador?'Editar decomiso':'Crear decomiso'}</Typography>
+                {errors.root?.server && <Alert severity="error">{errors.root.server.message}</Alert>}
                 {openMap ?
                     <ConfiscationMap handleOpen={handleOpenMap} lat={activeConfiscation.latitud} lng={activeConfiscation.longitud} nameLat={'latitud'} nameLng={'longitud'} nameDepto={'departamento'} nameMuni={'municipalidad'} control={control} />
                     :
-                    <FieldsForm handleSubmit={handleSubmit} onSubmit={onSubmit} loading={loading} register={register} errors={errors} handleOpenMap={handleOpenMap} control={control} />
+                    <FieldsForm handleSubmit={handleSubmit} onSubmit={onSubmit} loading={isSubmitting} register={register} errors={errors} handleOpenMap={handleOpenMap} control={control} />
                 }
             </Box>
         </>

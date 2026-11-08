@@ -8,8 +8,8 @@ las instrucciones para continuar en conversaciones independientes.
 dependencias ni se crearon services nuevos en esta preparación.
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Paso **1 completado**; siguiente paso pendiente:
-**2, guardado y conservación de formularios**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1 y 2 completados**; siguiente paso pendiente:
+**3, validación de archivos**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -82,7 +82,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | Paso | Estado | Nota |
 | --- | --- | --- |
 | 1. Consolidar referencia | Completado | Código, contratos, informes y logs reconciliados el 8 de noviembre; referencia reutilizada sin cambios funcionales. |
-| 2. Guardado de formularios | Pendiente | Revisar cierre anticipado y desmontaje durante envío. |
+| 2. Guardado de formularios | Completado | Formularios conservados durante envío/fallo, errores, bloqueo y reintentos verificados con HTTP simulado. |
 | 3. Archivos | Pendiente | Condiciones actuales no aplican correctamente el límite de tamaño. |
 | 4. Convenciones | Pendiente | Guía y plan iniciales preparados; consolidar sin repetir lo vigente. |
 | 5. Autenticación | Pendiente | Thunks/slice actuales; falta authService y mejora de tipos. |
@@ -117,9 +117,9 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
   paginación. El piloto debe resolver coherencia de lista, opciones y páginas.
 - `resouce` mantiene cargas/errores anteriores y copias separadas de catálogos.
   Verificar si los endpoints usados en selectores devuelven todas las opciones.
-- Los formularios de subdecomisos llaman al guardado y cierran sin esperarlo;
-  `EditView` condiciona el montaje del formulario a loading compartido con guardado.
-  Hallazgos de lectura: reproducir de forma acotada al ejecutar el paso 2.
+- Guardado de confiscaciones y subdecomisos corregido en el paso 2: el cierre
+  espera el éxito y `EditView` separa carga inicial de envío. Véase su registro
+  y [verificación](verification-confiscation-save-2026-11-08.md).
 - `file.size !== 0 || file.size <= 5000000` no impone un máximo efectivo.
   Corregir límites conservando imágenes existentes en el paso 3.
 - La carga diferida ya está implementada; el coste de código compartido y los
@@ -224,6 +224,51 @@ cookies del servidor ni rendimiento React. Los recorridos previos usan HTTP y
 autenticación simulados; no se presentan como ejecuciones nuevas. No se corrige
 la deuda global de lint ni el aviso de bundle. Paso 1 cerrado; paso 2 pendiente,
 sin iniciarlo y sin marcar completado ningún otro paso.
+
+### Paso 2 — Guardado y conservación de formularios (8 de noviembre de 2026)
+
+Se conservó el cambio documental del paso 1 que ya estaba en el workspace.
+Se ejecutó únicamente el paso 2 del plan; sin instalaciones, services nuevos,
+TanStack Query ni cambios en los esquemas de archivos del paso 3.
+
+- Los tres subformularios esperan el guardado del hook, que ya cierra solo
+  tras éxito. Ante rechazo conservan campos, archivo, relaciones y padre;
+  muestran un error y permiten reintentar. Sus callbacks de guardado se tiparon
+  como promesas. El formulario principal conserva también errores de campo.
+- React Hook Form administra `isSubmitting`; fieldset deshabilitado e `inert`
+  bloquean campos nativos y controles MUI, además de cancelar/borrar/mapa durante
+  el envío. El evento de envío se bloquea antes de volver a llamar a RHF y hay
+  protección con ref durante la escritura. Se verificó un segundo submit
+  programático: no duplica HTTP ni libera prematuramente el estado de envío.
+- `EditView` monta tras completar el detalle, conserva el montaje durante la
+  escritura y permite reintentar la carga inicial fallida. Los cuatro módulos
+  propagan la causa original del rechazo. Se conservan endpoints, cookies,
+  relaciones, JSON, multipart y POST con `_method=PUT`.
+- Se distinguieron `z.input`/`z.output` en el formulario principal y su control
+  del mapa; no cambia el comportamiento de geocodificación.
+
+**Comprobaciones nuevas:** `npm.cmd test`, 114 aprobadas y cero fallos,
+canceladas u omitidas (109 previas más cinco conteos del nuevo archivo).
+`npm.cmd run build` correcto, con el aviso previo de chunks mayores de 500 kB.
+Lint sigue fallando por deuda previa: **87 errores y 24 advertencias**, frente
+a 91/26; sin nuevas reglas infringidas. `git diff --check` correcto al cierre.
+Se restauró el artefacto incidental `tsconfig.app.tsbuildinfo` a su contenido
+inicial. No se alteraron dependencias ni configuración.
+
+**Navegador:** Playwright MCP operativo, siete grupos aprobados con autenticación
+y HTTP simulados; 12 escrituras interceptadas, tres solicitudes de detalle,
+cero errores JavaScript sin manejar y cero mensajes inesperados de consola.
+Cubre carga inicial fallida/reintento, alta/edición principal, edición de los tres
+subdecomisos con archivo y alta de droga con peso/opciones/archivo. Se corrigió
+el bloqueo de submit duplicado detectado durante el recorrido; el script final
+se ejecutó después de esa corrección. Detalles, rutas de scripts y límites en
+[el informe del paso 2](verification-confiscation-save-2026-11-08.md).
+
+Se reutiliza la evidencia previa para catálogos, auth, listados, carga diferida
+y geocodificación sin repetir recorridos no afectados. Context7 consultado para
+RHF 7.55.0: sin versión exacta en su catálogo, se usó documentación oficial
+general de `handleSubmit` y `isSubmitting`; no se actualizaron APIs/dependencias.
+No se verificó backend real ni persistencia. Paso 3 pendiente, sin iniciarlo.
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,
