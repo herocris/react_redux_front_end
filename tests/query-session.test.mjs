@@ -25,8 +25,8 @@ test('infraestructura Query y aislamiento de sesión durante la convivencia con 
     const { sessionMutationOptions } = await load('/src/queries/sessionMutationOptions.ts');
     const { default: api } = await load('/src/api/graphdataApi.ts');
     const { authSlice: { actions: auth } } = await load('/src/modules/auth/slices/authSlice.ts');
-    const { permissionSlice: { actions: permission } } = await load('/src/modules/permission/slices/permissionSlice.ts');
-    const permissionThunks = await load('/src/modules/permission/thunks/permissionThunks.ts');
+    const { roleSlice: { actions: role } } = await load('/src/modules/rol/slices/rolSlice.ts');
+    const roleThunks = await load('/src/modules/rol/thunks/rolThunks.ts');
     const resources = await load('/src/modules/resouce/thunks/resourceThunks.ts');
     const authThunks = await load('/src/modules/auth/thunks/aurthThunks.ts');
     const originalAdapter = api.defaults.adapter;
@@ -40,7 +40,7 @@ test('infraestructura Query y aislamiento de sesión durante la convivencia con 
         return { promise, resolve, reject };
     };
     const tick = () => new Promise(resolve => setImmediate(resolve));
-    const list = page => permissionThunks.startLoadingPermissions(page, 'id', 'asc', 10, '', '');
+    const list = page => roleThunks.startLoadingRoles(page, 'id', 'asc', 10, '', '');
     const data = id => ({ data: [{ identificador: id, nombre: id }], total: 1, current_page: 1 });
     const intercept = () => {
         const pending = [];
@@ -105,9 +105,9 @@ test('infraestructura Query y aislamiento de sesión durante la convivencia con 
             for (const key of Object.keys(store.getState()).filter(key => key !== 'auth')) {
                 store.dispatch({ type: `${key}/onLoading`, payload: true });
             }
-            store.dispatch(permission.setPermissions([{ id: 'old', nombre: 'old' }]));
-            store.dispatch(permission.onSetActivePermission({ id: 'old', nombre: 'old' }));
-            store.dispatch({ type: 'resource/setPermissions', payload: [{ value: 'old', description: 'old' }] });
+            store.dispatch(role.setRoles([{ id: 'old', nombre: 'old' }]));
+            store.dispatch(role.onSetActiveRole({ id: 'old', nombre: 'old' }));
+            store.dispatch({ type: 'resource/setRoles', payload: [{ value: 'old', description: 'old' }] });
             client.setQueryData(['private'], 'old');
             client.getMutationCache().build(client, { mutationKey: ['old'], mutationFn: async () => 'old' });
             store.dispatch(boundary);
@@ -179,24 +179,24 @@ test('infraestructura Query y aislamiento de sesión durante la convivencia con 
         const pending = intercept();
         const read = store.dispatch(list(1));
         const rejectedRead = assert.rejects(read, axios.isCancel);
-        const options = store.dispatch(resources.startLoadingPermissions());
-        const write = store.dispatch(permissionThunks.startSavePermission({ nombre: 'A' }));
+        const options = store.dispatch(resources.startLoadingRoles());
+        const write = store.dispatch(roleThunks.startSaveRol({ nombre: 'A' }));
         const rejected = assert.rejects(write, axios.isCancel);
         store.dispatch(auth.onLogout());
         store.dispatch(auth.onLogin(session('B')));
         const current = store.dispatch(list(1));
-        assert.equal(store.getState().permission.loading, true);
+        assert.equal(store.getState().role.loading, true);
         pending.slice(0, 3).forEach(request => assert.equal(request.config.signal.aborted, true));
         pending[0].finish(data('A'));
         pending[1].finish(data('A'));
         pending[2].finish({ identificador: 'A', nombre: 'A' });
         await Promise.all([rejectedRead, options, rejected]);
-        assert.equal(store.getState().permission.loading, true);
-        assert.deepEqual(store.getState().permission.permissions, []);
-        assert.deepEqual(store.getState().resource.permisosCollection, []);
+        assert.equal(store.getState().role.loading, true);
+        assert.deepEqual(store.getState().role.roles, []);
+        assert.deepEqual(store.getState().resource.rolesCollection, []);
         pending[3].finish(data('B'));
         await current;
-        assert.equal(store.getState().permission.permissions[0].id, 'B');
+        assert.equal(store.getState().role.roles[0].id, 'B');
     });
 
     await t.test('dispatch tardío y thunks anidados quedan bloqueados aun cuando el trabajo ignora cancelación', async () => {
@@ -204,14 +204,14 @@ test('infraestructura Query y aislamiento de sesión durante la convivencia con 
         const gate = deferred();
         const pending = store.dispatch(async dispatch => {
             await gate.promise;
-            dispatch(permission.setPermissions([{ id: 'A', nombre: 'A' }]));
+            dispatch(role.setRoles([{ id: 'A', nombre: 'A' }]));
             dispatch(inner => inner(auth.onLogin(session('A'))));
         });
         store.dispatch(auth.onLogin(session('B')));
         gate.resolve();
         await pending;
         assert.equal(store.getState().auth.user.nombre, 'B');
-        assert.deepEqual(store.getState().permission.permissions, []);
+        assert.deepEqual(store.getState().role.roles, []);
     });
 
     await t.test('se conserva la exclusividad del listado antiguo dentro de la misma sesión/store', async () => {
@@ -222,10 +222,10 @@ test('infraestructura Query y aislamiento de sesión durante la convivencia con 
         assert.equal(pending[0].config.signal.aborted, true);
         pending[0].finish(data('old'));
         await first;
-        assert.equal(store.getState().permission.loading, true);
+        assert.equal(store.getState().role.loading, true);
         pending[1].finish(data('current'));
         await second;
-        assert.equal(store.getState().permission.permissions[0].id, 'current');
+        assert.equal(store.getState().role.roles[0].id, 'current');
     });
 
     await t.test('refresh y login antiguos no restauran sesión tras logout o un acceso más reciente', async () => {

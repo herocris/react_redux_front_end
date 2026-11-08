@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { configureStore } from '@reduxjs/toolkit';
 import { createServer } from 'vite';
 
-test('los nueve listados conservan solo la petición vigente', async t => {
+test('los ocho listados antiguos conservan solo la petición vigente', async t => {
     t.mock.method(console, 'log', () => {});
     const server = await createServer({ configFile: false,
         cacheDir: join(tmpdir(), 'graphdata-tests', `lists-${process.pid}`),
@@ -22,7 +22,6 @@ test('los nueve listados conservan solo la petición vigente', async t => {
         ['weapon', 'weapon', 'startLoadingWeapons', 'weapons', 'weapon'],
         ['drugPresentation', 'drugPresentation', 'startLoadingDrugPresentations', 'drugPresentations', 'drugPresentation'],
         ['rol', 'role', 'startLoadingRoles', 'roles', 'role'],
-        ['permission', 'permission', 'startLoadingPermissions', 'permissions', 'permission'],
         ['activity', 'activity', 'startLoadingActivities', 'activities', 'activity'],
         ['confiscation', 'confiscation', 'startLoadingConfiscations', 'confiscations', 'confiscation'],
     ];

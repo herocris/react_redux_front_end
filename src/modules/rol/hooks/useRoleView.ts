@@ -1,14 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
+import { usePermissionOptions } from '../../permission/queries/usePermissionOptions';
+import { useCallback, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
 import type { Role } from "../types";
-import { startLoadingPermissions } from "../../resouce/thunks";
+
 import { clearActiveRole, onClearErrorMessage, onSetActiveRole } from "../slices";
 import { startDeleteRol, startLoadingRoles, startSaveRol, startUpdateRol } from "../thunks";
 
 export const useRoleView = () => {
   const { activeRole, roles, tableOptions, loading, errorMessage } = useAppSelector((state: RootState) => state.role);
-  const { permisosCollection: permisos } = useAppSelector((state: RootState) => state.resource);
+  const { permisos, permissionOptionsQuery } = usePermissionOptions();
   const dispatch = useAppDispatch();
 
   const [open, setOpen] = useState(false);
@@ -52,9 +53,6 @@ export const useRoleView = () => {
     handleOpen(false);
   };
 
-  useEffect(() => {
-    dispatch(startLoadingPermissions());
-  }, [dispatch])
 
   const LoadingEntities = useCallback((
     page: number,
@@ -81,6 +79,7 @@ export const useRoleView = () => {
     openDialog,
     columnsTable,
     permisos,
+    permissionOptionsQuery,
     activeRole,
     errorMessage,
     handleOpen,

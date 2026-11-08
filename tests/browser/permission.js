@@ -5,6 +5,7 @@ async (page) => {
     const writes = [];
     const unexpectedConsole = [];
     let expectedNetworkErrors = 0;
+    let items = [{ identificador: '7', nombre: 'Original' }];
     let createAttempts = 0;
     let editAttempts = 0;
     let deleteAttempts = 0;
@@ -37,8 +38,8 @@ async (page) => {
         } });
         if (url.pathname.endsWith('/permission') && request.method() === 'GET') {
             return route.fulfill({ json: {
-                data: [{ identificador: '7', nombre: 'Original' }],
-                current_page: 1, per_page: 10, total: 1, last_page: 1, orderBy: 'id', order: 'asc',
+                data: items,
+                current_page: 1, per_page: 10, total: items.length, last_page: 1, orderBy: 'id', order: 'asc',
             } });
         }
         if (request.method() !== 'GET') writes.push({ method: request.method(), path: url.pathname, body: request.postData() || '' });
@@ -48,12 +49,14 @@ async (page) => {
                 await createGate;
                 return route.fulfill({ status: 422, json: { error: { nombre: ['Ya existe ese permiso.'], campoAjeno: ['Error general.'] } } });
             }
-            return route.fulfill({ json: { identificador: '8', nombre: 'Nueva' } });
+            items.push({ identificador: '8', nombre: 'Nueva' });
+            return route.fulfill({ json: items.at(-1) });
         }
         if (url.pathname.endsWith('/permission/7') && request.method() === 'PUT') {
             editAttempts++;
             if (editAttempts === 1) return route.abort('failed');
-            return route.fulfill({ json: { identificador: '7', nombre: 'Editada' } });
+            items[0] = { identificador: '7', nombre: 'Editada' };
+            return route.fulfill({ json: items[0] });
         }
         if (url.pathname.endsWith('/permission/7') && request.method() === 'DELETE') {
             deleteAttempts++;
@@ -61,6 +64,7 @@ async (page) => {
                 await deleteGate;
                 return route.fulfill({ status: 500, json: { error: 'No se pudo borrar.' } });
             }
+            items = items.filter(item => item.identificador !== '7');
             return route.fulfill({ json: {} });
         }
         return route.fulfill({ json: { data: [] } });

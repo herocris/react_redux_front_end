@@ -14,7 +14,6 @@ import { resourceSlice } from '../modules/resouce/slices/resourceSlice'
 import { graphSlice } from '../modules/graph/slices/graphSlice'
 import { mapSlice } from '../modules/map/slices/mapSlice'
 import { roleSlice } from '../modules/rol/slices/rolSlice'
-import { permissionSlice } from '../modules/permission/slices/permissionSlice'
 import { weaponSlice } from '../modules/weapon/slices/weaponSlice'
 
 const appReducer = combineReducers({
@@ -22,7 +21,6 @@ const appReducer = combineReducers({
     user: userSlice.reducer,
     resource:resourceSlice.reducer,
     role:roleSlice.reducer,
-    permission:permissionSlice.reducer,
     activity:activitySlice.reducer,
     ammunition:ammunitionSlice.reducer,
     drug:drugSlice.reducer,

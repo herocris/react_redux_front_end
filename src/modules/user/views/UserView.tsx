@@ -1,3 +1,4 @@
+import { PermissionOptionsStatus } from '../../permission/components/PermissionOptionsStatus';
 import { UserError } from '../components/UserError';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { AddFloatingButton, LegacyEntityList as EntityList, } from '../../../components';
@@ -20,6 +21,7 @@ export const UserView = () => {
     users,
     activeUser,
     permisos,
+    permissionOptionsQuery,
     roles,
     onSaveOrUptdate,
     errorMessage
@@ -27,6 +29,8 @@ export const UserView = () => {
   return (
     <>
       <GrapLayout>
+        {!open && <PermissionOptionsStatus pending={permissionOptionsQuery.isPending}
+          error={permissionOptionsQuery.error} retry={() => { void permissionOptionsQuery.refetch(); }} />}
         {!open && !openDialog && <UserError message={errorMessage} />}
         <EntityList
           handleOpen={handleOpen}
@@ -42,6 +46,8 @@ export const UserView = () => {
             handleOpen={handleOpen}
             loading={loading}
             permisos={permisos}
+            permissionOptionsStatus={{ pending: permissionOptionsQuery.isPending,
+              error: permissionOptionsQuery.error, retry: () => { void permissionOptionsQuery.refetch(); } }}
             roles={roles}
             activeUser={activeUser}
             onSaveOrUptdate={onSaveOrUptdate}

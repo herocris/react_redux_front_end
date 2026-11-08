@@ -1,3 +1,4 @@
+import { PermissionOptionsStatus } from '../../permission/components/PermissionOptionsStatus';
 import Grid from '@mui/material/Grid2';
 import { Button, TextField, Typography, Zoom, Modal, Box, FormControl, InputLabel, Select, MenuItem, FormHelperText } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
@@ -14,6 +15,7 @@ import { boxStyleFormModal } from '../../../helpers/boxStyle';
 
 type FormFields = z.infer<typeof roleSchema>;
 export const RoleFormModal = ({
+    permissionOptionsStatus,
     handleOpen,
      permisos,
      loading,
@@ -26,7 +28,9 @@ export const RoleFormModal = ({
     });
 
     const busy = loading || isSubmitting;
+    const optionsUnavailable = permissionOptionsStatus.pending || !!permissionOptionsStatus.error;
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
+        if (optionsUnavailable) return;
         try {
             await onSaveOrUptdate(data);
         } catch (error) {
@@ -52,6 +56,7 @@ export const RoleFormModal = ({
                 <Box sx={boxStyleFormModal} role="dialog" aria-modal="true" aria-labelledby="role-title">
                     <Typography id='role-title' variant='h5' sx={{ mb: 1 }}>{activeRole.id?'Editar rol':'Crear rol'}</Typography>
                     <RoleError message={errorMessage} />
+                    <PermissionOptionsStatus {...permissionOptionsStatus} />
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
                             <Zoom in={true} style={{ transitionDelay: '150ms' }}>
@@ -71,7 +76,7 @@ export const RoleFormModal = ({
                                         <FormControl fullWidth disabled={busy} error={!!errors.permisos} sx={{ mb: 2 }}>
                                             <InputLabel id="role-permissions-label">Permisos</InputLabel>
                                             <Select<RolePermission[]> {...field} value={field.value ?? []} multiple
-                                                disabled={busy} labelId="role-permissions-label" label="Permisos"
+                                                disabled={busy || optionsUnavailable} labelId="role-permissions-label" label="Permisos"
                                                 aria-describedby="role-permissions-error"
                                                 MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}>
                                                 {permisos.map(option => <MenuItem key={option.value} value={option.value}>{option.description}</MenuItem>)}
@@ -80,7 +85,7 @@ export const RoleFormModal = ({
                                         </FormControl>
                                     )} />
                                     <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 2, mt: 2 }}>
-                                        <Button type='submit' variant='contained' fullWidth loading={busy} aria-label="Guardar rol">
+                                        <Button disabled={optionsUnavailable} type='submit' variant='contained' fullWidth loading={busy} aria-label="Guardar rol">
                                             <SaveIcon />
                                         </Button>
                                     </Grid>

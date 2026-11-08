@@ -1,7 +1,6 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
-import { setRoles, onLoading, setPermissions,setDrugs,setDrugPresentations, setWeapons,setAmmunitions } from '../slices';
-import { Permission } from '../../permission';
+import { setRoles, onLoading, setDrugs,setDrugPresentations, setWeapons,setAmmunitions } from '../slices';
 import { Drug } from '../../drug';
 import { Ammunition } from '../../ammunition';
 import { Weapon } from '../../weapon';
@@ -30,28 +29,6 @@ export const startLoadingRoles = () => {
     }
 }
 
-export const startLoadingPermissions = () => {
-    return async (dispatch: Dispatch) => {
-        dispatch(onLoading(true));
-        try {
-            const { data: { data } } = await calendarApi.get('/permission');
-            const permissions = data.map((permission: Permission) => ({
-                value:permission.identificador,
-                description:permission.nombre
-            }))
-            dispatch(setPermissions(permissions));
-            dispatch(onLoading(false));
-
-        } catch (error) {
-            // dispatch( onLogout('Registro incorrecto') );
-            // setTimeout(() => {
-            //     dispatch( clearErrorMessage() );
-            // }, 2000);
-            console.log('hubo un error');
-
-        }
-    }
-}
 export const startLoadingDrugNames = () => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));

@@ -6,7 +6,6 @@ import { ResourceState } from '../';
 
 const initialState: ResourceState = {
     rolesCollection: [],
-    permisosCollection: [],
     drugCollection:[],
     drugPresentationCollection:[],
     weaponCollection:[],
@@ -24,9 +23,6 @@ export const resourceSlice = createSlice({
         setRoles: (state, { payload }: PayloadAction<SelectOptions[]>) => {
             state.rolesCollection = payload;
         },
-        setPermissions: (state, { payload }: PayloadAction<SelectOptions[]>) => {
-            state.permisosCollection = payload;
-        },
         setDrugs: (state, { payload }: PayloadAction<SelectOptions[]>) => {
             state.drugCollection = payload;
         },
@@ -43,5 +39,5 @@ export const resourceSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { setRoles, setPermissions,setDrugs,setDrugPresentations,setWeapons,setAmmunitions, onLoading } = resourceSlice.actions
+export const { setRoles, setDrugs,setDrugPresentations,setWeapons,setAmmunitions, onLoading } = resourceSlice.actions
 

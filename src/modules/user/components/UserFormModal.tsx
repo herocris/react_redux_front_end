@@ -1,3 +1,4 @@
+import { PermissionOptionsStatus } from '../../permission/components/PermissionOptionsStatus';
 import Grid from '@mui/material/Grid2';
 import { Button, TextField, Typography, Zoom, Modal, Box, FormControl, InputLabel, Select, MenuItem, FormHelperText } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
@@ -14,6 +15,7 @@ import { boxStyleFormModal } from '../../../helpers/boxStyle';
 
 type FormFields = z.infer<typeof userSchema>;
 export const UserFormModal = ({
+    permissionOptionsStatus,
     handleOpen,
     permisos,
     roles,
@@ -27,7 +29,9 @@ export const UserFormModal = ({
     });
 
     const busy = loading || isSubmitting;
+    const optionsUnavailable = permissionOptionsStatus.pending || !!permissionOptionsStatus.error;
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
+        if (optionsUnavailable) return;
         try {
             await onSaveOrUptdate(data);
         } catch (error) {
@@ -53,6 +57,7 @@ export const UserFormModal = ({
                 <Box sx={boxStyleFormModal} role="dialog" aria-modal="true" aria-labelledby="user-title">
                     <Typography id='user-title' variant='h5' sx={{ mb: 1 }}>{activeUser.id?'Editar usuario':'Crear usuario'}</Typography>
                     <UserError message={errorMessage} />
+                    <PermissionOptionsStatus {...permissionOptionsStatus} />
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
                             <Zoom in={true} style={{ transitionDelay: '150ms' }}>
@@ -92,7 +97,7 @@ export const UserFormModal = ({
                                         <FormControl fullWidth disabled={busy} error={!!errors.permisos} sx={{ mb: 2 }}>
                                             <InputLabel id="user-permissions-label">Permisos</InputLabel>
                                             <Select<UserPermission[]> {...field} value={field.value ?? []} multiple
-                                                disabled={busy} labelId="user-permissions-label" label="Permisos"
+                                                disabled={busy || optionsUnavailable} labelId="user-permissions-label" label="Permisos"
                                                 aria-describedby="user-permissions-error"
                                                 MenuProps={{ PaperProps: { style: { maxHeight: 224, width: 250 } } }}>
                                                 {permisos.map(option => <MenuItem key={option.value} value={option.value}>{option.description}</MenuItem>)}
@@ -101,7 +106,7 @@ export const UserFormModal = ({
                                         </FormControl>
                                     )} />
                                     <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 2, mt: 2 }}>
-                                        <Button type='submit' variant='contained' fullWidth loading={busy} aria-label="Guardar usuario">
+                                        <Button disabled={optionsUnavailable} type='submit' variant='contained' fullWidth loading={busy} aria-label="Guardar usuario">
                                             <SaveIcon />
                                         </Button>
                                     </Grid>

@@ -82,8 +82,8 @@ async (page) => {
                 new URL(entry.name).pathname === path).name;
             const { store } = await import(moduleURL('/src/store/store.ts'));
             const { queryClient } = await import(moduleURL('/src/queries/queryClient.ts'));
-            return { rows: store.getState().permission.permissions.length,
-                options: store.getState().resource.permisosCollection.length,
+            return { rows: Number('permission' in store.getState()),
+                options: Number('permisosCollection' in store.getState().resource),
                 queries: queryClient.getQueryCache().getAll().length,
                 mutations: queryClient.getMutationCache().getAll().length };
         });
@@ -101,12 +101,14 @@ async (page) => {
             const url = performance.getEntriesByType('resource').find(entry =>
                 new URL(entry.name).pathname === '/src/store/store.ts').name;
             const { store } = await import(url);
-            return store.getState().permission.permissions[0]?.id === 'B' && !store.getState().permission.loading;
+            const clientURL = performance.getEntriesByType('resource').find(entry => new URL(entry.name).pathname === '/src/queries/queryClient.ts').name;
+            const { queryClient } = await import(clientURL);
+            return queryClient.getQueryCache().findAll({ queryKey: ['permission', 'list'] }).some(query => query.state.data?.permissions[0]?.id === 'B') && !('permission' in store.getState());
         });
         check(await page.getByText('Permiso A', { exact: true }).count() === 0, 'No reaparecen filas de A');
         check(errors.length === 0, JSON.stringify(errors));
         check(consoleErrors.length === 0, JSON.stringify(consoleErrors));
-        return { passed: ['listado antiguo con proveedor Query', 'logout fallido conserva sesión sin rechazo sin manejar', 'salida limpia Redux y Query con lectura pendiente',
+        return { passed: ['listado de permisos migrado a Query', 'logout fallido conserva sesión sin rechazo sin manejar', 'salida limpia Redux y Query con lectura pendiente',
             'acceso B y respuesta tardía A sin contaminación'], requests,
             cleanAfterLogout: clean, pageErrors: errors.length, unexpectedConsole: consoleErrors.length, expectedNetworkErrors };
     } finally {

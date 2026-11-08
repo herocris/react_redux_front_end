@@ -33,7 +33,7 @@ async (page) => {
         if (!['fetch', 'xhr'].includes(request.resourceType())) return route.fallback();
         const url = new URL(request.url());
         if (url.pathname.endsWith('/role')) return route.fulfill({ json: { data: [{ identificador: 'admin', nombre: 'Administrador' }, { identificador: 3, nombre: 'Operador' }] } });
-        if (url.pathname.endsWith('/permission')) return route.fulfill({ json: { data: [{ identificador: 1, nombre: 'Leer' }, { identificador: 2, nombre: 'Editar' }] } });
+        if (url.pathname.endsWith('/permission')) return route.fulfill({ json: { data: [{ identificador: 1, nombre: 'Leer' }, { identificador: 2, nombre: 'Editar' }], current_page: 1, per_page: 100, total: 2, last_page: 1 } });
         if (url.pathname.endsWith('/refresh')) return route.fulfill({ json: {
             user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: [],
         } });

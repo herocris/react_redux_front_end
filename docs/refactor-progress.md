@@ -5,11 +5,12 @@
 Se consolidaron los cambios anteriores en 12 commits locales y se prepararon
 las instrucciones para continuar en conversaciones independientes.
 La preparación inicial no instaló dependencias ni creó services. **El paso 6
-ya incorpora la infraestructura de TanStack Query; ningún CRUD está migrado.**
+incorpora la infraestructura de TanStack Query y el paso 9 migra el CRUD de
+permisos y sus opciones en roles y usuarios.**
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1, 2, 3, 4, 5, 6, 7 y 8 completados**; siguiente paso pendiente:
-**9, piloto de permisos**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1, 2, 3, 4, 5, 6, 7, 8 y 9 completados**; siguiente paso pendiente:
+**10, componentes compartidos**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -89,7 +90,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | 6. TanStack Query | Completado | Cliente/proveedor estables, política explícita y aislamiento de sesión con convivencia Redux; pruebas y navegador con HTTP simulado. |
 | 7. Service de permisos | Completado | Service tipado, contratos HTTP probados y thunks compatibles; pantalla y opciones siguen en Redux. |
 | 8. EntityList | Completado | Tabla genérica controlada, callbacks de fila y adaptador temporal para los diez consumidores antiguos; CRUD, solo lectura y control externo verificados. |
-| 9. Piloto de permisos | Pendiente | CRUD y opciones aún usan Redux manual. |
+| 9. Piloto de permisos | Completado | CRUD y opciones en Query; invalidación, catálogo paginado, página vacía, fallos/reintentos y sesión probados. |
 | 10. Componentes comunes | Pendiente | Hay alertas/confirmaciones repetidas y campos con tipos amplios. |
 | 11. Catálogos y actividad | Pendiente | Refactors previos conservados; migración de datos no iniciada. |
 | 12. Confiscaciones | Pendiente | Mantener geocodificación y completar flujos, tipos y datos. |
@@ -110,13 +111,14 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
   del contrato antes de endurecer o normalizar sus formatos.
 - El interceptor conserva rechazos y puede entregar el cuerpo HTTP. Evitar
   asumir AxiosError/status disponibles en todos los casos.
-- Conservar cancelación/protección de respuestas obsoletas. Sus pruebas actuales
-  se centran en una petición vigente por listado/store; verificar la política
-  deseada al introducir caché por argumentos.
-- Las escrituras de permisos modifican filas locales sin reconstruir totales y
-  paginación. El piloto debe resolver coherencia de lista, opciones y páginas.
-- `resouce` mantiene cargas/errores anteriores y copias separadas de catálogos.
-  Verificar si los endpoints usados en selectores devuelven todas las opciones.
+- Conservar cancelación/protección de respuestas obsoletas. Los ocho listados
+  antiguos mantienen una petición vigente por listado/store; permisos usa caché
+  por argumentos y cancela al retirar el último consumidor de cada clave.
+- Las escrituras de permisos invalidan listas/opciones y vuelven a consultar
+  totales; el consumidor ajusta páginas vacías conservando filtros y orden.
+- `resouce` mantiene cargas/errores anteriores de los catálogos restantes.
+  Las opciones de permisos ya usan Query y recorren la paginación, sin copia en
+  Redux; verificar catálogos completos de los demás dominios en el paso 11.
 - Guardado de confiscaciones y subdecomisos corregido en el paso 2: el cierre
   espera el éxito y `EditView` separa carga inicial de envío. Véase su registro
   y [verificación](verification-confiscation-save-2026-11-08.md).
@@ -758,6 +760,128 @@ entrega los modelos completos al consumidor. No se acredita todavía caché,
 invalidación, catálogo completo ni corrección de página vacía de permisos:
 corresponden al paso 9. Continúan deuda de lint y aviso de bundle. Paso 8
 cerrado; paso 9 pendiente, sin iniciarlo.
+
+### Paso 9 — Piloto de permisos (8 de noviembre de 2026)
+
+Al comenzar, HEAD `2e2fa77` y workspace limpio. Se leyeron AGENTS.md, plan y
+progreso, contrastando consumidores de permisos, opciones, store y pruebas.
+Se ejecutó únicamente el prompt del paso 9, sin instalar dependencias ni
+migrar el CRUD de roles/usuarios u otros dominios. Plan sin cambios.
+
+**Cambios y decisiones.**
+
+- [`permissionQueries`](../src/modules/permission/queries/permissionQueries.ts)
+  centraliza claves de listas y opciones. Cada lista incluye página, tamaño,
+  orden, campo y valor de filtro del contrato HTTP; consume directamente el
+  service con la señal de Query. Mantiene la política del cliente del paso 6.
+  Las claves independientes pueden coexistir, sin exclusividad global antigua.
+- Las tres escrituras consumen el service mediante `sessionMutationOptions`.
+  Solo tras éxito invalidan el dominio (todas las listas y opciones), esperan
+  sus recargas activas y comprueban otra vez la señal de sesión antes de cerrar
+  diálogos. Fallar la escritura no invalida ni altera filas/selección. Si falla
+  una recarga tras una escritura correcta, se muestra el error de consulta con
+  reintento, sin presentar la escritura como fallida ni repetirla automáticamente.
+- [`usePermissionView`](../src/modules/permission/hooks/usePermissionView.ts)
+  posee los modelos controlados y selección/diálogos locales; la tabla consume
+  EntityList directamente, sin adaptador Redux. Query posee filas, metadatos,
+  carga y errores. Los datos anteriores durante cambios de argumentos son
+  placeholder de Query; no permiten seleccionar otra fila ni corregir página
+  hasta recibir el resultado actual. Una página vacía confirmada se ajusta al
+  último índice válido usando el total del servidor, sin borrar orden/filtros.
+  RHF conserva la edición, separada de la carga del listado y de la mutación.
+- [`permissionService.catalog`](../src/modules/permission/services/permissionService.ts)
+  recorre `/permission` con página explícita y orden estable. No asume que un
+  GET sin parámetros ni `per_page=100` entregue todo: sigue `last_page` incluso
+  si el servidor limita el tamaño. Comprueba página, metadatos enteros, total
+  estable, identificadores repetidos, páginas intermedias vacías y recuento
+  final. Rechaza recorridos incompletos/inconsistentes sin publicar opciones
+  parciales; propaga errores y cancelación. Se conserva la serialización HTTP,
+  JSON, métodos, cookies e identificadores sin coerción del paso 7.
+- Roles y usuarios comparten la consulta de opciones y las derivan de entidades
+  consultadas, sin copiarlas a `resouce`. El estado de carga/error permite
+  reintentar, conserva el borrador y bloquea selector/envío mientras no se puede
+  disponer del catálogo. No bloquea la edición de texto por una recarga normal.
+  El pequeño estado visual de opciones pertenece a permisos; no se consolidaron
+  formularios, alertas generales ni confirmaciones del paso 10.
+- Tras buscar consumidores en aplicación/store/pruebas, se retiraron slice,
+  thunks, exports y `PermissionState` antiguos de permisos, además del thunk,
+  acción y colección de sus opciones en `resouce`. Los tipos de entidad/formulario
+  y sus consumidores de relaciones se conservan. `createLatestListRequest`,
+  LegacyEntityList, los demás catálogos y Redux de sesión siguen vigentes.
+
+**Comprobaciones nuevas.**
+
+- [`permission.test.mjs`](../tests/permission.test.mjs): nueve conteos (grupo y
+  ocho subpruebas), trasladando errores/reintentos a Query. Cubre claves por
+  argumentos, caché/deduplificación, cambios rápidos y desmontaje con aborto,
+  respuestas tardías, claves concurrentes, causas originales, las tres
+  escrituras con invalidación solo tras éxito, listas/opciones activas,
+  metadatos recargados, sesión retirada y cambio de sesión durante el await de
+  invalidación. Conserva la prueba del esquema del formulario.
+- [`permission-service.test.mjs`](../tests/permission-service.test.mjs) conserva
+  las cinco subpruebas de contratos y añade tres de catálogo: servidor limita
+  tamaño, vacío, metadatos ausentes/incoherentes, total cambiante, duplicados,
+  fallo de segunda página y cancelación. No acredita el contrato de un backend
+  real: verifica el contrato paginado disponible mediante transporte simulado.
+- La prueba de listados antiguos conserva los ocho dominios restantes. La
+  cobertura Redux de convivencia/sesión usa ahora roles y sus opciones, aún
+  antiguos, manteniendo las mismas garantías tras retirar permisos.
+- `node --test tests/permission.test.mjs tests/permission-service.test.mjs
+  tests/list-loading.test.mjs tests/query-session.test.mjs tests/rol.test.mjs
+  tests/user.test.mjs`: **82 aprobadas**, cero fallos/canceladas/omitidas.
+  Log final: `%TEMP%/graphdata-step9-tests-final.txt`.
+- `npm.cmd run build`: correcto, salida 0 en la ejecución final; persiste el
+  aviso de chunks >500 kB. El primer comando redirigido en PowerShell devolvió
+  1 pese a generar el build, al capturar el aviso por stderr; se confirmó sin
+  redirección. Se restauró `tsconfig.app.tsbuildinfo` a sus bytes iniciales.
+- `npm.cmd run lint -- --format json --output-file ...`: **77 errores y
+  24 advertencias** de deuda restante, frente a 78/24 del paso 8; cero nuevos
+  diagnósticos por archivo/regla/severidad/mensaje. Sin incidencias en archivos
+  nuevos. Logs finales: `%TEMP%/graphdata-step9-lint-final.json` y `.txt`.
+- `git diff --check`: correcto al cierre. No se repitió la suite completa;
+  se reutilizan resultados históricos de contratos de módulos no modificados,
+  imágenes, multipart, geocodificación y carga diferida. Roles/usuarios conservan
+  sus CRUD Redux y se incluyeron sus pruebas de comportamiento en la selección.
+
+**Navegador.** Playwright MCP operativo, reutilizando página y servidor existente
+en 4175; el intento con `--strictPort` confirmó el puerto ocupado sin iniciar
+otro servidor. Se ejecutó [`permission.js`](../tests/browser/permission.js):
+siete grupos aprobados y seis escrituras simuladas. Su fixture ahora mantiene
+estado para que las recargas posteriores a escrituras devuelvan el resultado
+del servidor. Se conserva la captura del formulario del recorrido existente.
+[`query-session.js`](../tests/browser/query-session.js), adaptado a la retirada
+del slice, aprueba cuatro grupos con salida fallida, limpieza y lectura tardía
+de A tras acceso B; ocho peticiones simuladas. Cero excepciones JS y mensajes
+inesperados en ambos recorridos; errores HTTP simulados y aviso Canvas conocido.
+
+El nuevo [`permission-query.js`](../tests/browser/permission-query.js) aprueba
+cinco grupos: última fila de página 2 borrada con vuelta a página 1/total 10 y
+filtro/orden conservados; fallo/reintento de recarga; catálogo completo en roles
+con servidor limitado a dos filas; creación que actualiza opciones cacheadas
+al volver a roles; opciones compartidas en usuarios y fallo/reintento sin perder
+borrador ni permitir envío incompleto. Ejecución final: 30 GET de permisos,
+18 de ellos páginas de opciones, dos 503 esperados, cero excepciones y cero
+mensajes inesperados. Se repitió tras el último ajuste del selector de roles.
+Los intentos iniciales corrigieron solo el script: codificación de guiones,
+nombre accesible del menú y espera a la carga diferida de usuarios para evitar
+interactuar con la vista anterior. Interceptaciones retiradas en finally.
+Los fixtures de los recorridos históricos de roles/usuarios incluyen ahora los
+metadatos de permisos; no se ejecutaron sus baterías completas, ya cubiertas por
+la evidencia histórica para CRUD y por el recorrido nuevo para opciones.
+
+**Documentación y límites.** Se aplicaron las skills React y composición,
+manteniendo un propietario por estado y derivando opciones sin sincronizarlas
+con Redux. Lockfile reconfirmado: Query 5.107.1, React 19.3.1, Axios 1.21.0,
+DataGrid 7.27.3 y RHF 7.55.0; sin cambios de versiones. Context7 consultado para
+Query; no ofrece 5.107.1 exacta. Se contrastó su guía v5 de
+[invalidación](https://tanstack.com/query/v5/docs/framework/react/guides/invalidations-from-mutations)
+y [cancelación](https://tanstack.com/query/v5/docs/framework/react/guides/query-cancellation)
+con los tipos instalados, build y pruebas; no se atribuye a un tag exacto.
+Backend/autenticación simulados: quedan sin verificar persistencia, cookies y
+metadatos reales del endpoint. Un catálogo cambiante/incompleto requiere
+reintento; no se presume una instantánea transaccional del servidor. Cancelar
+no demuestra reversión de escrituras remotas. Continúan deuda de lint y aviso
+de bundle. Paso 9 cerrado; paso 10 pendiente y sin iniciar.
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,

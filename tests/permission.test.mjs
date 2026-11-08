@@ -1,106 +1,189 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import axios from 'axios';
+import { QueryObserver, isCancelledError } from '@tanstack/react-query';
 import { createServer } from 'vite';
-import { configureStore } from '@reduxjs/toolkit';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-test('CRUD de permisos: transiciones, errores y reintentos Redux', async t => {
-    const server = await createServer({
-        configFile: false,
-        cacheDir: join(tmpdir(), 'graphdata-tests', `permission-${process.pid}`),
+test('piloto de permisos: caché, concurrencia, invalidación y sesión', async t => {
+    const server = await createServer({ configFile: false,
+        cacheDir: join(tmpdir(), 'graphdata-tests', 'permission-' + process.pid),
         optimizeDeps: { noDiscovery: true, include: [] },
-        server: { middlewareMode: true, hmr: false, ws: false },
-        appType: 'custom',
-    });
+        server: { middlewareMode: true, hmr: false, ws: false }, appType: 'custom' });
     t.after(() => server.close());
-    const { default: api } = await server.ssrLoadModule('/src/api/graphdataApi.ts');
-    const { permissionSlice: slice } = await server.ssrLoadModule('/src/modules/permission/slices/permissionSlice.ts');
-    const thunks = await server.ssrLoadModule('/src/modules/permission/thunks/permissionThunks.ts');
-    const { getApiErrorMessage } = await server.ssrLoadModule('/src/api/apiErrors.ts');
+    const load = path => server.ssrLoadModule(path);
+    const { default: api } = await load('/src/api/graphdataApi.ts');
+    const { permissionKeys: keys, permissionListOptions: list, permissionOptionsOptions: catalog,
+        permissionMutationOptions: write } = await load('/src/modules/permission/queries/permissionQueries.ts');
+    const { createAppQueryClient } = await load('/src/queries/queryClient.ts');
+    const { resetSessionScope } = await load('/src/api/sessionScope.ts');
     const original = api.defaults.adapter;
     t.after(() => { api.defaults.adapter = original; });
-    const item = { id: '7', nombre: 'Original' };
-    const makeStore = () => {
-        const store = configureStore({ reducer: slice.reducer });
-        store.dispatch(slice.actions.setPermissions([item]));
-        store.dispatch(slice.actions.onSetActivePermission(item));
-        return store;
+    const client = createAppQueryClient();
+    const defaults = client.getDefaultOptions();
+    client.setDefaultOptions({ ...defaults, queries: { ...defaults.queries, gcTime: Infinity },
+        mutations: { ...defaults.mutations, gcTime: Infinity } });
+    t.after(() => client.clear());
+    const params = { page: 1, sortBy: 'id', orderType: 'asc', per_page: 10, search_by: '', valueSearch: '' };
+    const reply = (config, data) => ({ config, data, status: 200, statusText: 'OK', headers: {} });
+    const data = (id, page = 1) => ({ data: [{ identificador: id, nombre: id }],
+        current_page: page, per_page: 10, total: 1, last_page: 1 });
+    const tick = () => new Promise(resolve => setImmediate(resolve));
+    const intercept = () => {
+        const pending = [];
+        api.defaults.adapter = config => new Promise(resolve => pending.push({ config,
+            finish: body => resolve(reply(config, body)) }));
+        return pending;
     };
-    const success = (config, data) => ({ config, data, status: 200, statusText: 'OK', headers: {} });
 
-    await t.test('los cuatro thunks conservan causa, datos y selección ante fallos', async () => {
-        for (const reason of [new axios.AxiosError('Network Error', 'ERR_NETWORK'), { error: { nombre: ['Duplicado'] } }, { error: { ajeno: ['General'] } }, null]) {
-            for (const action of [
-                () => thunks.startLoadingPermissions(1, 'id', 'asc', 10, '', ''),
-                () => thunks.startSavePermission(item),
-                () => thunks.startUpdatePermission(item),
-                () => thunks.startDeletePermission(item),
-            ]) {
-                const store = makeStore();
-                api.defaults.adapter = async () => { throw reason; };
-                await assert.rejects(store.dispatch(action()), error => error === reason);
-                assert.equal(store.getState().loading, false);
-                assert.deepEqual(store.getState().permissions, [item]);
-                assert.deepEqual(store.getState().activePermission, item);
-                assert.deepEqual(store.getState().errorMessage, getApiErrorMessage(reason));
+    await t.test('cada argumento cambia la clave; catálogo separado y caché vigente sin duplicados', async () => {
+        const changes = { page: 2, sortBy: 'nombre', orderType: 'desc', per_page: 25,
+            search_by: 'nombre', valueSearch: 'Leer' };
+        const hashes = new Set([JSON.stringify(keys.list(params))]);
+        for (const [field, value] of Object.entries(changes)) hashes.add(JSON.stringify(keys.list({ ...params, [field]: value })));
+        assert.equal(hashes.size, 7);
+        assert.notDeepEqual(keys.options(), keys.list(params));
+        let calls = 0;
+        api.defaults.adapter = async config => { calls++; return reply(config, data('7')); };
+        const [a, b] = await Promise.all([client.fetchQuery(list(params)), client.fetchQuery(list(params))]);
+        assert.deepEqual(a, b);
+        await client.fetchQuery(list(params));
+        assert.equal(calls, 1);
+    });
+
+    await t.test('cambios rápidos de argumentos y desmontaje abortan; respuestas tardías no sustituyen la clave actual', async () => {
+        client.clear();
+        const pending = intercept();
+        const observer = new QueryObserver(client, list(params));
+        const unsubscribe = observer.subscribe(() => {});
+        observer.setOptions(list({ ...params, page: 2, valueSearch: 'B' }));
+        assert.equal(pending[0].config.signal.aborted, true);
+        pending[1].finish(data('B', 2));
+        await tick();
+        pending[0].finish(data('A'));
+        await tick();
+        assert.equal(observer.getCurrentResult().data.permissions[0].id, 'B');
+        assert.equal(client.getQueryData(keys.list(params)), undefined);
+        observer.setOptions(list({ ...params, page: 3 }));
+        unsubscribe();
+        assert.equal(pending[2].config.signal.aborted, true);
+        pending[2].finish(data('late', 3));
+        await tick();
+        assert.equal(client.getQueryData(keys.list({ ...params, page: 3 })), undefined);
+    });
+
+    await t.test('claves independientes coexisten y no cancelan otros consumidores', async () => {
+        client.clear();
+        const pending = intercept();
+        const a = client.fetchQuery(list(params));
+        const b = client.fetchQuery(list({ ...params, page: 2 }));
+        assert.equal(pending[0].config.signal.aborted, false);
+        pending[1].finish(data('B', 2));
+        pending[0].finish(data('A'));
+        await Promise.all([a, b]);
+        assert.equal(client.getQueryData(keys.list(params)).permissions[0].id, 'A');
+        assert.equal(client.getQueryData(keys.list({ ...params, page: 2 })).permissions[0].id, 'B');
+    });
+
+    await t.test('errores conservan causa y caché, sin invalidación ni éxito; reintento de las tres escrituras', async () => {
+        const reason = { error: { nombre: ['Duplicado'], desconocido: ['General'] } };
+        const writes = [{ type: 'create', values: { nombre: 'Nueva' } },
+            { type: 'update', values: { id: '7', nombre: 'Editada' } }, { type: 'delete', id: '7' }];
+        for (const value of writes) {
+            client.clear();
+            client.setQueryData(keys.list(params), { permissions: [{ id: '7', nombre: 'Original' }] });
+            client.setQueryData(keys.options(), [{ id: '7', nombre: 'Original' }]);
+            client.setQueryData(keys.list({ ...params, page: 2 }), 'page2');
+            client.setQueryData(['other'], 'unchanged');
+            let effects = 0;
+            api.defaults.adapter = async () => { throw reason; };
+            const mutation = client.getMutationCache().build(client, write(client, () => { effects++; }));
+            await assert.rejects(mutation.execute(value), error => error === reason);
+            assert.equal(effects, 0);
+            assert.equal(client.getQueryState(keys.list(params)).isInvalidated, false);
+            assert.equal(client.getQueryState(keys.options()).isInvalidated, false);
+            assert.equal(client.getQueryData(keys.list(params)).permissions[0].nombre, 'Original');
+            api.defaults.adapter = async config => reply(config, { identificador: '7', nombre: 'Nueva' });
+            await mutation.execute(value);
+            assert.equal(effects, 1);
+            for (const key of [keys.list(params), keys.list({ ...params, page: 2 }), keys.options()]) {
+                assert.equal(client.getQueryState(key).isInvalidated, true);
             }
+            assert.equal(client.getQueryState(['other']).isInvalidated, false);
         }
     });
 
-    await t.test('crear y editar publican la entidad y limpian error y selección tras éxito', async () => {
-        for (const update of [false, true]) {
-            {
-                const store = makeStore();
-                store.dispatch(slice.actions.onSetErrorMessage('Anterior'));
-                const values = { nombre: 'Nuevo', ...(update ? { id: '7' } : {}) };
-                api.defaults.adapter = async config => {
-                    assert.equal(store.getState().loading, true);
-                    assert.deepEqual(store.getState().permissions, [item]);
-                    assert.deepEqual(store.getState().errorMessage, {});
-                    return success(config, { identificador: update ? '7' : '8', nombre: 'Nuevo' });
-                };
-                await store.dispatch(update ? thunks.startUpdatePermission(values) : thunks.startSavePermission(values));
-                const saved = store.getState().permissions.find(permission => permission.id === (update ? '7' : '8'));
-                assert.deepEqual(saved, { id: update ? '7' : '8', nombre: 'Nuevo' });
-                assert.equal(store.getState().loading, false);
-                assert.deepEqual(store.getState().activePermission, { nombre: '' });
-            }
-        }
+    await t.test('éxito espera recarga de listas y opciones activas; metadatos paginados proceden del servidor', async () => {
+        client.clear();
+        let removed = false;
+        const reads = [];
+        api.defaults.adapter = async config => {
+            if (config.method === 'delete') { removed = true; return reply(config, {}); }
+            reads.push(config.url);
+            return reply(config, { data: removed ? [] : [{ identificador: '7', nombre: 'Original' }],
+                current_page: 1, per_page: 10, total: removed ? 0 : 1, last_page: 1 });
+        };
+        const listObserver = new QueryObserver(client, list(params));
+        const optionObserver = new QueryObserver(client, catalog());
+        const unlist = listObserver.subscribe(() => {});
+        const unoption = optionObserver.subscribe(() => {});
+        try {
+            await tick();
+            let effects = 0;
+            await client.getMutationCache().build(client, write(client, () => {
+                effects++;
+                assert.equal(listObserver.getCurrentResult().data.tableOptions.total, 0);
+                assert.deepEqual(optionObserver.getCurrentResult().data, []);
+            })).execute({ type: 'delete', id: '7' });
+            assert.equal(effects, 1);
+            assert.equal(reads.length, 4);
+        } finally { unlist(); unoption(); }
     });
 
-    await t.test('el esquema conserva nombre e identificador sin transformar', async () => {
-        const { permissionSchema } = await server.ssrLoadModule('/src/modules/permission/validators/permissionValidations.ts');
+    await t.test('lectura y escritura tardías de sesión A no invalidan ni publican en B', async () => {
+        client.clear(); resetSessionScope();
+        const pending = intercept();
+        const read = client.fetchQuery(list(params));
+        const rejectedRead = assert.rejects(read, isCancelledError);
+        let effects = 0;
+        const mutation = client.getMutationCache().build(client, write(client, () => { effects++; }));
+        const old = mutation.execute({ type: 'create', values: { nombre: 'A' } });
+        const rejectedWrite = assert.rejects(old, axios.isCancel);
+        await tick();
+        resetSessionScope();
+        await client.cancelQueries(); client.clear();
+        client.setQueryData(keys.options(), [{ id: 'B', nombre: 'B' }]);
+        pending[0].finish(data('A'));
+        pending[1].finish({ identificador: 'A', nombre: 'A' });
+        await Promise.all([rejectedRead, rejectedWrite]);
+        assert.equal(effects, 0);
+        assert.equal(client.getQueryState(keys.options()).isInvalidated, false);
+        assert.equal(client.getQueryData(keys.options())[0].id, 'B');
+    });
+
+    await t.test('cambio de sesión durante la invalidación impide efectos posteriores al await', async () => {
+        client.clear(); resetSessionScope();
+        const pending = intercept();
+        client.setQueryData(keys.list(params), { permissions: [{ id: 'A', nombre: 'A' }], tableOptions: { total: 1 } });
+        const observer = new QueryObserver(client, list(params));
+        const unsubscribe = observer.subscribe(() => {});
+        let effects = 0;
+        const old = client.getMutationCache().build(client, write(client, () => { effects++; }))
+            .execute({ type: 'delete', id: 'A' });
+        await tick(); pending[0].finish({}); await tick();
+        assert.equal(pending.length, 2);
+        resetSessionScope(); await client.cancelQueries(); client.clear();
+        pending[1].finish(data('A'));
+        await old;
+        assert.equal(effects, 0);
+        unsubscribe();
+    });
+
+    await t.test('esquema de formulario conserva los campos y rechaza nombre vacío', async () => {
+        const { permissionSchema } = await load('/src/modules/permission/validators/permissionValidations.ts');
         const values = { nombre: 'Leer', identificador: 'read' };
         assert.deepEqual(permissionSchema.parse(values), values);
         assert.equal(permissionSchema.safeParse({ nombre: '' }).success, false);
-    });
-
-    await t.test('un reintento conserva campos y limpia el error en el mismo store', async () => {
-        const store = makeStore();
-        const reason = { error: 'Temporal' };
-        api.defaults.adapter = async () => { throw reason; };
-        await assert.rejects(store.dispatch(thunks.startUpdatePermission(item)), error => error === reason);
-        const retained = store.getState().activePermission;
-        api.defaults.adapter = async config => {
-            assert.deepEqual(store.getState().errorMessage, {});
-            return success(config, { identificador: item.id, nombre: item.nombre });
-        };
-        await store.dispatch(thunks.startUpdatePermission(retained));
-        assert.deepEqual(store.getState().permissions, [item]);
-        assert.deepEqual(store.getState().activePermission, { nombre: '' });
-    });
-
-    await t.test('borrar solo elimina la fila tras confirmación del servidor', async () => {
-        const store = makeStore();
-        api.defaults.adapter = async config => {
-            assert.equal(store.getState().loading, true);
-            assert.equal(store.getState().permissions.length, 1);
-            return success(config, {});
-        };
-        await store.dispatch(thunks.startDeletePermission(item));
-        assert.deepEqual(store.getState().permissions, []);
-        assert.equal(store.getState().loading, false);
     });
 });

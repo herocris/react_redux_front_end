@@ -29,14 +29,6 @@ export interface PermissionListResult {
     permissions: PermissionEntity[],
     tableOptions: TableOptions,
 }
-export interface PermissionState {
-    permissions: Permission[],
-    activePermission: Permission,
-    tableOptions: TableOptions,
-    loading: boolean
-    errorMessage: ApiErrorMessage
-}
-
 export interface PermissionFormModalProps {
     handleOpen: (open: boolean) => void;
     loading: boolean

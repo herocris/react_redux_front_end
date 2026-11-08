@@ -1,3 +1,4 @@
+import { PermissionOptionsStatus } from '../../permission/components/PermissionOptionsStatus';
 import { RoleError } from '../components/RoleError';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { AddFloatingButton, LegacyEntityList as EntityList, } from '../../../components';
@@ -18,6 +19,7 @@ export const RoleView = () => {
     openDialog,
     open,
     permisos,
+    permissionOptionsQuery,
     roles,
     activeRole,
     onSaveOrUptdate,
@@ -26,6 +28,8 @@ export const RoleView = () => {
   return (
     <>
       <GrapLayout>
+        {!open && <PermissionOptionsStatus pending={permissionOptionsQuery.isPending}
+          error={permissionOptionsQuery.error} retry={() => { void permissionOptionsQuery.refetch(); }} />}
         {!open && !openDialog && <RoleError message={errorMessage} />}
         <EntityList
           handleOpen={handleOpen}
@@ -40,6 +44,8 @@ export const RoleView = () => {
           <RoleFormModal
             handleOpen={handleOpen}
             permisos={permisos}
+            permissionOptionsStatus={{ pending: permissionOptionsQuery.isPending,
+              error: permissionOptionsQuery.error, retry: () => { void permissionOptionsQuery.refetch(); } }}
             loading={loading}
             activeRole={activeRole}
             onSaveOrUptdate={onSaveOrUptdate}

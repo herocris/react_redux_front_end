@@ -17,6 +17,37 @@ export const permissionService = {
         const { data: { data, ...tableOptions } } = await api.get<PermissionListResponse>(listUrl(params), { signal });
         return { permissions: data.map(toPermission), tableOptions };
     },
+    async catalog(signal?: AbortSignal): Promise<PermissionEntity[]> {
+        const permissions: PermissionEntity[] = [];
+        let page = 1;
+        let expectedTotal: number | undefined;
+        let lastPage: number | undefined;
+        const ids = new Set<string>();
+        do {
+            const result = await permissionService.list({ page, sortBy: 'id', orderType: 'asc',
+                per_page: 100, search_by: '', valueSearch: '' }, signal);
+            const { total, current_page, last_page } = result.tableOptions;
+            // The endpoint is paginated. Never publish a partial or inconsistent catalog.
+            if (!Number.isInteger(total) || total < 0 || current_page !== page ||
+                !Number.isInteger(last_page) || last_page < 1 ||
+                (expectedTotal !== undefined && (total !== expectedTotal || last_page !== lastPage))) {
+                throw new Error('No se pudo verificar el catálogo completo de permisos.');
+            }
+            expectedTotal = total;
+            lastPage = last_page;
+            for (const permission of result.permissions) {
+                if (ids.has(permission.id)) throw new Error('El catálogo de permisos contiene páginas repetidas.');
+                ids.add(permission.id);
+                permissions.push(permission);
+            }
+            if (page < last_page && result.permissions.length === 0) {
+                throw new Error('El catálogo de permisos está incompleto.');
+            }
+            page++;
+        } while (page <= lastPage!);
+        if (permissions.length !== expectedTotal) throw new Error('El catálogo de permisos está incompleto.');
+        return permissions;
+    },
     // Se conserva el payload heredado, incluidos id/identificador si el consumidor los aporta.
     async create(permission: Permission, signal?: AbortSignal): Promise<PermissionEntity> {
         const { data } = await api.post<PermissionResponse>('/permission', permission, { signal });

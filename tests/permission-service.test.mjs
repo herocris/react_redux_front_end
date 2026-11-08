@@ -114,4 +114,51 @@ test('permissionService: contratos HTTP sin Redux', async t => {
             await assert.rejects(pending, error => axios.isCancel(error));
         }
     });
+
+    await t.test('catálogo recorre todas las páginas aunque el servidor limite per_page; ids sin coerción', async () => {
+        const pages = [];
+        api.defaults.adapter = async config => {
+            const page = Number(new URL(config.url, 'http://test').searchParams.get('page'));
+            pages.push(page);
+            return success(config, { data: [{ identificador: page === 1 ? '007' : '008', nombre: 'P' + page }],
+                current_page: page, per_page: 1, total: 2, last_page: 2 });
+        };
+        const catalog = await service.catalog();
+        assert.deepEqual(pages, [1, 2]);
+        assert.deepEqual(catalog.map(row => row.id), ['007', '008']);
+        api.defaults.adapter = async config => success(config, { data: [], current_page: 1, per_page: 100, total: 0, last_page: 1 });
+        assert.deepEqual(await service.catalog(), []);
+    });
+
+    await t.test('catálogo incompleto, paginación ausente/repetida y cambio de total rechazan sin publicar opciones parciales', async () => {
+        for (const mode of ['missing', 'incomplete', 'repeated', 'changed', 'empty', 'wrongpage']) {
+            api.defaults.adapter = async config => {
+                const page = Number(new URL(config.url, 'http://test').searchParams.get('page'));
+                return success(config, { data: mode === 'empty' ? [] : [{ identificador: mode === 'repeated' ? '7' : String(page), nombre: 'P' }],
+                    current_page: mode === 'wrongpage' ? 1 : page, per_page: 1,
+                    ...(mode === 'missing' ? {} : { total: mode === 'changed' && page === 2 ? 3 : 2,
+                        last_page: mode === 'incomplete' ? 1 : 2 }) });
+            };
+            await assert.rejects(service.catalog(), Error, mode);
+        }
+    });
+
+    await t.test('catálogo propaga fallo de página posterior y cancelación durante el recorrido', async () => {
+        const reason = { error: 'Segunda página fallida' };
+        for (const cancel of [false, true]) {
+            const controller = new AbortController();
+            let calls = 0;
+            api.defaults.adapter = async config => {
+                calls++;
+                if (calls === 2) {
+                    if (cancel) controller.abort();
+                    else throw reason;
+                }
+                return success(config, { data: [{ identificador: String(calls), nombre: 'P' }],
+                    current_page: calls, total: 3, last_page: 3 });
+            };
+            await assert.rejects(service.catalog(controller.signal), error => cancel ? axios.isCancel(error) : error === reason);
+            assert.equal(calls, 2);
+        }
+    });
 });

@@ -1,20 +1,26 @@
+import type { GridColDef } from '@mui/x-data-grid';
+import type { PermissionEntity } from '../types';
 import { PermissionError } from '../components/PermissionError';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import { AddFloatingButton, LegacyEntityList as EntityList, } from '../../../components';
+import { AddFloatingButton, EntityList } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { PermissionFormModal } from '../components/PermissionFormModal';
 import { usePermissionView } from '../hooks/usePermissionView';
 
+const columns: GridColDef<PermissionEntity>[] = [
+  { field: 'id', headerName: 'Id', width: 150 },
+  { field: 'nombre', headerName: 'Nombre', flex: 1 },
+];
+
 export const PermissionView = () => {
   const {
     DeletePermission,
-    LoadingEntities,
-    columnsTable,
+    paginationModel, sortModel, filterModel,
+    onPaginationModelChange, onSortModelChange, onFilterModelChange,
+    listLoading, listError, retryList, rowCount, onEdit, onDelete,
     handleOpen,
     handleOpenDialog,
     loading,
-    setIdPermission,
-    tableOptions,
     openDialog,
     open,
     permissions,
@@ -26,15 +32,14 @@ export const PermissionView = () => {
     <>
       <GrapLayout>
         {!open && !openDialog && <PermissionError message={errorMessage} />}
+        <PermissionError message={listError} />
+        {listError && <Button onClick={retryList} disabled={listLoading}>Reintentar listado</Button>}
         <EntityList
-          handleOpen={handleOpen}
-          handleOpenDialog={handleOpenDialog}
-          LoadingEntities={LoadingEntities}
-          setIdEntity={setIdPermission}
-          EntityCollection={permissions}
-          tableOptions={tableOptions}
-          loading={loading}
-          columnsTable={columnsTable} />
+          rows={permissions} columns={columns} rowCount={rowCount} loading={listLoading}
+          paginationModel={paginationModel} sortModel={sortModel} filterModel={filterModel}
+          onPaginationModelChange={onPaginationModelChange}
+          onSortModelChange={onSortModelChange} onFilterModelChange={onFilterModelChange}
+          onEdit={onEdit} onDelete={onDelete} />
         {open &&
           <PermissionFormModal
             handleOpen={handleOpen}

@@ -1,15 +1,17 @@
+import { usePermissionOptions } from '../../permission/queries/usePermissionOptions';
 import { useCallback, useEffect, useState } from 'react';
 import { clearActiveUser, onClearErrorMessage, onSetActiveUser } from "../slices";
 import { startDeleteUser, startLoadingUsers, startSaveUser, startUpdateUser } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
 import { User } from "../";
-import { startLoadingPermissions, startLoadingRoles } from "../../resouce/thunks";
+import { startLoadingRoles } from "../../resouce/thunks";
 
 export const useUserView = () => {
   const { activeUser, users, tableOptions, loading, errorMessage } = useAppSelector((state: RootState) => state.user);
-  const { permisosCollection: permisos, rolesCollection: roles } = useAppSelector((state: RootState) => state.resource);
+  const { rolesCollection: roles } = useAppSelector((state: RootState) => state.resource);
   const dispatch = useAppDispatch();
+  const { permisos, permissionOptionsQuery } = usePermissionOptions();
 
   const [open, setOpen] = useState(false);
   const handleOpen = (valOp:boolean) => {
@@ -53,7 +55,6 @@ export const useUserView = () => {
 
   useEffect(() => {
     dispatch(startLoadingRoles());
-    dispatch(startLoadingPermissions());
   }, [dispatch])
 
   const LoadingEntities = useCallback((
@@ -81,6 +82,7 @@ export const useUserView = () => {
     openDialog,
     columnsTable,
     permisos,
+    permissionOptionsQuery,
     roles,
     activeUser,
     errorMessage,

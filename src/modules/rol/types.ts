@@ -1,3 +1,4 @@
+import type { PermissionOptionsStatusProps } from '../permission/components/PermissionOptionsStatus';
 import type { ApiErrorMessage } from '../../api/apiErrors';
 import { TableOptions } from "../../shared/interfaces/sharedInterfaces";
 import type { Permission } from "../permission";
@@ -19,6 +20,7 @@ export interface RoleState {
     errorMessage: ApiErrorMessage
 }
 export interface RoleFormModalProps {
+    permissionOptionsStatus: PermissionOptionsStatusProps;
     handleOpen: (open: boolean) => void;
     permisos: { value: string | number; description: string }[]
     loading: boolean
