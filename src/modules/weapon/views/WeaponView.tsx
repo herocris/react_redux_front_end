@@ -1,8 +1,9 @@
-import { AddFloatingButton, AlertDialog, EntityList, } from '../../../components';
+import { WeaponError } from '../components/WeaponError';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { AddFloatingButton, EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { WeaponFormModal } from '../components';
 import { useWeaponView } from '../hooks';
-
 
 export const WeaponView = () => {
   const {
@@ -24,6 +25,7 @@ export const WeaponView = () => {
   return (
     <>
       <GrapLayout>
+        {!open && !openDialog && <WeaponError message={errorMessage} />}
         <EntityList
           handleOpen={handleOpen}
           handleOpenDialog={handleOpenDialog}
@@ -42,11 +44,17 @@ export const WeaponView = () => {
             errorMessage={errorMessage} />
         }
         {openDialog &&
-          <AlertDialog
-            title='Borrar'
-            dialogMessage="Deseas borrar la munición?"
-            DeleteEntity={DeleteWeapon}
-            handleOpen={handleOpenDialog} />
+          <Dialog open onClose={() => { if (!loading) handleOpenDialog(); }} aria-labelledby="delete-weapon-title" aria-describedby="delete-weapon-description">
+            <DialogTitle id="delete-weapon-title">Borrar arma</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="delete-weapon-description">¿Deseas borrar el arma?</DialogContentText>
+              <WeaponError message={errorMessage} />
+            </DialogContent>
+            <DialogActions>
+              <Button disabled={loading} onClick={handleOpenDialog}>Cancelar</Button>
+              <Button loading={loading} onClick={DeleteWeapon} color="error">Borrar</Button>
+            </DialogActions>
+          </Dialog>
         }
         <AddFloatingButton handleOpen={handleOpen} />
       </GrapLayout>

@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
-import { clearActiveWeapon, onSetActiveWeapon} from "../slices";
-import {startDeleteWeapon, startLoadingWeapons, startSaveWeapon, startUpdateWeapon } from "../thunks";
+import { clearActiveWeapon, onClearErrorMessage, onSetActiveWeapon} from "../slices";
+import { startDeleteWeapon, startLoadingWeapons, startSaveWeapon, startUpdateWeapon } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { Weapon } from "../";
+import type { Weapon } from '../types';
 
 export const useWeaponView = () => {
   const { activeWeapon, weapons, tableOptions, loading, errorMessage } = useAppSelector((state: RootState) => state.weapon);
@@ -11,39 +11,43 @@ export const useWeaponView = () => {
 
   const [open, setOpen] = useState(false);
   const handleOpen = (valOp:boolean) => {
-    if (open) dispatch(clearActiveWeapon())
+    if (loading) return;
+    dispatch(onClearErrorMessage());
+    if (!valOp) dispatch(clearActiveWeapon())
     setOpen(valOp);
   }
 
   const [openDialog, setOpenDialog] = useState(false);
   const handleOpenDialog = () => {
-    setOpenDialog(!openDialog);
+    if (loading) return;
+    dispatch(onClearErrorMessage());
+    if (openDialog) dispatch(clearActiveWeapon());
+    setOpenDialog(value => !value);
   }
 
   const setIdWeapon = (id: string) => {
     const weapon = weapons.find((row: Weapon) => row.id === id);
-    dispatch(onSetActiveWeapon(weapon as Weapon))
+    if (weapon) dispatch(onSetActiveWeapon(weapon))
   };
 
   const DeleteWeapon = async () => {
-    await dispatch(startDeleteWeapon(activeWeapon));
-    setOpenDialog(!openDialog);
-  }
+    if (activeWeapon.id === undefined) return;
+    try {
+      await dispatch(startDeleteWeapon({ ...activeWeapon, id: activeWeapon.id }));
+      setOpenDialog(false);
+    } catch {
+      // The thunk publishes the error; keep the dialog open for a retry.
+    }
+  };
 
   const onSaveOrUptdate = async (weapon: Weapon) => {
-    console.log(weapon);
     if (activeWeapon.id === undefined) {
-      await dispatch(startSaveWeapon(weapon)).then(() => {
-        handleOpen(false)
-      })
+      await dispatch(startSaveWeapon(weapon));
     } else {
-      await dispatch(startUpdateWeapon({ ...weapon, id: activeWeapon.id })).then(() => {
-        handleOpen(false)
-      })
+      await dispatch(startUpdateWeapon({ ...weapon, id: activeWeapon.id }));
     }
-     dispatch(clearActiveWeapon())
-  }
-
+    handleOpen(false);
+  };
 
   const LoadingEntities = useCallback((
     page: number,

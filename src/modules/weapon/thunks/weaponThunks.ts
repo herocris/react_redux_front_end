@@ -1,8 +1,9 @@
 import { createLatestListRequest } from '../../../api/latestListRequest';
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
-import { setWeapons, onAddNewWeapon, onUpdateWeapon, onDeleteWeapon, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
-import { Weapon } from '../';
+import { setWeapons, onAddNewWeapon, onUpdateWeapon, onDeleteWeapon, onSetTableOptions, onLoading, onClearErrorMessage, onSetErrorMessage } from '../slices';
+import type { Weapon, WeaponListResponse, WeaponResponse } from '../types';
+import { getApiErrorMessage } from '../../../api/apiErrors';
 
 
 const beginListRequest = createLatestListRequest();
@@ -11,11 +12,12 @@ export const startLoadingWeapons = (page: number, sortBy: string, orderType: str
     return async (dispatch: Dispatch) => {
         const request = beginListRequest(dispatch, signal);
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         sortBy = sortBy === 'id' ? 'identificador' : sortBy;
         try {
-            const { data: { data, ...optionsTable } } = await calendarApi.get(`/weapon?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
+            const { data: { data, ...optionsTable } } = await calendarApi.get<WeaponListResponse>(`/weapon?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
             if (!request.isCurrent()) return;
-            const weapons = data.map((weapon: Weapon) => {
+            const weapons = data.map((weapon) => {
                 const { identificador: id, ...resto } = weapon;
                 return { id, ...resto }
             })
@@ -33,8 +35,9 @@ export const startLoadingWeapons = (page: number, sortBy: string, orderType: str
 export const startSaveWeapon = (weapon: Weapon) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         try {
-            const { data } = await calendarApi.post('/weapon', weapon, {
+            const { data } = await calendarApi.post<WeaponResponse>('/weapon', weapon, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -42,7 +45,7 @@ export const startSaveWeapon = (weapon: Weapon) => {
             const { identificador: id, ...resto } = data;
             dispatch(onAddNewWeapon({ id, ...resto }))
         }
-        catch (error: any) {
+        catch (error) {
             return handleApiError(error, dispatch);
         } finally {
             dispatch(onLoading(false));
@@ -50,28 +53,27 @@ export const startSaveWeapon = (weapon: Weapon) => {
     }
 }
 
-export const startUpdateWeapon = (weapon: Weapon) => {
+export const startUpdateWeapon = (weapon: Weapon & { id: string }) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
-        const formData = new FormData();
-        formData.append('descripcion', weapon.descripcion);
-        // Si el archivo existe (por ejemplo, desde tu componente PhotoInput)
-        if (weapon.logo instanceof File) {
-            formData.append('logo', weapon.logo);
-        }
-        // Si quieres enviar un método PUT (Laravel lo reconocerá si el form usa POST):
-        formData.append('_method', 'PUT');
+        dispatch(onClearErrorMessage());
 
         try {
-            const { data } = await calendarApi.post(`/weapon/${weapon.id}`, formData, {
+            const formData = new FormData();
+            formData.append('descripcion', weapon.descripcion);
+            if (weapon.logo instanceof File) {
+                formData.append('logo', weapon.logo);
+            }
+            formData.append('_method', 'PUT');
+
+            const { data } = await calendarApi.post<WeaponResponse>(`/weapon/${weapon.id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
             const { identificador: id, ...resto } = data;
             dispatch(onUpdateWeapon({ id, ...resto }))
-        } catch (error: any) {
-            console.log(error);
+        } catch (error) {
 
             return handleApiError(error, dispatch);
         } finally {
@@ -80,12 +82,13 @@ export const startUpdateWeapon = (weapon: Weapon) => {
     }
 }
 
-export const startDeleteWeapon = (weapon: Weapon) => {
+export const startDeleteWeapon = (weapon: Weapon & { id: string }) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         try {
             await calendarApi.delete(`/weapon/${weapon.id}`,);
-            dispatch(onDeleteWeapon(weapon.id as string))
+            dispatch(onDeleteWeapon(weapon.id))
         } catch (error) {
             return handleApiError(error, dispatch);
         } finally {
@@ -94,10 +97,7 @@ export const startDeleteWeapon = (weapon: Weapon) => {
     }
 }
 
-const handleApiError = (error: any, dispatch: Dispatch) => {
-    if (error?.hasOwnProperty('error')) {
-        dispatch(onSetErrorMessage(error.error));
-    }
-    return Promise.reject();
+const handleApiError = (error: unknown, dispatch: Dispatch) => {
+    dispatch(onSetErrorMessage(getApiErrorMessage(error)));
+    return Promise.reject(error);
 };
-

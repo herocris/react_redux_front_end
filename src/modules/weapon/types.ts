@@ -1,3 +1,4 @@
+import type { ApiErrorMessage } from '../../api/apiErrors';
 import { TableOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface Weapon {
@@ -12,13 +13,19 @@ export interface WeaponState {
     activeWeapon: Weapon,
     tableOptions: TableOptions,
     loading: boolean
-    errorMessage: object
+    errorMessage: ApiErrorMessage
 }
 
 export interface WeaponFormModalProps {
-    handleOpen: Function;
+    handleOpen: (open: boolean) => void;
     loading: boolean
     activeWeapon: Weapon
-    onSaveOrUptdate: Function
-    errorMessage: object | string
+    onSaveOrUptdate: (values: Weapon) => Promise<void>
+    errorMessage: ApiErrorMessage
 }
+export type WeaponResponse = Omit<Weapon, 'id' | 'identificador' | 'logo'> & {
+    identificador: string;
+    logo: string;
+};
+
+export type WeaponListResponse = TableOptions & { data: WeaponResponse[] };
