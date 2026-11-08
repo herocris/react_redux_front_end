@@ -54,9 +54,61 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
 - Preservar tipos y contratos públicos durante la transición; introducir DTO,
   entidad, formulario y mapeadores cuando clarifiquen fronteras. No cambiar
   identificadores o relaciones por deducción ni usar un genérico como validación.
+- Al extraer un dominio, ubicar su acceso HTTP en `services/` y las futuras
+  consultas/mutaciones en `queries/` dentro del módulo; conservar `types.ts`
+  como contrato público compatible. Los mapeadores pertenecen a la frontera
+  de datos, no a componentes ni reducers. No crear carpetas o capas vacías.
+- Centralizar las claves de consultas por dominio y distinguir listas, detalles
+  y opciones. Incluir página, tamaño, orden, filtros y padre cuando afecten la
+  respuesta; derivar opciones de datos consultados sin otra copia en Redux.
+  Verificar que su fuente entregue el catálogo completo. Definir vigencia,
+  reintentos y recargas en el paso 6; no asumir defaults como política acordada.
+- Tras una escritura exitosa, las mutaciones invalidan listas, detalles y
+  opciones afectados según el contrato. Resolver totales y página vacía tras
+  borrar conservando orden/filtros; no dar por coherente una lista paginada
+  solo por insertar o quitar una fila local. No invalidar como si hubiera éxito
+  cuando falla la escritura ni cerrar el formulario antes de su resultado.
+- En módulos migrados, consulta y mutación poseen sus estados remotos; los hooks
+  de pantalla coordinan selección local, diálogos, mensajes y navegación. La
+  tabla recibe datos y callbacks explícitos, con un único propietario de página,
+  orden y filtros de lista en el consumidor. Mantener la edición en RHF y separar
+  carga inicial, recarga y envío para conservar campos/archivos ante fallos y
+  evitar que una recarga sobrescriba cambios. Los slices restantes mantienen
+  transiciones puras de sesión/filtros, sin HTTP ni efectos visuales.
 - Conservar las correcciones de errores, formularios, accesibilidad, geocodificación
   y carga diferida. Borradores por pasos, lotes y exportaciones son ampliaciones
   posteriores; no forman parte de esta migración.
+
+### Convivencia y retirada
+
+- La arquitectura anterior describe el destino; el estado implementado está en
+  [el progreso](docs/refactor-progress.md). Los módulos aún no migrados conservan
+  HTTP en thunks y datos en slices. El paso 7 permite que los thunks de permisos
+  consuman su service antes de migrar la pantalla en el paso 9; no extender esa
+  adaptación temporal a módulos fuera del paso solicitado.
+- Migrar coordinadamente pantallas y consumidores de opciones, incluidos los
+  de `resouce`. Mantener los demás dominios antiguos funcionando. Adaptar
+  `EntityList` mediante una compatibilidad pequeña en el paso 8; no añadir
+  variantes por banderas ni duplicar propietarios para soportar ambos modelos.
+- Retirar un thunk, slice remoto, export o adaptador solo tras buscar todos sus
+  consumidores en aplicación, store y pruebas, migrarlos y verificar las mismas
+  garantías con el nuevo propietario. Trasladar cobertura de contratos a services
+  y de concurrencia/invalidación a consultas; conservar pruebas de transiciones
+  Redux que sigan vigentes. No retirar `createLatestListRequest` mientras exista
+  algún listado antiguo que lo use ni eliminar Redux de sesión/filtros.
+- La cancelación actual de `src/api/latestListRequest.ts` mantiene una petición
+  vigente por dominio/store, aborta la anterior y enlaza la señal del efecto de
+  lista; sus consumidores protegen publicación de datos y fin de carga. Esto no
+  prueba caché por argumentos ni aislamiento de sesión. Al migrar, pasar la señal
+  de consulta al service y comprobar cambios rápidos de argumentos, desmontaje
+  y respuestas tardías. Distintas claves pueden coexistir en caché: no trasladar
+  sin revisión la exclusividad global del listado antiguo.
+- En el paso 6, verificar cancelación y limpieza de datos al salir/cambiar de
+  usuario, incluidas respuestas tardías de lecturas y escrituras. Revisar también
+  los módulos antiguos que convivan: el logout actual solo reinicia auth y no
+  acredita limpieza global. Cancelar una petición no demuestra que el servidor
+  haya deshecho una escritura. Esta política debe probarse antes de considerarla
+  implementada; no introducir una segunda copia de sesión para resolverla.
 
 ## Stack y estructura
 

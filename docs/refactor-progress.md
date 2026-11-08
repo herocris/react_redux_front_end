@@ -8,8 +8,8 @@ las instrucciones para continuar en conversaciones independientes.
 dependencias ni se crearon services nuevos en esta preparación.
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1, 2 y 3 completados**; siguiente paso pendiente:
-**4, convenciones de arquitectura**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1, 2, 3 y 4 completados**; siguiente paso pendiente:
+**5, autenticación**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -84,7 +84,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | 1. Consolidar referencia | Completado | Código, contratos, informes y logs reconciliados el 8 de noviembre; referencia reutilizada sin cambios funcionales. |
 | 2. Guardado de formularios | Completado | Formularios conservados durante envío/fallo, errores, bloqueo y reintentos verificados con HTTP simulado. |
 | 3. Archivos | Completado | Siete esquemas con máximo efectivo de 5.000.000 bytes, rechazo de archivos vacíos y conservación de imágenes existentes; pruebas automatizadas. |
-| 4. Convenciones | Pendiente | Guía y plan iniciales preparados; consolidar sin repetir lo vigente. |
+| 4. Convenciones | Completado | Guía contrastada con código/plan; convivencia, propietarios, retirada y límites de cancelación documentados. |
 | 5. Autenticación | Pendiente | Thunks/slice actuales; falta authService y mejora de tipos. |
 | 6. TanStack Query | Pendiente | No instalado ni configurado. |
 | 7. Service de permisos | Pendiente | HTTP todavía dentro de thunks. |
@@ -326,6 +326,58 @@ No se comprobó backend real, persistencia ni validación del servidor.
 
 Paso 3 cerrado. Paso 4 pendiente, sin iniciarlo; continúan la deuda global de
 lint y el aviso de bundle documentados. El plan conserva su alcance original.
+
+### Paso 4 — Convenciones de arquitectura (8 de noviembre de 2026)
+
+Al comenzar, HEAD `e26aad4` y workspace limpio. Se leyó el prompt del paso 4
+y se contrastaron guía, plan y progreso con store, auth, CRUD de permisos,
+`resouce`, cliente HTTP, utilidad de cancelación y pruebas de listados.
+Los pasos 1–3 están incorporados; TanStack Query sigue ausente del lockfile y
+no hay piloto ni services de backend implementados. El paso 4 consolida las
+convenciones para ese piloto futuro, no registra decisiones como ya probadas.
+
+**Cambios y decisiones.** Se completó únicamente [AGENTS.md](../AGENTS.md),
+manteniendo las reglas comunes allí y el alcance/secuencia en el plan:
+
+- Ubicación por módulo de services y futuras consultas, contratos públicos y
+  mapeadores; claves por dominio/argumentos, lista/detalle/opciones e invalidación
+  tras éxito. El piloto deberá resolver totales, páginas vacías y catálogo de
+  opciones completo; vigencia/reintentos/recargas se definen en el paso 6.
+- Propietarios del estado en módulos migrados: Query para datos/estados remotos,
+  Redux para sesión/filtros aplicados, RHF para edición y pantalla para selección,
+  diálogos y navegación. Tabla controlada por el consumidor y conservación del
+  formulario durante envío/recarga. No se trasladó estado en este paso.
+- Convivencia explícita: HTTP/thunks/slices antiguos hasta su paso; permisos
+  extraerá primero el service con thunks compatibles (7), adaptará EntityList (8)
+  y migrará consultas y opciones (9). Retirada condicionada a ausencia de
+  consumidores, integración y cobertura de garantías, sin duplicar datos remotos
+  en Redux ni extender adaptadores temporales a otros dominios.
+- Cancelación actual por dominio/store frente a futura caché por argumentos.
+  Las pruebas existentes cubren respuesta tardía, fin de carga, aborto externo
+  y stores independientes en nueve listados; no prueban aislamiento de sesión.
+  Auth solo se reinicia a sí mismo al salir: no hay limpieza global acreditada.
+  Queda para el paso 6 verificar limpieza/cancelación al cambiar sesión y
+  respuestas tardías de lecturas/escrituras, también en módulos aún antiguos.
+
+Se leyeron las skills locales de React y composición, aplicando solo derivación
+de estado y composición sin variantes por banderas. No se introdujeron APIs ni
+configuración de librerías: no fue necesaria nueva consulta a Context7. Se
+reconfirmaron en el lockfile React 19.3.1, Redux Toolkit 2.6.1, Axios 1.21.0 y
+RHF 7.55.0. No se modificaron código, pruebas, configuración ni dependencias.
+
+**Verificación reutilizada.** Se leyeron los tres logs temporales del paso 3:
+125 pruebas aprobadas, cero fallos/canceladas/omitidas; build correcto con aviso
+de chunks mayores de 500 kB; lint falla por deuda previa de 87 errores y 24
+advertencias. HEAD contiene el cierre del paso 3 y el diff contra HEAD de `src`,
+`tests`, `package.json` y `package-lock.json` estaba vacío; los resultados siguen
+vigentes. No se repitieron esos comandos para cambios exclusivamente
+documentales. Se comprobó `git diff --check` al cerrar este paso.
+
+Se mantiene la política selectiva de Playwright y la evidencia histórica con
+HTTP/auth simulados. Sin cambios de comportamiento, no se repitió navegador ni
+se comprobó disponibilidad actual de MCP. No se verificaron backend real,
+persistencia ni rendimiento; no se atribuye cobertura de Query/sesión a las
+pruebas antiguas. Paso 4 cerrado, plan sin cambios y paso 5 sin iniciar.
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,
