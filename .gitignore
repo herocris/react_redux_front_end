@@ -13,6 +13,9 @@ dist
 dist-ssr
 *.local
 
+# Artefactos locales de verificaciones con navegador
+.playwright-mcp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

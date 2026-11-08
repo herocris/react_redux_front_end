@@ -18,6 +18,10 @@ const servers = {
   playwright: [
     '@playwright/mcp@0.0.84',
     '--isolated',
+    '--snapshot-mode', 'none',
+    '--codegen', 'none',
+    '--console-level', 'warning',
+    '--no-webmcp',
     ...(useBrave ? ['--executable-path', bravePath] : []),
   ],
 }

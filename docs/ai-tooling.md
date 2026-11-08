@@ -52,6 +52,61 @@ Codex y comprobar que abren Brave. Los procesos ya iniciados conservan los
 argumentos anteriores. La detección del ejecutable no garantiza por sí sola que
 las herramientas React experimentales funcionen con Brave.
 
+### Respuestas breves de Playwright MCP
+
+El lanzador fija Playwright MCP 0.0.84 con estas opciones, verificadas para esa
+versión en Context7 y su documentación oficial:
+
+| Opción | Efecto |
+| --- | --- |
+| `--snapshot-mode none` | Evita snapshots automáticos en las respuestas de las acciones. |
+| `--codegen none` | Evita devolver el código generado junto a cada operación. |
+| `--console-level warning` | Limita el nivel automático de consola a advertencias y errores. |
+| `--no-webmcp` | No descubre herramientas WebMCP de las páginas en Playwright. |
+
+Las herramientas explícitas de búsqueda, snapshot, consola, red y capturas siguen
+disponibles. No se habilitan capacidades adicionales con `--caps`. Las capturas
+visuales se solicitan solo cuando son útiles; no se bloquean sus imágenes.
+Chrome DevTools mantiene la configuración para las herramientas React.
+
+Para localizar un control, comenzar con una búsqueda acotada:
+
+```json
+{"text":"Guardar","maxResults":3}
+```
+
+Si se necesita contexto de un formulario, pedir un snapshot explícito limitado:
+
+```json
+{"target":"form","depth":3}
+```
+
+`maxResults` pertenece a `browser_find`; `target` y `depth` pertenecen a
+`browser_snapshot`, no a una configuración global del servidor. Si un árbol es
+grande, usar `filename` y leer solo el fragmento necesario. En recorridos conocidos,
+reutilizar scripts y devolver resúmenes de aserciones en vez de transcripciones.
+Una acción correcta puede devolver texto vacío con estas opciones; confirmar su
+resultado con una aserción o búsqueda dirigida, sin pedir un árbol completo por
+rutina.
+
+Para regresiones repetibles, ejecutar primero `npm test`. La aplicación utiliza
+Node y Vite para sus pruebas actuales; todavía no incluye Playwright Test, Vitest
+ni React Testing Library. Una futura suite E2E debe usar Playwright Test y mostrar
+al agente el resultado final y los fallos, reservando MCP para exploración y
+verificación interactiva. Este ajuste no instala un nuevo runner.
+
+Reiniciar Playwright MCP después de cambiar el lanzador. Un proceso ya iniciado
+conserva la configuración anterior. Estas opciones reducen información devuelta;
+no representan una medición ni una garantía de ahorro fijo de tokens.
+
+Comprobación local con Brave y dos procesos MCP nuevos: en una página sintética
+de 300 filas, la respuesta de `browser_run_code_unsafe` pasó de 514 a 39
+caracteres y la de un clic de 181 a 0. Se verificó que el clic ya no añadía
+snapshot automático y que `browser_find` y el snapshot explícito del formulario
+seguían funcionando. Es una comparación de caracteres de ese caso, no de tokens.
+
+Referencia: [Playwright MCP 0.0.84](https://github.com/microsoft/playwright-mcp/blob/v0.0.84/README.md).
+
 ## Context7 y credenciales
 
 La configuración compartida no incluye claves. Si el servicio requiere autenticación

@@ -81,3 +81,28 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
   activo en la sesión, comunicar la limitación.
 - No guardar secretos en Git ni enviar datos privados a documentación externa.
   Puesta en marcha del entorno: `docs/ai-tooling.md`.
+
+## Uso eficiente del navegador
+
+- Ejecutar primero las pruebas automatizadas aplicables. Usar Playwright MCP para
+  explorar y verificar los flujos afectados; preferir Playwright Test para una
+  futura suite E2E repetible. Actualmente solo está instalado el runner de Node.
+- Reutilizar la sesión y la página cuando no haga falta aislar el escenario;
+  evitar navegaciones, snapshots y consultas de consola/red repetidos sin motivo.
+- Buscar elementos con `browser_find` y `maxResults` antes de pedir el árbol
+  completo. Si hace falta contexto, usar `browser_snapshot` con `target` y `depth`.
+  Ampliar el snapshot solo si la vista parcial no permite continuar.
+- Conservar scripts de recorridos repetidos y usar `filename` cuando la
+  herramienta lo admita. Agrupar pasos conocidos en bloques breves con aserciones;
+  devolver casos aprobados/fallidos, mensajes de error y rutas de artefactos.
+- No devolver HTML, árboles, estados Redux, cuerpos HTTP ni código fuente completos
+  si bastan conteos o campos concretos. Guardar diagnósticos extensos en archivos
+  y leer solo la parte necesaria cuando falle una comprobación.
+- Tomar capturas solo cuando se necesite verificar el aspecto visual. Preferir
+  consola filtrada y peticiones relevantes para depurar; usar Chrome DevTools MCP
+  para React y perfiles en vez de habilitar capacidades extra de Playwright.
+- Liberar respuestas interceptadas en `finally` y retirar rutas simuladas al acabar.
+  Si una prueba deja interceptaciones pendientes, cerrar ese contexto antes de
+  repetir; no esperar indefinidamente con `unrouteAll({ behavior: 'wait' })`.
+- El lanzador usa `--snapshot-mode none` y `--codegen none`: pedir explícitamente
+  la información necesaria, sin suponer que la respuesta a cada acción trae DOM.
