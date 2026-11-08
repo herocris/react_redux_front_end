@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
-import { Role } from "../";
+import type { Role } from "../types";
 import { startLoadingPermissions } from "../../resouce/thunks";
-import { clearActiveRole, onSetActiveRole } from "../slices";
+import { clearActiveRole, onClearErrorMessage, onSetActiveRole } from "../slices";
 import { startDeleteRol, startLoadingRoles, startSaveRol, startUpdateRol } from "../thunks";
 
 export const useRoleView = () => {
@@ -14,41 +14,47 @@ export const useRoleView = () => {
   const [open, setOpen] = useState(false);
 
   const handleOpen = (valOp:boolean) => {
-    if (open) dispatch(clearActiveRole())
+    if (loading) return;
+    dispatch(onClearErrorMessage());
+    if (!valOp) dispatch(clearActiveRole())
     setOpen(valOp);
   }
 
   const [openDialog, setOpenDialog] = useState(false);
   const handleOpenDialog = () => {
-    setOpenDialog(!openDialog);
+    if (loading) return;
+    dispatch(onClearErrorMessage());
+    if (openDialog) dispatch(clearActiveRole());
+    setOpenDialog(value => !value);
   }
 
   const setIdRole = (id: string) => {
     const role = roles.find((row: Role) => row.id === id);
-    dispatch(onSetActiveRole(role as Role))
+    if (role) dispatch(onSetActiveRole(role))
   };
 
   const DeleteRole = async () => {
-    await dispatch(startDeleteRol(activeRole));
-    setOpenDialog(!openDialog);
-  }
+    if (loading || activeRole.id === undefined) return;
+    try {
+      await dispatch(startDeleteRol({ ...activeRole, id: activeRole.id }));
+      setOpenDialog(false);
+    } catch {
+      // Keep selection and confirmation for a retry; the thunk publishes the error.
+    }
+  };
 
   const onSaveOrUptdate = async (role: Role) => {
-    console.log(role);
     if (activeRole.id === undefined) {
-      await dispatch(startSaveRol(role)).then(() => {
-        handleOpen(false)
-      })
+      await dispatch(startSaveRol(role));
     } else {
-      await dispatch(startUpdateRol({ ...role, id: activeRole.id })).then(() => {
-        handleOpen(false)
-      })
+      await dispatch(startUpdateRol({ ...role, id: activeRole.id }));
     }
-  }
+    handleOpen(false);
+  };
 
   useEffect(() => {
     dispatch(startLoadingPermissions());
-  }, [])
+  }, [dispatch])
 
   const LoadingEntities = useCallback((
     page: number,

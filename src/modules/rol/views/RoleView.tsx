@@ -1,4 +1,6 @@
-import { AddFloatingButton, AlertDialog, EntityList, } from '../../../components';
+import { RoleError } from '../components/RoleError';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { AddFloatingButton, EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { RoleFormModal } from '../components/RoleFormModal';
 import { useRoleView } from '../hooks/useRoleView';
@@ -24,6 +26,7 @@ export const RoleView = () => {
   return (
     <>
       <GrapLayout>
+        {!open && !openDialog && <RoleError message={errorMessage} />}
         <EntityList
           handleOpen={handleOpen}
           handleOpenDialog={handleOpenDialog}
@@ -43,11 +46,17 @@ export const RoleView = () => {
             errorMessage={errorMessage} />
         }
         {openDialog &&
-          <AlertDialog
-            title='Borrar'
-            dialogMessage="Deseas borrar el rol?"
-            DeleteEntity={DeleteRole}
-            handleOpen={handleOpenDialog} />
+          <Dialog open onClose={() => { if (!loading) handleOpenDialog(); }} aria-labelledby="delete-role-title" aria-describedby="delete-role-description">
+            <DialogTitle id="delete-role-title">Borrar rol</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="delete-role-description">¿Deseas borrar el rol?</DialogContentText>
+              <RoleError message={errorMessage} />
+            </DialogContent>
+            <DialogActions>
+              <Button disabled={loading} onClick={handleOpenDialog}>Cancelar</Button>
+              <Button loading={loading} onClick={DeleteRole} color="error">Borrar</Button>
+            </DialogActions>
+          </Dialog>
         }
         <AddFloatingButton handleOpen={handleOpen} />
       </GrapLayout>

@@ -1,8 +1,9 @@
 import { createLatestListRequest } from '../../../api/latestListRequest';
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
-import { setRoles, onAddNewRole, onUpdateRole, onDeleteRol, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices';
-import { Role } from '../';
+import { setRoles, onAddNewRole, onUpdateRole, onDeleteRol, onSetTableOptions, onLoading, onClearErrorMessage, onSetErrorMessage } from '../slices';
+import type { Role, RoleListResponse, RoleResponse } from '../types';
+import { getApiErrorMessage } from '../../../api/apiErrors';
 
 
 const beginListRequest = createLatestListRequest();
@@ -11,16 +12,17 @@ export const startLoadingRoles = (page: number, sortBy: string, orderType: strin
     return async (dispatch: Dispatch) => {
         const request = beginListRequest(dispatch, signal);
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         sortBy = sortBy === 'id' ? 'identificador' : sortBy;
         try {
-            const { data: { data, ...optionsTable } } = await calendarApi.get(`/role?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
+            const { data: { data, ...optionsTable } } = await calendarApi.get<RoleListResponse>(`/role?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
             if (!request.isCurrent()) return;
-            const roles = data.map((role: Role) => {
+            const roles = data.map((role) => {
                 const { identificador: id, ...resto } = role;
                 return { id, ...resto }
             })
-            console.log(roles);
-            
+
+
             dispatch(onSetTableOptions(optionsTable));
             dispatch(setRoles(roles));
         } catch (error) {
@@ -35,12 +37,13 @@ export const startLoadingRoles = (page: number, sortBy: string, orderType: strin
 export const startSaveRol = (role: Role) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         try {
-            const { data } = await calendarApi.post('/role', role);
+            const { data } = await calendarApi.post<RoleResponse>('/role', role);
             const { identificador: id, ...resto } = data;
             dispatch(onAddNewRole({ id, ...resto }))
         }
-        catch (error: any) {
+        catch (error) {
             return handleApiError(error, dispatch);
         } finally {
             dispatch(onLoading(false));
@@ -48,27 +51,14 @@ export const startSaveRol = (role: Role) => {
     }
 }
 
-export const startUpdateRol = (role: Role) => {
+export const startUpdateRol = (role: Role & { id: string }) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         try {
-            const { data } = await calendarApi.put(`/role/${role.id}`, role);
+            const { data } = await calendarApi.put<RoleResponse>(`/role/${role.id}`, role);
             const { identificador: id, ...resto } = data;
             dispatch(onUpdateRole({ id, ...resto }))
-        } catch (error: any) {
-            return handleApiError(error, dispatch);
-        } finally {
-            dispatch(onLoading(false));
-        }
-    }
-}
-
-export const startDeleteRol = (role: Role) => {
-    return async (dispatch: Dispatch) => {
-        dispatch(onLoading(true));
-        try {
-            await calendarApi.delete(`/role/${role.id}`,);
-            dispatch(onDeleteRol(role.id as string))
         } catch (error) {
             return handleApiError(error, dispatch);
         } finally {
@@ -77,10 +67,22 @@ export const startDeleteRol = (role: Role) => {
     }
 }
 
-const handleApiError = (error: any, dispatch: Dispatch) => {
-    if (error?.hasOwnProperty('error')) {
-        dispatch(onSetErrorMessage(error.error));
+export const startDeleteRol = (role: Role & { id: string }) => {
+    return async (dispatch: Dispatch) => {
+        dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
+        try {
+            await calendarApi.delete(`/role/${role.id}`,);
+            dispatch(onDeleteRol(role.id))
+        } catch (error) {
+            return handleApiError(error, dispatch);
+        } finally {
+            dispatch(onLoading(false));
+        }
     }
-    return Promise.reject();
-};
+}
 
+const handleApiError = (error: unknown, dispatch: Dispatch) => {
+    dispatch(onSetErrorMessage(getApiErrorMessage(error)));
+    return Promise.reject(error);
+};

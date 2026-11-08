@@ -1,6 +1,7 @@
 import { createSlice,PayloadAction } from '@reduxjs/toolkit'
 import { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
-import { Role,RoleState } from '../';
+import type { Role, RoleState } from '../types';
+import type { ApiErrorMessage } from '../../../api/apiErrors';
 
 
 const role: Role = {
@@ -37,7 +38,7 @@ export const roleSlice = createSlice({
     name: 'role',
     initialState,
     reducers: {
-        onSetErrorMessage: (state, { payload }: PayloadAction<object>) => {
+        onSetErrorMessage: (state, { payload }: PayloadAction<ApiErrorMessage>) => {
             state.errorMessage = payload;
         },
         onClearErrorMessage: (state) => {
