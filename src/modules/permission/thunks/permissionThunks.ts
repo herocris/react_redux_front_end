@@ -1,8 +1,9 @@
 import { createLatestListRequest } from '../../../api/latestListRequest';
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
-import { Permission } from '../';
-import { onAddNewPermission, onDeletePermission, onLoading, onSetErrorMessage, onSetTableOptions, onUpdatePermission, setPermissions } from '../slices';
+import { setPermissions, onAddNewPermission, onUpdatePermission, onDeletePermission, onSetTableOptions, onLoading, onClearErrorMessage, onSetErrorMessage } from '../slices';
+import type { Permission, PermissionListResponse, PermissionResponse } from '../types';
+import { getApiErrorMessage } from '../../../api/apiErrors';
 
 
 const beginListRequest = createLatestListRequest();
@@ -11,14 +12,17 @@ export const startLoadingPermissions = (page: number, sortBy: string, orderType:
     return async (dispatch: Dispatch) => {
         const request = beginListRequest(dispatch, signal);
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         sortBy = sortBy === 'id' ? 'identificador' : sortBy;
         try {
-            const { data: { data, ...optionsTable } } = await calendarApi.get(`/permission?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
+            const { data: { data, ...optionsTable } } = await calendarApi.get<PermissionListResponse>(`/permission?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
             if (!request.isCurrent()) return;
-            const permissions = data.map((permission: Permission) => {
+            const permissions = data.map((permission) => {
                 const { identificador: id, ...resto } = permission;
                 return { id, ...resto }
             })
+
+
             dispatch(onSetTableOptions(optionsTable));
             dispatch(setPermissions(permissions));
         } catch (error) {
@@ -33,12 +37,13 @@ export const startLoadingPermissions = (page: number, sortBy: string, orderType:
 export const startSavePermission = (permission: Permission) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         try {
-            const { data } = await calendarApi.post('/permission', permission);
+            const { data } = await calendarApi.post<PermissionResponse>('/permission', permission);
             const { identificador: id, ...resto } = data;
             dispatch(onAddNewPermission({ id, ...resto }))
         }
-        catch (error: any) {
+        catch (error) {
             return handleApiError(error, dispatch);
         } finally {
             dispatch(onLoading(false));
@@ -46,27 +51,14 @@ export const startSavePermission = (permission: Permission) => {
     }
 }
 
-export const startUpdatePermission = (permission: Permission) => {
+export const startUpdatePermission = (permission: Permission & { id: string }) => {
     return async (dispatch: Dispatch) => {
         dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
         try {
-            const { data } = await calendarApi.put(`/permission/${permission.id}`, permission);
+            const { data } = await calendarApi.put<PermissionResponse>(`/permission/${permission.id}`, permission);
             const { identificador: id, ...resto } = data;
             dispatch(onUpdatePermission({ id, ...resto }))
-        } catch (error: any) {
-            return handleApiError(error, dispatch);
-        } finally {
-            dispatch(onLoading(false));
-        }
-    }
-}
-
-export const startDeletePermission = (permission: Permission) => {
-    return async (dispatch: Dispatch) => {
-        dispatch(onLoading(true));
-        try {
-            await calendarApi.delete(`/permission/${permission.id}`,);
-            dispatch(onDeletePermission(permission.id as string))
         } catch (error) {
             return handleApiError(error, dispatch);
         } finally {
@@ -75,10 +67,22 @@ export const startDeletePermission = (permission: Permission) => {
     }
 }
 
-const handleApiError = (error: any, dispatch: Dispatch) => {
-    if (error?.hasOwnProperty('error')) {
-        dispatch(onSetErrorMessage(error.error));
+export const startDeletePermission = (permission: Permission & { id: string }) => {
+    return async (dispatch: Dispatch) => {
+        dispatch(onLoading(true));
+        dispatch(onClearErrorMessage());
+        try {
+            await calendarApi.delete(`/permission/${permission.id}`,);
+            dispatch(onDeletePermission(permission.id))
+        } catch (error) {
+            return handleApiError(error, dispatch);
+        } finally {
+            dispatch(onLoading(false));
+        }
     }
-    return Promise.reject();
-};
+}
 
+const handleApiError = (error: unknown, dispatch: Dispatch) => {
+    dispatch(onSetErrorMessage(getApiErrorMessage(error)));
+    return Promise.reject(error);
+};

@@ -1,6 +1,7 @@
+import type { ApiErrorMessage } from '../../../api/apiErrors';
 import { createSlice,PayloadAction } from '@reduxjs/toolkit'
 import { TableOptions} from '../../../shared/interfaces/sharedInterfaces';
-import { Permission, PermissionState } from '../';
+import { Permission, PermissionState } from '../types';
 
 const permission: Permission = {
     nombre: '',
@@ -35,7 +36,7 @@ export const permissionSlice = createSlice({
     name: 'permission',
     initialState,
     reducers: {
-        onSetErrorMessage: (state, { payload }: PayloadAction<object>) => {
+        onSetErrorMessage: (state, { payload }: PayloadAction<ApiErrorMessage>) => {
             state.errorMessage = payload;
         },
         onClearErrorMessage: (state) => {

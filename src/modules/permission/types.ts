@@ -1,3 +1,4 @@
+import type { ApiErrorMessage } from '../../api/apiErrors';
 import { TableOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface Permission {
@@ -10,13 +11,15 @@ export interface PermissionState {
     activePermission: Permission,
     tableOptions: TableOptions,
     loading: boolean
-    errorMessage: object
+    errorMessage: ApiErrorMessage
 }
 
 export interface PermissionFormModalProps {
-    handleOpen: Function;
+    handleOpen: (open: boolean) => void;
     loading: boolean
     activePermission: Permission
-    onSaveOrUptdate: Function
-    errorMessage: object | string
+    onSaveOrUptdate: (values: Permission) => Promise<void>
+    errorMessage: ApiErrorMessage
 }
+export type PermissionResponse = Omit<Permission, "id" | "identificador"> & { identificador: string };
+export type PermissionListResponse = TableOptions & { data: PermissionResponse[] };
