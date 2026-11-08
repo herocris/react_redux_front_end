@@ -57,7 +57,7 @@ export const FieldsForm = ({ handleSubmit, onSubmit, loading, register, errors, 
                         />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 1, mt: 2 }}>
-                        <Button variant='outlined' fullWidth onClick={() => handleOpenMap(true)}>
+                        <Button variant='outlined' fullWidth aria-label="Seleccionar ubicación en el mapa" onClick={() => handleOpenMap(true)}>
                             <Map />
                         </Button>
                     </Grid>

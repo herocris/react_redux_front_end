@@ -1,4 +1,4 @@
-import { FieldErrors } from "react-hook-form"
+import { Control, FieldErrors } from "react-hook-form"
 import { TableOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface Confiscation {
@@ -22,14 +22,14 @@ export interface ConfiscationState {
 }
 
 export interface ConfiscationMapModalProps {
-    handleOpen: Function
+    handleOpen: (open: boolean) => void
     lat: number,
     lng: number,
-    nameLat: string,
-    nameLng: string,
-    nameDepto: string,
-    nameMuni: string,
-    control: any
+    nameLat: 'latitud',
+    nameLng: 'longitud',
+    nameDepto: 'departamento',
+    nameMuni: 'municipalidad',
+    control: Control<Omit<Confiscation, 'id'>>
 }
 
 export interface FieldsFormProps {
