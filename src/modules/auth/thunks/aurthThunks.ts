@@ -3,6 +3,19 @@ import type { Dispatch } from '@reduxjs/toolkit';
 import { onChecking, onLogin, onLogout, clearErrorMessage } from '../slices/authSlice';
 import { authService } from '../services/authService';
 import type { LoginData, RegisterData } from '../types';
+import { getSessionSignal } from '../../../api/sessionScope';
+
+const authRequests = new WeakMap<Dispatch, AbortController>();
+const beginAuthRequest = (dispatch: Dispatch) => {
+    authRequests.get(dispatch)?.abort();
+    const controller = new AbortController();
+    const sessionSignal = getSessionSignal();
+    authRequests.set(dispatch, controller);
+    return {
+        signal: controller.signal,
+        isCurrent: () => !controller.signal.aborted && !sessionSignal.aborted,
+    };
+};
 
 export const checkingAuthentication = () => (dispatch: Dispatch) => {
     dispatch(onChecking());
@@ -10,39 +23,46 @@ export const checkingAuthentication = () => (dispatch: Dispatch) => {
 
 export const startCreatingUserWithEmailPassword = (values: RegisterData) => {
     return async (dispatch: Dispatch): Promise<void> => {
+        const request = beginAuthRequest(dispatch);
         dispatch(clearErrorMessage());
         try {
-            dispatch(onLogin(await authService.register(values)));
+            const user = await authService.register(values, request.signal);
+            if (request.isCurrent()) dispatch(onLogin(user));
         } catch (error: unknown) {
-            dispatch(onLogout(getApiErrorText(error)));
+            if (request.isCurrent()) dispatch(onLogout(getApiErrorText(error)));
         }
     };
 };
 
 export const startLoginWithEmailPassword = (values: LoginData) => {
     return async (dispatch: Dispatch): Promise<void> => {
+        const request = beginAuthRequest(dispatch);
         dispatch(clearErrorMessage());
         try {
-            dispatch(onLogin(await authService.login(values)));
+            const user = await authService.login(values, request.signal);
+            if (request.isCurrent()) dispatch(onLogin(user));
         } catch (error: unknown) {
-            dispatch(onLogout(getApiErrorText(error)));
+            if (request.isCurrent()) dispatch(onLogout(getApiErrorText(error)));
         }
     };
 };
 
 export const startLogout = () => {
     return async (dispatch: Dispatch): Promise<void> => {
-        await authService.logout();
-        dispatch(onLogout());
+        const request = beginAuthRequest(dispatch);
+        await authService.logout(request.signal);
+        if (request.isCurrent()) dispatch(onLogout());
     };
 };
 
 export const checkAuthToken = () => {
     return async (dispatch: Dispatch): Promise<void> => {
+        const request = beginAuthRequest(dispatch);
         try {
-            dispatch(onLogin(await authService.checkSession()));
+            const user = await authService.checkSession(request.signal);
+            if (request.isCurrent()) dispatch(onLogin(user));
         } catch {
-            dispatch(onLogout());
+            if (request.isCurrent()) dispatch(onLogout());
         }
     };
 };

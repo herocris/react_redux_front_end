@@ -47,10 +47,15 @@ test('autenticación: contratos del service y transiciones de sesión', async t 
                 assert.equal(config.url, path);
                 assert.equal(config.withCredentials, true);
                 assert.deepEqual(config.data ? JSON.parse(config.data) : undefined, payload);
-                if (path === '/refresh') assert.equal(config.signal, controller.signal);
+                if (path === '/refresh') {
+                    assert.equal(config.signal.aborted, false);
+                    controller.abort();
+                    assert.equal(config.signal.aborted, true);
+                }
                 return reply(config);
             };
-            assert.deepEqual(await call(), expected);
+            if (path === '/refresh') await assert.rejects(call(), axios.isCancel);
+            else assert.deepEqual(await call(), expected);
         }
         api.defaults.adapter = async config => reply(config, { user: session });
         assert.deepEqual(await authService.register(registration), session);

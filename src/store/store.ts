@@ -1,4 +1,5 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { combineReducers, configureStore } from '@reduxjs/toolkit'
+import { isSessionBoundary, sessionMiddleware } from './sessionMiddleware'
 import { userSlice } from '../modules/user/slices/userSlice'
 import { drugPresentationSlice } from '../modules/drugPresentation/slices/drugPresentationSlice'
 import { confiscationSlice } from '../modules/confiscation/slices/confiscationSlice'
@@ -16,8 +17,7 @@ import { roleSlice } from '../modules/rol/slices/rolSlice'
 import { permissionSlice } from '../modules/permission/slices/permissionSlice'
 import { weaponSlice } from '../modules/weapon/slices/weaponSlice'
 
-export const store = configureStore({
-  reducer: {
+const appReducer = combineReducers({
     auth: authSlice.reducer,
     user: userSlice.reducer,
     resource:resourceSlice.reducer,
@@ -34,7 +34,21 @@ export const store = configureStore({
     ammunitionConfiscation:ammunitionConfiscationSlice.reducer,
     graph:graphSlice.reducer,
     map:mapSlice.reducer,
-  },
+})
+
+export const rootReducer: typeof appReducer = (state, action) => {
+  if (isSessionBoundary(action)) {
+    // Reset every legacy remote domain, including options, maps and graphs.
+    // Preserve auth until its own reducer applies the requested transition.
+    const initial = appReducer(undefined, { type: '@@session/reset' })
+    return appReducer({ ...initial, auth: state?.auth ?? initial.auth }, action)
+  }
+  return appReducer(state, action)
+}
+
+export const store = configureStore({
+  reducer: rootReducer,
+  middleware: getDefaultMiddleware => getDefaultMiddleware().prepend(sessionMiddleware),
 })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

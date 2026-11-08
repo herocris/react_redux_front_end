@@ -109,6 +109,16 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
   acredita limpieza global. Cancelar una petición no demuestra que el servidor
   haya deshecho una escritura. Esta política debe probarse antes de considerarla
   implementada; no introducir una segunda copia de sesión para resolverla.
+- Infraestructura del paso 6: `queries/queryClient.ts` crea el cliente único;
+  `sessionMiddleware` cancela/limpia Query y retira la señal de transporte al
+  recibir `onLogin`, `onLogout` u `onChecking`. El reducer raíz reinicia los
+  dominios antiguos y el dispatch de sus thunks queda ligado a esa sesión.
+  No guardar identidad ni credenciales en `sessionScope`. Las consultas futuras
+  pasan su `signal` al service; las mutaciones usan `sessionMutationOptions`
+  creado en el consumidor autenticado, con invalidación y efectos en sus
+  callbacks protegidos, no en callbacks por llamada a `mutate`. Si un callback
+  espera trabajo adicional, comprobar de nuevo la señal de sesión tras el await
+  antes de publicar efectos. Limpiar la caché no cancela una escritura del servidor.
 
 ## Stack y estructura
 

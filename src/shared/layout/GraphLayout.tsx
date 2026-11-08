@@ -26,7 +26,9 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
     const { mode, toggleMode } = useThemeContext();//para modo oscuro
 
     const onLogout = () => {
-        dispatch(startLogout());
+        void dispatch(startLogout()).catch(() => {
+            // A failed or superseded logout retains the current session.
+        });
     }
     const handleDrawerClose = () => {
         setIsClosing(true);

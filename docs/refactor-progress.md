@@ -4,12 +4,12 @@
 
 Se consolidaron los cambios anteriores en 12 commits locales y se prepararon
 las instrucciones para continuar en conversaciones independientes.
-**La migración a TanStack Query todavía no ha comenzado.** No se instalaron
-dependencias ni se crearon services nuevos en esta preparación.
+La preparación inicial no instaló dependencias ni creó services. **El paso 6
+ya incorpora la infraestructura de TanStack Query; ningún CRUD está migrado.**
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1, 2, 3, 4 y 5 completados**; siguiente paso pendiente:
-**6, infraestructura de TanStack Query**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1, 2, 3, 4, 5 y 6 completados**; siguiente paso pendiente:
+**7, service de permisos**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -86,7 +86,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | 3. Archivos | Completado | Siete esquemas con máximo efectivo de 5.000.000 bytes, rechazo de archivos vacíos y conservación de imágenes existentes; pruebas automatizadas. |
 | 4. Convenciones | Completado | Guía contrastada con código/plan; convivencia, propietarios, retirada y límites de cancelación documentados. |
 | 5. Autenticación | Completado | authService, contratos de sesión separados, selectores tipados y thunks Redux; contratos y transiciones probados, acceso/registro verificados en navegador. |
-| 6. TanStack Query | Pendiente | No instalado ni configurado. |
+| 6. TanStack Query | Completado | Cliente/proveedor estables, política explícita y aislamiento de sesión con convivencia Redux; pruebas y navegador con HTTP simulado. |
 | 7. Service de permisos | Pendiente | HTTP todavía dentro de thunks. |
 | 8. EntityList | Pendiente | Sigue usando callback de carga y contratos compartidos amplios. |
 | 9. Piloto de permisos | Pendiente | CRUD y opciones aún usan Redux manual. |
@@ -465,6 +465,129 @@ cambiar usuario y bloquear publicaciones tardías de lecturas y escrituras,
 incluidos refresh/login pendientes y módulos antiguos. El soporte de señal del
 service y su prueba no acreditan aislamiento de sesión ni reversión de una
 escritura del servidor. Paso 5 cerrado; paso 6 sin iniciar, plan sin cambios.
+
+### Paso 6 — Infraestructura Query y aislamiento de sesión (8 de noviembre de 2026)
+
+Al comenzar, HEAD `8d3f6b8` y workspace limpio. Se leyeron guía, plan y progreso;
+se contrastaron auth, store, cliente HTTP, cancelación de listados y consumidores.
+Se ejecutó únicamente el prompt del paso 6. No se creó permissionService, no se
+adaptó EntityList ni se migró ningún CRUD, opciones, mapas o gráficos a Query.
+
+**Dependencias y política.** Se instaló la versión estable consultada en npm,
+`@tanstack/react-query` **5.107.1**, fijada exactamente; `query-core` resuelve
+también 5.107.1. Sus peers admiten React y sus tipos 18/19. Se reconfirmaron en
+el lockfile React/React DOM 19.3.1, RTK 2.6.1, Axios 1.21.0 y TypeScript 5.8.2;
+ninguna dependencia previa cambia de versión. npm recalculó una marca de
+dependencia de desarrollo en el lockfile. La red del sandbox rechazó npm con
+EACCES; consulta e instalación se completaron con la aprobación de escalación.
+
+- [`queryClient`](../src/queries/queryClient.ts) se crea una vez fuera de React
+  y se conecta mediante QueryClientProvider en bootstrap, después del registro
+  de DevTools de desarrollo. No hay consultas de dominio ni copia de sesión.
+- Consultas vigentes **30 segundos**, retención inactiva **cinco minutos**;
+  recarga al montar, enfocar y reconectar solo si los datos están vencidos.
+  Sin polling, persistencia ni reintentos automáticos en lecturas/escrituras.
+  Mutaciones con retención explícita de cinco minutos. Cada dominio podrá
+  ajustar esta base cuando se migre y lo justifique su contrato.
+- `retry: false` evita clasificar errores por un supuesto AxiosError o perder
+  su causa: el interceptor sigue rechazando con el cuerpo HTTP cuando existe,
+  y se conserva el reintento explícito del usuario.
+
+**Sesión y convivencia.**
+
+- [`sessionScope`](../src/api/sessionScope.ts) solo mantiene la vida de una señal,
+  sin usuario, credenciales ni estado React/Redux. El cliente HTTP combina esa
+  señal con las señales nativas de consultas/listados usando `AbortSignal.any`.
+  Su interceptor síncrono captura la sesión al iniciar la petición. Se mantienen
+  URL, cookies, métodos, payloads y separación de la geocodificación externa.
+- [`sessionMiddleware`](../src/store/sessionMiddleware.ts) retira la señal,
+  cancela consultas y limpia ambas cachés al recibir onLogin/onLogout/onChecking.
+  La política es conservadora: toda publicación de sesión, también un refresh
+  del mismo usuario, inicia una vida nueva. Logout conserva la sesión y sus
+  datos hasta éxito; un fallo no limpia datos ni publica una salida falsa.
+- El reducer raíz reinicia todos los dominios antiguos (filas, detalle/selección,
+  opciones, paginación, errores, carga, mapas y gráficos); auth aplica su propia
+  transición. Redux sigue siendo el único propietario de sesión. Aún no existe
+  el slice de filtros aplicados del paso 13; su futura conservación deberá ser
+  explícita en este reducer, sin preservar resultados remotos por accidente.
+- El middleware precede al thunk de RTK y proporciona un dispatch estable por
+  sesión/store a los thunks existentes. Tras retirarlo, bloquea sus acciones y
+  thunks anidados tardíos, incluso si el trabajo ignora la cancelación. Conserva
+  la identidad necesaria para createLatestListRequest, que no se retira.
+  Es infraestructura de la aplicación con su store/cliente únicos; no una copia
+  adicional de identidad ni un service de dominio temporal.
+- Auth coordina la última operación por dispatch, abortando la anterior. Refresh,
+  acceso y registro tardíos no vuelven a autenticar ni expulsan al usuario nuevo;
+  una salida antigua tampoco lo expulsa. authService admite señal opcional en
+  sus cuatro operaciones sin cambiar payloads. El layout maneja el rechazo de
+  logout para evitar promesas sin manejar, conservando la sesión y el reintento.
+- [`sessionMutationOptions`](../src/queries/sessionMutationOptions.ts) prepara
+  las futuras mutaciones: rechaza resultados obsoletos y evita iniciar sus
+  callbacks de éxito/error/finalización tras un cambio de sesión. Query no
+  cancela mutaciones automáticamente al limpiar su caché. Las futuras pantallas
+  usarán este helper y sus callbacks protegidos, sin efectos por llamada a
+  mutate; cualquier efecto posterior a un await adicional debe volver a comprobar
+  la señal. Esa convención se añadió a AGENTS.md; no se implementó el piloto.
+
+**Comprobaciones nuevas.**
+
+- [`tests/query-session.test.mjs`](../tests/query-session.test.mjs): 11 conteos
+  (grupo y diez subpruebas). Cubre caché por argumentos y vigencia; rechazo HTTP
+  original sin reintentos; claves concurrentes; desmontaje y transporte; limpieza
+  de todos los slices/cachés en tres transiciones; consultas tardías aun sin
+  consumir signal; mutaciones tardías exitosas/fallidas y callbacks actuales;
+  listado/opciones/escritura antiguos pendientes; dispatch tardío y anidado;
+  exclusividad del listado dentro de sesión; carreras de refresh/acceso/salida;
+  fallo de logout con caché conservada. Las pruebas desactivan solo sus timers
+  de GC con Infinity para no esperar cinco minutos en Node; la app conserva su
+  política. El primer intento esperaba resolución del listado retirado: se
+  corrigió la prueba para comprobar su rechazo de cancelación, sin cambiar CRUD.
+- `npm.cmd test`: **144 aprobadas**, cero fallos, canceladas u omitidas. Se
+  conservan las 133 previas; auth prueba ahora propagación de la señal combinada
+  en lugar de exigir identidad de objeto con la señal original.
+- `npm.cmd run build`: correcto; sigue el aviso previo de chunks >500 kB.
+- `npm.cmd run lint -- --format json --output-file ...`: deuda previa de
+  **85 errores y 24 advertencias**, igual que el paso 5, sin incidencias nuevas.
+- Logs finales locales: `%TEMP%/graphdata-step6-tests-final.txt`,
+  `%TEMP%/graphdata-step6-build-final.txt` y
+  `%TEMP%/graphdata-step6-lint-final.json`. `tsconfig.app.tsbuildinfo` restaurado
+  al contenido inicial; `git diff --check` comprobado al cierre.
+
+**Navegador.** Playwright MCP operativo. Se repitió
+[`auth-service.js`](../tests/browser/auth-service.js) porque ahora cambian
+transporte y coordinación: dos grupos aprobados, cuatro escrituras simuladas,
+cero excepciones y cero mensajes inesperados. El recorrido nuevo
+[`query-session.js`](../tests/browser/query-session.js) aprueba cuatro grupos:
+listado antiguo con proveedor, logout fallido sin rechazo sin manejar, salida
+con lectura pendiente y limpieza de filas/opciones/ambas cachés, acceso B sin
+reaparición de datos A. Ocho solicitudes simuladas; cero excepciones JS y cero
+mensajes inesperados, con el 503 de logout esperado y avisos Canvas conocidos.
+Se corrigieron dos problemas del script: selector duplicado del menú y uso de
+URLs sin timestamp de HMR que importaba otro store/cliente en vez de los usados
+por la aplicación. La ejecución final usa las URLs ya cargadas y pasó después
+de las correcciones. Interceptaciones liberadas en finally; sin capturas porque
+no cambia el aspecto visual.
+
+**Documentación y reutilización.** Se aplicó la skill React y su regla de
+inicialización única, sin rediseñar APIs de componentes. Context7 no ofrece las
+versiones exactas 5.107.1 de Query ni 1.21.0 de Axios: se consultaron sus guías
+generales de Query v5 y Axios v1, contrastando tipos/código instalados y pruebas.
+Referencias oficiales: [política de Query](https://tanstack.com/query/v5/docs/framework/react/guides/important-defaults),
+[QueryClient](https://tanstack.com/query/v5/docs/reference/QueryClient),
+[mutaciones](https://tanstack.com/query/v5/docs/framework/react/guides/mutations)
+y [interceptores Axios](https://github.com/axios/axios/blob/v1.x/README.md).
+No se atribuye esa documentación general a un tag exacto.
+Se reutiliza la evidencia histórica de formularios, archivos, multipart,
+geocodificación y carga diferida sin repetir sus baterías de navegador; sus
+pruebas automatizadas sí forman parte de la suite completa ejecutada.
+
+**Límites y pendientes.** HTTP/autenticación simulados: sin backend real,
+persistencia ni cookies del servidor verificadas. Abortar/ignorar una respuesta
+no demuestra que el servidor deshaga una escritura o un cambio de cookie; no se
+promete reversión remota. La cobertura de infraestructura no acredita todavía
+invalidación, catálogos completos o formularios de un CRUD migrado. Continúan
+la deuda de lint y el aviso de bundle. Paso 6 cerrado; plan sin cambios y paso 7
+pendiente, sin iniciarlo.
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,
