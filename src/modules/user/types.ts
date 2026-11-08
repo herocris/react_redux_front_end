@@ -1,5 +1,5 @@
 import type { ApiErrorMessage } from '../../api/apiErrors';
-import { SelectOptions, TableOptions } from "../../shared/interfaces/sharedInterfaces";
+import { TableOptions } from "../../shared/interfaces/sharedInterfaces";
 import { Permission } from "../permission";
 import { Role } from "../rol";
 
@@ -9,17 +9,17 @@ export interface User {
     correo: string,
     nombre: string,
     password?: string,
-    permisos?: Permission[],
-    roles?: Role[]
+    permisos?: UserPermission[],
+    roles?: UserRole[]
 }
 
 export interface UserFormModalProps {
-    handleOpen: Function;
-    permisos: SelectOptions[]
-    roles: SelectOptions[]
+    handleOpen: (open: boolean) => void;
+    permisos: { value: string | number; description: string }[]
+    roles: { value: string | number; description: string }[]
     loading: boolean
     activeUser: User
-    onSaveOrUptdate: Function
+    onSaveOrUptdate: (values: User) => Promise<void>
     errorMessage: ApiErrorMessage
 }
 
@@ -31,13 +31,8 @@ export interface UserState {
     errorMessage: ApiErrorMessage
 }
 
-export interface userUseForm {
-    user: User,
-    formValidations: UserValidationsRule,
-}
-
-export interface UserValidationsRule {
-    correo: Array<string | Function>,
-    nombre: Array<string | Function>,
-    password: Array<string | Function>,
-}
+// Select identifiers and unchanged relation objects returned by the server.
+export type UserPermission = string | number | Permission;
+export type UserRole = string | number | Role;
+export type UserResponse = Omit<User, 'id' | 'identificador'> & { identificador: string };
+export type UserListResponse = TableOptions & { data: UserResponse[] };

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { clearActiveUser, onSetActiveUser } from "../slices";
+import { clearActiveUser, onClearErrorMessage, onSetActiveUser } from "../slices";
 import { startDeleteUser, startLoadingUsers, startSaveUser, startUpdateUser } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
@@ -13,23 +13,29 @@ export const useUserView = () => {
 
   const [open, setOpen] = useState(false);
   const handleOpen = (valOp:boolean) => {
-    if (open) dispatch(clearActiveUser())
+    if (loading) return;
+    dispatch(onClearErrorMessage());
+    if (!valOp) dispatch(clearActiveUser())
     setOpen(valOp);
   }
 
   const [openDialog, setOpenDialog] = useState(false);
   const handleOpenDialog = () => {
-    setOpenDialog(!openDialog);
+    if (loading) return;
+    dispatch(onClearErrorMessage());
+    if (openDialog) dispatch(clearActiveUser());
+    setOpenDialog(value => !value);
   }
 
   const setIdUser = (id: string) => {
     const user = users.find((row: User) => row.id === id);
-    dispatch(onSetActiveUser(user as User))
+    if (user) dispatch(onSetActiveUser(user))
   };
 
   const DeleteUser = async () => {
+    if (loading || activeUser.id === undefined) return;
     try {
-      await dispatch(startDeleteUser(activeUser));
+      await dispatch(startDeleteUser({ ...activeUser, id: activeUser.id }));
       setOpenDialog(false);
     } catch {
       // El thunk ya publicó el error; se conserva el diálogo para reintentar.
@@ -37,17 +43,13 @@ export const useUserView = () => {
   }
 
   const onSaveOrUptdate = async (user: User) => {
-    try {
-      if (activeUser.id === undefined) {
-        await dispatch(startSaveUser(user));
-      } else {
-        await dispatch(startUpdateUser({ ...user, id: activeUser.id }));
-      }
-      handleOpen(false);
-    } catch {
-      // El thunk ya publicó el error; se conserva el formulario.
+    if (activeUser.id === undefined) {
+      await dispatch(startSaveUser(user));
+    } else {
+      await dispatch(startUpdateUser({ ...user, id: activeUser.id }));
     }
-  }
+    handleOpen(false);
+  };
 
   useEffect(() => {
     dispatch(startLoadingRoles());

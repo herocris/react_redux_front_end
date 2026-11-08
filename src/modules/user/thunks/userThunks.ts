@@ -2,7 +2,7 @@ import { createLatestListRequest } from '../../../api/latestListRequest';
 import { Dispatch } from '@reduxjs/toolkit';
 import calendarApi from '../../../api/graphdataApi';
 import { setUsers,onAddNewUser,onUpdateUser,onDeleteUser, onSetTableOptions, onLoading, onSetErrorMessage } from '../slices/userSlice';
-import type { User } from '../types';
+import type { User, UserResponse, UserListResponse } from '../types';
 import { getApiErrorMessage } from '../../../api/apiErrors';
 
 
@@ -15,20 +15,20 @@ export const startLoadingUsers = (page:number,sortBy:string,orderType:string,per
         dispatch(onSetErrorMessage({}));
         sortBy = sortBy === 'id' ? 'identificador' : sortBy;
         try {
-            const {data:{data,...optionsTable}} = await calendarApi.get(`/user?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
+            const {data:{data,...optionsTable}} = await calendarApi.get<UserListResponse>(`/user?page=${page}&sort_by=${sortBy}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal: request.signal });
             if (!request.isCurrent()) return;
-            const users = data.map((user:User) => {
+            const users = data.map((user) => {
                 const { identificador: id, ...resto } = user;
                 return {  id, ...resto }
-            }) 
-            console.log(users);
-            
+            })
+
+
             dispatch( onSetTableOptions( optionsTable ));
             dispatch( setUsers( users ));
         } catch (error) {
             if (request.signal.aborted) return;
             return handleApiError(error, dispatch);
-        }finally { 
+        }finally {
             if (request.finish()) dispatch(onLoading(false));
          }
     }
@@ -39,44 +39,44 @@ export const startSaveUser = (user:User) => {
         dispatch( onLoading( true ));
         dispatch(onSetErrorMessage({}));
         try {
-            const {data} = await calendarApi.post('/user',user); 
+            const {data} = await calendarApi.post<UserResponse>('/user',user);
             const { identificador: id, ...resto } = data;
             dispatch(onAddNewUser({  id, ...resto }))
-        } 
+        }
         catch (error) {
             return handleApiError(error, dispatch);
-        } finally { 
+        } finally {
             dispatch( onLoading( false ));
          }
     }
 }
 
-export const startUpdateUser = (user:User) => {
+export const startUpdateUser = (user:User & { id: string }) => {
     return async( dispatch:Dispatch ) => {
         dispatch( onLoading( true ));
         dispatch(onSetErrorMessage({}));
         try {
-            const {data} = await calendarApi.put(`/user/${user.id}`,user); 
+            const {data} = await calendarApi.put<UserResponse>(`/user/${user.id}`,user);
             const { identificador: id, ...resto } = data;
             dispatch(onUpdateUser({  id, ...resto }))
         } catch (error) {
             return handleApiError(error, dispatch);
-        }finally { 
+        }finally {
             dispatch( onLoading( false ));
          }
     }
 }
 
-export const startDeleteUser = (user:User) => {
+export const startDeleteUser = (user:User & { id: string }) => {
     return async( dispatch:Dispatch ) => {
         dispatch( onLoading( true ));
         dispatch(onSetErrorMessage({}));
         try {
-            await calendarApi.delete(`/user/${user.id}`,); 
-            dispatch(onDeleteUser(user.id as string))
+            await calendarApi.delete(`/user/${user.id}`,);
+            dispatch(onDeleteUser(user.id))
         } catch (error) {
             return handleApiError(error, dispatch);
-        }finally { 
+        }finally {
             dispatch( onLoading( false ));
          }
     }

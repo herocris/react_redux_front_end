@@ -1,13 +1,11 @@
-import { Alert } from '@mui/material';
-
-
-import { useUserView } from "../hooks";
-import { UserFormModal } from "../components";
-import { AddFloatingButton, AlertDialog, EntityList, } from '../../../components';
-import { GrapLayout } from "../../../shared/layout/GraphLayout";
+import { UserError } from '../components/UserError';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { AddFloatingButton, EntityList, } from '../../../components';
+import { GrapLayout } from '../../../shared/layout/GraphLayout';
+import { UserFormModal } from '../components/UserFormModal';
+import { useUserView } from '../hooks/useUserView';
 
 export const UserView = () => {
-
   const {
     DeleteUser,
     LoadingEntities,
@@ -17,19 +15,19 @@ export const UserView = () => {
     loading,
     setIdUser,
     tableOptions,
-    users,
     openDialog,
     open,
+    users,
+    activeUser,
     permisos,
     roles,
-    activeUser,
     onSaveOrUptdate,
     errorMessage
   } = useUserView()
   return (
     <>
       <GrapLayout>
-        {!open && typeof errorMessage === 'string' && <Alert severity="error">{errorMessage}</Alert>}
+        {!open && !openDialog && <UserError message={errorMessage} />}
         <EntityList
           handleOpen={handleOpen}
           handleOpenDialog={handleOpenDialog}
@@ -42,19 +40,25 @@ export const UserView = () => {
         {open &&
           <UserFormModal
             handleOpen={handleOpen}
+            loading={loading}
             permisos={permisos}
             roles={roles}
-            loading={loading}
             activeUser={activeUser}
             onSaveOrUptdate={onSaveOrUptdate}
             errorMessage={errorMessage} />
         }
         {openDialog &&
-          <AlertDialog
-            title='Borrar'
-            dialogMessage={typeof errorMessage === 'string' ? `Deseas borrar el usuario? ${errorMessage}` : 'Deseas borrar el usuario?'}
-            DeleteEntity={DeleteUser}
-            handleOpen={handleOpenDialog} />
+          <Dialog open onClose={() => { if (!loading) handleOpenDialog(); }} aria-labelledby="delete-user-title" aria-describedby="delete-user-description">
+            <DialogTitle id="delete-user-title">Borrar usuario</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="delete-user-description">¿Deseas borrar el usuario?</DialogContentText>
+              <UserError message={errorMessage} />
+            </DialogContent>
+            <DialogActions>
+              <Button disabled={loading} onClick={handleOpenDialog}>Cancelar</Button>
+              <Button loading={loading} onClick={DeleteUser} color="error">Borrar</Button>
+            </DialogActions>
+          </Dialog>
         }
         <AddFloatingButton handleOpen={handleOpen} />
       </GrapLayout>
