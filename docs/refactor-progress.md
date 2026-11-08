@@ -8,8 +8,8 @@ las instrucciones para continuar en conversaciones independientes.
 dependencias ni se crearon services nuevos en esta preparación.
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1, 2, 3 y 4 completados**; siguiente paso pendiente:
-**5, autenticación**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1, 2, 3, 4 y 5 completados**; siguiente paso pendiente:
+**6, infraestructura de TanStack Query**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -85,7 +85,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | 2. Guardado de formularios | Completado | Formularios conservados durante envío/fallo, errores, bloqueo y reintentos verificados con HTTP simulado. |
 | 3. Archivos | Completado | Siete esquemas con máximo efectivo de 5.000.000 bytes, rechazo de archivos vacíos y conservación de imágenes existentes; pruebas automatizadas. |
 | 4. Convenciones | Completado | Guía contrastada con código/plan; convivencia, propietarios, retirada y límites de cancelación documentados. |
-| 5. Autenticación | Pendiente | Thunks/slice actuales; falta authService y mejora de tipos. |
+| 5. Autenticación | Completado | authService, contratos de sesión separados, selectores tipados y thunks Redux; contratos y transiciones probados, acceso/registro verificados en navegador. |
 | 6. TanStack Query | Pendiente | No instalado ni configurado. |
 | 7. Service de permisos | Pendiente | HTTP todavía dentro de thunks. |
 | 8. EntityList | Pendiente | Sigue usando callback de carga y contratos compartidos amplios. |
@@ -378,6 +378,93 @@ HTTP/auth simulados. Sin cambios de comportamiento, no se repitió navegador ni
 se comprobó disponibilidad actual de MCP. No se verificaron backend real,
 persistencia ni rendimiento; no se atribuye cobertura de Query/sesión a las
 pruebas antiguas. Paso 4 cerrado, plan sin cambios y paso 5 sin iniciar.
+
+### Paso 5 — Autenticación (8 de noviembre de 2026)
+
+Al comenzar, HEAD `d3d53c3` y workspace limpio. Se contrastaron instrucciones,
+plan y progreso con auth, router, layout, usuario administrativo, cliente HTTP,
+store y pruebas. Se ejecutó únicamente el prompt del paso 5; sin instalaciones,
+TanStack Query, migración de CRUD ni cambios en formularios o endpoints.
+
+**Cambios y decisiones.**
+
+- [`authService`](../src/modules/auth/services/authService.ts) concentra POST
+  `/login`, `/register`, `/refresh` y `/logout`, usando el cliente compartido con
+  cookies. Conserva los payloads: email/password y name/email/password; no envía
+  confirmación. Devuelve usuario de sesión o propaga la causa del rechazo sin
+  efectos Redux/visuales. La comprobación admite `AbortSignal` opcional; todavía
+  no se coordina cancelación global desde auth.
+- Se tiparon las respuestas y su adaptación en la frontera. Login/refresh
+  convierten name/email y roles/permissions a nombre/correo y roles/permisos.
+  Registro conserva la forma anterior `{ user: SessionUser }` y adapta también
+  la forma name/email presente en las pruebas previas. No se reinterpretan
+  identificadores ni relaciones: conservan números, texto y objetos heredados.
+  Son contratos del frontend, no validación runtime ni confirmación del servidor.
+- `SessionUser`, roles y permisos de sesión son independientes de `User` y su
+  formulario administrativo. Redux sigue siendo el único propietario de sesión;
+  se conserva su estructura pública y el usuario vacío al salir. `AuthStatus`
+  restringe los tres estados existentes y el error visual es string/undefined.
+  Selectores tipados de estado, usuario y error se usan en router, layout y hook,
+  con suscripciones precisas y sin importar el store desde la frontera de datos.
+- Los thunks consumen directamente el service y conservan la coordinación Redux.
+  `checking` sigue reservado al arranque; envío/campos permanecen en RHF. Se
+  retiraron logs de errores potencialmente sensibles y temporizadores de cuatro
+  segundos: el error persiste hasta el siguiente intento, limpieza explícita o
+  transición de sesión; un temporizador antiguo ya no puede borrar otro error.
+  Login/registro manejan el rechazo y permiten reintentar sin desmontar la vista.
+  Logout conserva su contrato: espera éxito para salir, y ante fallo conserva
+  sesión y propaga la causa; no se añadió una nueva UI de error de logout.
+
+**Comprobaciones nuevas.**
+
+- [`tests/auth.test.mjs`](../tests/auth.test.mjs): ocho conteos (grupo y siete
+  subpruebas) cubren métodos, rutas, payloads, cookies, adaptación de ambas formas
+  de registro, relaciones, rechazos HTTP/red/desconocidos, señal de refresh,
+  reducers/selectores, refresh exitoso/fallido, fallo/reintento de acceso/registro
+  sin checking y logout pendiente/exitoso/fallido. Se conserva cobertura previa
+  de errores en `api-errors.test.mjs`, ajustando la expectativa de persistencia.
+- `npm.cmd test`: **133 aprobadas**, cero fallos, canceladas u omitidas.
+- `npm.cmd run build`: correcto; continúa el aviso previo de chunks mayores de
+  500 kB. Se restauró `tsconfig.app.tsbuildinfo` al contenido inicial.
+- `npm.cmd run lint -- --format json --output-file ...`: falla por deuda previa,
+  **85 errores y 24 advertencias**, frente a 87/24. Sin nuevas infracciones;
+  `Function` en `PasswordFieldProps` sigue siendo deuda previa del archivo de
+  tipos, ajena al contrato de sesión. No se hizo limpieza general de lint.
+- `git diff --check`: correcto al cierre. Logs temporales no versionados:
+  `%TEMP%/graphdata-step5-tests.txt`, `%TEMP%/graphdata-step5-lint.json` y
+  `%TEMP%/graphdata-step5-build.txt`.
+
+**Navegador y reutilización.** Playwright MCP operativo; recorrido guardado en
+[`tests/browser/auth-service.js`](../tests/browser/auth-service.js). Dos grupos
+(login/registro) verifican petición pendiente, formulario montado, controles
+bloqueados, conservación de campos/contraseñas tras rechazo, reintento y usuario
+de sesión visible en dashboard. Cuatro escrituras POST simuladas con sus campos
+correctos; cero excepciones JS y cero mensajes inesperados. El primer recorrido
+solo falló al tratar dos avisos Canvas2D de lectura frecuente como inesperados;
+se clasificaron explícitamente en el script y se repitió correctamente. No hubo
+cambios de producto derivados de esos avisos. Los errores HTTP simulados de
+refresh/acceso se filtran por endpoint. No se tomaron capturas: no cambió el
+aspecto visual. Se reutiliza la evidencia previa de listados, CRUD, archivos,
+geocodificación y carga diferida; no se repitieron sus recorridos no afectados.
+
+**Documentación y límites.** Lockfile reconfirmado: React 19.3.1, Redux Toolkit
+2.6.1, Axios 1.21.0 y React Redux 9.2.0; dependencias sin cambios. Se leyó la
+skill React y su regla de suscripciones derivadas; no se rediseñó la composición
+de componentes. Context7 consultado para RTK: sin 2.6.1 en su catálogo, se usó
+documentación general de `createSlice`/`PayloadAction` y
+[tipado oficial](https://redux-toolkit.js.org/usage/usage-with-typescript),
+contrastado mediante compilación con los tipos instalados. Las URLs del tag
+2.6.1 no se pudieron recuperar con el navegador; no se atribuye a esa versión
+exacta la documentación general. No se verificaron backend real, cookies del
+servidor ni persistencia.
+
+**Pendiente explícito para el paso 6.** No hay caché Query instalada ni limpieza
+global implementada. Logout solo reinicia auth; siguen los datos remotos de
+módulos antiguos en Redux. Falta coordinar cancelación/limpieza al salir o
+cambiar usuario y bloquear publicaciones tardías de lecturas y escrituras,
+incluidos refresh/login pendientes y módulos antiguos. El soporte de señal del
+service y su prueba no acreditan aislamiento de sesión ni reversión de una
+escritura del servidor. Paso 5 cerrado; paso 6 sin iniciar, plan sin cambios.
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,

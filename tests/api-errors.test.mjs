@@ -106,7 +106,7 @@ test('errores HTTP y thunks con el cliente real y un transporte simulado', async
                 assert.equal(store.getState().status, 'not-authenticated');
                 assert.equal(store.getState().errorMessage, getApiErrorText(reason));
                 t.mock.timers.tick(4000);
-                assert.equal(store.getState().errorMessage, undefined);
+                assert.equal(store.getState().errorMessage, getApiErrorText(reason));
             }
         }
     });

@@ -1,8 +1,7 @@
 import { createSlice,PayloadAction } from '@reduxjs/toolkit'
-import { AuthState } from '../'
-import { User } from '../../user'
+import type { AuthState, SessionUser } from '../types'
 
-const user: User = {
+const user: SessionUser = {
     nombre: '', 
     correo: '',
     roles:[],
@@ -23,12 +22,12 @@ export const authSlice = createSlice({
             state.user = user;
             state.errorMessage = undefined;
         },
-        onLogin: (state, { payload }: PayloadAction<User>) => {
+        onLogin: (state, { payload }: PayloadAction<SessionUser>) => {
             state.status = 'authenticated';
             state.user = payload;
             state.errorMessage = undefined;
         },
-        onLogout: (state, { payload }: PayloadAction<String|undefined>) => { //duda con el tipo del payload para errorMessage
+        onLogout: (state, { payload }: PayloadAction<string | undefined>) => {
             state.status = 'not-authenticated';
             state.user = user;
             state.errorMessage = payload;

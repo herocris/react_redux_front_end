@@ -1,10 +1,10 @@
-import { RootState } from '../../../store';
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { startCreatingUserWithEmailPassword, startLoginWithEmailPassword } from '../thunks';
-import { LoginData,RegisterData } from '../';
+import type { LoginData,RegisterData } from '../types';
+import { selectAuthError } from '../selectors';
 
 export const useAuth = () => {
-    const { errorMessage } = useAppSelector((state: RootState) => state.auth);
+    const errorMessage = useAppSelector(selectAuthError);
     const dispatch = useAppDispatch();
     
     const onLogin = async (data:LoginData)=>{

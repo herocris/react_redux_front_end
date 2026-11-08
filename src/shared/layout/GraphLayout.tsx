@@ -3,7 +3,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { ReactNode, useState } from 'react';
 import { AccountCircle, Logout, Person, RecentActors, Map, ContactEmergency, SignalCellularAlt, Inventory2, FormatListBulleted, HomeRepairServiceOutlined, Vaccines, AllInbox, Category } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
-import { RootState } from '../../store';
+import { selectSessionUser } from '../../modules/auth/selectors';
 import { startLogout } from '../../modules/auth/thunks';
 import { useNavigate, useLocation } from 'react-router';
 import { useThemeContext } from '../../theme/ThemeContext';
@@ -19,7 +19,7 @@ interface GrapLayoutProps {
 
 export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) => {
     const { pathname } = useLocation();
-    const { user } = useAppSelector((state: RootState) => state.auth);
+    const user = useAppSelector(selectSessionUser);
     const dispatch = useAppDispatch();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);

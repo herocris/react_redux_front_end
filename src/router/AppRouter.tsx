@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router';
 import { AuthRoutes } from '../modules/auth';
 import { useAppDispatch, useAppSelector } from '../hooks/hooks';
-import { RootState } from '../store';
+import { selectAuthStatus } from '../modules/auth/selectors';
 import { lazy, Suspense, useEffect } from 'react';
 import { checkAuthToken } from '../modules/auth/thunks';
 import { Box, CircularProgress } from '@mui/material';
@@ -27,7 +27,7 @@ const RouteLoading = () => (
 );
 
 export const AppRouter = () => {
-    const { status } = useAppSelector((state: RootState) => state.auth);
+    const status = useAppSelector(selectAuthStatus);
     const dispatch = useAppDispatch();
     useEffect(() => {
         dispatch(checkAuthToken())

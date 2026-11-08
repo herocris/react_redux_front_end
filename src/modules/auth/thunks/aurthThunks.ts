@@ -1,80 +1,48 @@
 import { getApiErrorText } from '../../../api/apiErrors';
-import { Dispatch } from '@reduxjs/toolkit';
-import calendarApi from '../../../api/graphdataApi';
-import { onChecking, onLogin, onLogout, clearErrorMessage } from '../slices';
-import { LoginData, RegisterData } from '../';
+import type { Dispatch } from '@reduxjs/toolkit';
+import { onChecking, onLogin, onLogout, clearErrorMessage } from '../slices/authSlice';
+import { authService } from '../services/authService';
+import type { LoginData, RegisterData } from '../types';
 
-export const checkingAuthentication = () => {
-    return async (dispatch: Dispatch) => {
-        dispatch(onChecking());
-    }
-}
+export const checkingAuthentication = () => (dispatch: Dispatch) => {
+    dispatch(onChecking());
+};
 
-export const startCreatingUserWithEmailPassword = ({ name, email, password }: RegisterData) => {
-    return async (dispatch: Dispatch) => {
+export const startCreatingUserWithEmailPassword = (values: RegisterData) => {
+    return async (dispatch: Dispatch): Promise<void> => {
         dispatch(clearErrorMessage());
         try {
-            const { data } = await calendarApi.post('/register', { name, email, password });
-            dispatch(onLogin(data.user));
-        } catch (error) {
-            console.log(error);
-            const errorMessage = getApiErrorText(error);
-            dispatch(onLogout(errorMessage));
-            setTimeout(() => {
-                dispatch(clearErrorMessage());
-            }, 4000);
-        }
-    }
-}
-
-
-export const startLoginWithEmailPassword = ({ email, password }: LoginData) => {
-    return async (dispatch: Dispatch) => {
-        dispatch(clearErrorMessage());
-        try {
-            const { data } = await calendarApi.post('/login', { email, password });
-            //localStorage.setItem('token', data.access_token);
-            dispatch(onLogin({
-                nombre: data.user.name,
-                correo: data.user.email,
-                roles: data.roles,
-                permisos: data.permissions,
-            }));
-        } catch (error) {
-            console.log(error);
-            
+            dispatch(onLogin(await authService.register(values)));
+        } catch (error: unknown) {
             dispatch(onLogout(getApiErrorText(error)));
-            setTimeout(() => {
-                dispatch(clearErrorMessage());
-            }, 4000);
         }
-    }
-}
+    };
+};
+
+export const startLoginWithEmailPassword = (values: LoginData) => {
+    return async (dispatch: Dispatch): Promise<void> => {
+        dispatch(clearErrorMessage());
+        try {
+            dispatch(onLogin(await authService.login(values)));
+        } catch (error: unknown) {
+            dispatch(onLogout(getApiErrorText(error)));
+        }
+    };
+};
 
 export const startLogout = () => {
-    return async (dispatch: Dispatch) => {
-        await calendarApi.post('/logout',);
-        //localStorage.removeItem('token');
+    return async (dispatch: Dispatch): Promise<void> => {
+        await authService.logout();
         dispatch(onLogout());
-    }
-}
+    };
+};
 
 export const checkAuthToken = () => {
-    return async (dispatch: Dispatch) => {
-        //if ( !token ) return dispatch( onLogout() );
+    return async (dispatch: Dispatch): Promise<void> => {
         try {
-            const { data } = await calendarApi.post('/refresh');
-            dispatch(onLogin({
-                nombre: data.user.name,
-                correo: data.user.email,
-                roles: data.roles,
-                permisos: data.permissions,
-            }));
-            //localStorage.setItem('token', data.access_token);
-        } catch (error) {
-            console.log(error);
-
+            dispatch(onLogin(await authService.checkSession()));
+        } catch {
             dispatch(onLogout());
         }
-    }
-}
+    };
+};
