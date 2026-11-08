@@ -1,6 +1,6 @@
 import { DrugError } from '../components/DrugError';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import { AddFloatingButton, EntityList, } from '../../../components';
+import { AddFloatingButton, LegacyEntityList as EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { DrugFormModal } from '../components';
 import { useDrugView } from '../hooks';

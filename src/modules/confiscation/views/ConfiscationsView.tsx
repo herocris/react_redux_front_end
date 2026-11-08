@@ -1,5 +1,5 @@
 import { useMediaQuery } from '@mui/material';
-import { AddFloatingButton, AlertDialog, EntityList, } from '../../../components';
+import { AddFloatingButton, AlertDialog, LegacyEntityList as EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { useConfiscationView } from '../hooks';
 

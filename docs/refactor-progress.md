@@ -8,8 +8,8 @@ La preparación inicial no instaló dependencias ni creó services. **El paso 6
 ya incorpora la infraestructura de TanStack Query; ningún CRUD está migrado.**
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1, 2, 3, 4, 5, 6 y 7 completados**; siguiente paso pendiente:
-**8, adaptación de EntityList**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1, 2, 3, 4, 5, 6, 7 y 8 completados**; siguiente paso pendiente:
+**9, piloto de permisos**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -88,7 +88,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | 5. Autenticación | Completado | authService, contratos de sesión separados, selectores tipados y thunks Redux; contratos y transiciones probados, acceso/registro verificados en navegador. |
 | 6. TanStack Query | Completado | Cliente/proveedor estables, política explícita y aislamiento de sesión con convivencia Redux; pruebas y navegador con HTTP simulado. |
 | 7. Service de permisos | Completado | Service tipado, contratos HTTP probados y thunks compatibles; pantalla y opciones siguen en Redux. |
-| 8. EntityList | Pendiente | Sigue usando callback de carga y contratos compartidos amplios. |
+| 8. EntityList | Completado | Tabla genérica controlada, callbacks de fila y adaptador temporal para los diez consumidores antiguos; CRUD, solo lectura y control externo verificados. |
 | 9. Piloto de permisos | Pendiente | CRUD y opciones aún usan Redux manual. |
 | 10. Componentes comunes | Pendiente | Hay alertas/confirmaciones repetidas y campos con tipos amplios. |
 | 11. Catálogos y actividad | Pendiente | Refactors previos conservados; migración de datos no iniciada. |
@@ -668,6 +668,96 @@ verificados. Abortar una petición no demuestra reversión de una escritura del
 servidor. No se acredita catálogo completo, caché ni invalidación del CRUD de
 permisos: aún no está migrado a Query. Continúan deuda de lint y aviso de bundle.
 Paso 7 cerrado, plan sin cambios y paso 8 sin iniciar.
+
+### Paso 8 — EntityList controlado (8 de noviembre de 2026)
+
+Al comenzar, HEAD `4398dcb` y workspace limpio. Se leyeron AGENTS.md, plan y
+progreso y se contrastaron todos los consumidores, tipos y protocolo de carga.
+Se ejecutó únicamente el prompt del paso 8, sin cambiar dependencias, services,
+thunks, store ni migrar pantallas/opciones a Query. El plan conserva su alcance.
+
+**Cambios y decisiones.**
+
+- [`EntityList`](../src/components/EntityList.tsx) recibe filas y columnas
+  genéricas, total, carga y los tres modelos controlados de MUI (paginación,
+  orden y filtros), con eventos tipados mediante `DataGridProps<Row>`. No
+  mantiene estado propio ni efectos de carga, Redux, Query o diálogos.
+  `onEdit` y `onDelete` reciben la fila original; omitirlos conserva solo lectura.
+  No incorpora una bandera para alternar protocolos de carga.
+- [`LegacyEntityList`](../src/components/LegacyEntityList.tsx) conserva el
+  contrato anterior de los diez consumidores: columnas por nombre, avatares,
+  selección y apertura de edición/borrado, incluido el flujo de confiscaciones.
+  Las vistas solo cambian el import al adaptador. Su bandera `editable` previa
+  permanece exclusivamente en esta compatibilidad, sin ampliarla al nuevo API.
+- [`useEntityList`](../src/hooks/useEntityList.tsx) queda limitado al protocolo
+  antiguo: es el único propietario de los modelos del adaptador y los entrega
+  controlados a la tabla. Conserva carga por argumentos primitivos, numeración
+  HTTP desde uno, filtro inicial vacío, orden de respaldo, señal de efecto y
+  aborto al cambiar argumentos/desmontar. Los metadatos Redux aportan valores
+  iniciales y total; no sobrescriben modelos en cada respuesta. Se mantienen
+  `createLatestListRequest` y las protecciones de los thunks existentes.
+- Se sustituyen `Function` y `Object[]` del contrato antiguo por callbacks y
+  la forma mínima de fila que usa el adaptador. Se elimina `useEntityListProps`
+  tras buscar sus consumidores; solo lo usaba el hook sustituido. Los tipos
+  nuevos pertenecen al componente y no dependen de metadatos del backend.
+
+**Comprobaciones nuevas.**
+
+- `node --test tests/permission.test.mjs tests/permission-service.test.mjs
+  tests/list-loading.test.mjs tests/query-session.test.mjs`: **69 aprobadas**,
+  cero fallos/canceladas/omitidas. Contratos y transiciones de permisos,
+  cancelación/desmontaje/respuestas tardías de los nueve dominios y aislamiento
+  de sesión durante la convivencia. No se repitió la suite completa.
+- `npm.cmd run build`: correcto; persiste el aviso previo de chunks >500 kB.
+  Se restauró `tsconfig.app.tsbuildinfo` a sus bytes iniciales.
+- `npm.cmd run lint -- --format json --output-file ...`: **78 errores y
+  24 advertencias** de deuda restante, frente a 85/24 del paso 7. Comparación
+  por archivo/regla/severidad/mensaje: cero diagnósticos nuevos; sin incidencias
+  en EntityList, adaptador ni hook. No se hizo limpieza general de lint.
+- `git diff --check`: correcto al cierre. Logs locales no versionados:
+  `%TEMP%/graphdata-step8-tests.txt`, `%TEMP%/graphdata-step8-build.txt`,
+  `%TEMP%/graphdata-step8-lint.json` y `%TEMP%/graphdata-step8-lint.txt`.
+
+**Navegador.** Playwright MCP operativo, reutilizando la página y el servidor de
+desarrollo existente en 4175. El intento de iniciar otro servidor eligió 4176;
+se detuvo ese proceso auxiliar. Se ejecutaron los recorridos existentes
+[`permission.js`](../tests/browser/permission.js) (siete grupos: selección,
+crear/editar/borrar, fallo y reintento; seis escrituras simuladas) y
+[`activity.js`](../tests/browser/activity.js) (cinco grupos: solo lectura,
+campos, error, reintento y vacío; seis GET y ninguna escritura). Cero
+excepciones JS y cero mensajes inesperados; errores de red simulados esperados.
+El script de permisos conserva sus capturas existentes en `.playwright-mcp/`.
+
+El nuevo [`entity-list.js`](../tests/browser/entity-list.js) monta un consumidor
+controlado temporal y aprueba tres grupos: callbacks reciben la fila original
+con ID numérico; eventos de página/orden actualizan el consumidor; cambios
+externos de página/orden/filtro se reflejan en la tabla, el filtro emite cambios
+y omitir callbacks elimina acciones. Cero solicitudes HTTP, excepciones o
+mensajes de consola. Desmonta la prueba y retira sus listeners en `finally`.
+Los primeros dos intentos fallaron por la forma del export CommonJS de React
+y React DOM en Vite; se corrigió el script para usar sus exports por defecto,
+sin cambios de producto, y la ejecución final pasó.
+
+**Documentación y reutilización.** Se aplicaron las skills React y composición,
+en concreto derivación sin estado duplicado y ausencia de nuevas variantes
+por banderas. Lockfile reconfirmado: React 19.3.1, MUI Material 6.4.7 y DataGrid
+7.27.3, sin modificaciones. Context7 no ofrece DataGrid 7.27.3 exacta; se
+consultó su documentación oficial de la rama 7.29.1 sobre modelos controlados,
+[paginación](https://github.com/mui/mui-x/blob/v7.29.1/docs/data/data-grid/pagination/pagination.md),
+[orden](https://github.com/mui/mui-x/blob/v7.29.1/docs/data/data-grid/sorting/sorting.md)
+y [filtros](https://github.com/mui/mui-x/blob/v7.29.1/docs/data/data-grid/filtering/index.md),
+contrastada con tipos instalados, build y navegador. No se atribuye a la versión
+exacta instalada. Se reutiliza la evidencia histórica de archivos, multipart,
+geocodificación, autenticación y carga diferida, cuyos escenarios no cambian;
+no se repitieron sus baterías ni los CRUD equivalentes de otros catálogos.
+
+**Límites y pendientes.** Backend y autenticación simulados: no se verificaron
+persistencia ni cookies reales. El adaptador conserva las limitaciones del
+protocolo antiguo (primer filtro/orden y metadatos iniciales); la nueva tabla
+entrega los modelos completos al consumidor. No se acredita todavía caché,
+invalidación, catálogo completo ni corrección de página vacía de permisos:
+corresponden al paso 9. Continúan deuda de lint y aviso de bundle. Paso 8
+cerrado; paso 9 pendiente, sin iniciarlo.
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,

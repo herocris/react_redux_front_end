@@ -1,4 +1,4 @@
-import { EntityList, } from '../../../components';
+import { LegacyEntityList as EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { useActivityView } from '../hooks';
 import { Button } from '@mui/material';

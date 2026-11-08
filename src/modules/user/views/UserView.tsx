@@ -1,6 +1,6 @@
 import { UserError } from '../components/UserError';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import { AddFloatingButton, EntityList, } from '../../../components';
+import { AddFloatingButton, LegacyEntityList as EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { UserFormModal } from '../components/UserFormModal';
 import { useUserView } from '../hooks/useUserView';

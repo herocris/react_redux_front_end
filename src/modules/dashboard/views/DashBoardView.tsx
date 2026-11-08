@@ -1,6 +1,6 @@
 import Grid from '@mui/material/Grid2';
 import { BarGraph, LineGraph } from '../../graph/components';
-import { EntityList, } from '../../../components';
+import { LegacyEntityList as EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { useDrugView } from '../../drug/hooks';
 import {MapComponent } from '../../map';

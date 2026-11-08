@@ -50,11 +50,11 @@ export type LoadEntities = (
 ) => void | Promise<void>;
 
 export interface EntityListProps {
-    handleOpen: Function
-    handleOpenDialog: Function
+    handleOpen: (open: boolean) => void
+    handleOpenDialog: () => void
     LoadingEntities: LoadEntities
-    setIdEntity: Function
-    EntityCollection: Object[]
+    setIdEntity: (id: string, action: 'editar' | 'borrar') => void
+    EntityCollection: { id?: string; name?: string; nombre?: string }[]
     tableOptions: TableOptions
     loading: boolean
     columnsTable: string[],
@@ -62,16 +62,6 @@ export interface EntityListProps {
 }
 
 
-
-export interface useEntityListProps {
-    handleOpen: Function
-    handleOpenDialog: Function
-    setIdEntity: Function
-    columnsTable: string[]
-    LoadingEntities: LoadEntities,
-    editable: boolean,
-    tableOptions: TableOptions
-}
 
 export interface PhotoInputProps {
     setValueFile: Function,
