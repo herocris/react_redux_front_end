@@ -9,11 +9,13 @@ incorpora la infraestructura de TanStack Query, el paso 9 migra permisos y el
 paso 11 extiende la migración a los demás catálogos, sus opciones y actividad;
 el paso 12 migra confiscaciones y subdecomisos; el paso 13 añade los filtros
 aplicados compartidos en Redux, el paso 14 conecta mapas/gráficos con Query y el
-paso 15 retira la infraestructura sustituida y difiere el CSS de Leaflet.**
+paso 15 retira la infraestructura sustituida y difiere el CSS de Leaflet; el
+paso 16 cierra la integración con suite completa y límites explícitos.**
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1 a 15 completados**; siguiente paso pendiente:
-**16, cierre de integración**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1 a 16 completados**. Migración cerrada dentro
+del alcance del plan; la deuda y la validación con backend real se detallan en
+el cierre del paso 16. No hay otro paso iniciado.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -100,7 +102,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | 13. Filtros Redux | Completado | Slice serializable, aplicación explícita desde RHF, selector tipado y reset de sesión; transiciones y navegador verificados. |
 | 14. Mapas y gráficos | Completado | Services/Query con contexto Redux, RHF aislado, estados remotos y capas verificados. |
 | 15. Limpieza/rendimiento | Completado | Retirados slices/thunks y adaptador antiguos sin consumidores; CSS Leaflet diferido, bundle y perfil local medidos; regresión selectiva aprobada. |
-| 16. Integración | Pendiente | Ejecutar al completar los pasos anteriores. |
+| 16. Integración | Completado | Propietarios y retirada contrastados; 208 pruebas aprobadas, build correcto, lint sin diagnósticos nuevos y regresión selectiva de opciones integrada. Límites y deuda registrados. |
 
 ## Contratos y pendientes que deben contrastarse
 
@@ -1628,6 +1630,102 @@ persistencia, cookies ni escrituras contra el backend real; abortar transporte
 no revierte escrituras del servidor. Pendientes: deuda de lint, chunk compartido
 grande, perfil representativo de vistas autenticadas si se desea optimizarlas y
 cierre de integración del paso 16. **Paso 15 cerrado; paso 16 sin iniciar.**
+
+### Paso 16 — Cierre de integración (9 de noviembre de 2026)
+
+Inicio en HEAD `4a3d274`, workspace limpio. Leídos AGENTS.md, plan y progreso;
+ejecutado únicamente el prompt del paso 16. No se requieren cambios de aplicación,
+pruebas, dependencias ni alcance del plan: la adaptación de pruebas retiradas
+quedó completada en los pasos anteriores y la suite actual conserva sus garantías.
+Solo se actualiza este documento. No se crea un commit ni se inicia otro trabajo.
+
+**Contraste de arquitectura y contratos.**
+
+- Store/reducer raíz con exactamente `auth` y `analysisFilters`; sin resultados
+  remotos ni archivos en Redux. El filtro aplicado contiene fechas y arrays de
+  IDs serializables; RHF conserva el borrador hasta Aplicar. La sesión no se copia
+  en Query ni en `sessionScope`, que solo conserva su ciclo de vida.
+- Consultas por dominio llaman directamente a services, pasando `signal`;
+  claves de listas con sus argumentos, sublistas con padre, opciones separadas
+  y análisis con snapshot aplicado/controles que afectan la respuesta. Las
+  opciones se derivan de Query y sus services recorren el catálogo paginado.
+  El cliente único/proveedor y su política explícita del paso 6 se conservan.
+- Acceso HTTP del backend en services, mediante Axios compartido con cookies y
+  rechazo del cuerpo HTTP; geocodificación externa separada. Solo auth conserva
+  thunks. Los services no importan React/Redux/Query ni administran efectos de UI.
+- Mutaciones con `sessionMutationOptions`, invalidación tras éxito y comprobación
+  de sesión después de esperar recargas antes de cerrar/navegar. Se conserva la
+  invalidación de análisis por escrituras de confiscaciones/hijos y la retirada
+  de consultas hijas al borrar un padre. Las fronteras cancelan/limpian Query y
+  filtros, con dispatch de auth ligado a sesión. Limpiar caché no revierte una
+  escritura que el servidor haya aceptado.
+- Listas controladas con página/orden/filtros en el consumidor; formularios en
+  RHF, selección y diálogos locales. Las instantáneas de edición y claves por
+  padre evitan sobrescribir borradores durante recargas. Las referencias a claves
+  de respaldo de listas no almacenan otra copia de resultados remotos.
+- Búsqueda en `src` y `tests`: sin consumidores de `LegacyEntityList`,
+  `useEntityList`, `createLatestListRequest` ni slices remotos retirados. Los
+  únicos slices/thunks presentes corresponden a los propietarios vigentes.
+  No se reintroduce compatibilidad ni se cambian endpoints, relaciones o payloads.
+
+**Comprobaciones nuevas.**
+
+- `npm.cmd test`: **208 aprobadas**, cero fallos/canceladas/omitidas/todo; salida 0.
+  Incluye contratos HTTP, JSON/multipart, errores, imágenes, validación y
+  geocodificación; claves/caché/concurrencia/invalidación y aislamiento de sesión;
+  transiciones de autenticación/filtros. Log `%TEMP%/graphdata-step16-tests.txt`.
+- `npm.cmd run lint -- --format json --output-file ...`: salida 1 por **10 errores
+  y 9 advertencias** previos. Comparación por archivo/regla/severidad/mensaje con
+  `%TEMP%/graphdata-step15-lint.json`: **cero diagnósticos nuevos**. Informe actual:
+  `%TEMP%/graphdata-step16-lint.json`. No se presenta lint como aprobado.
+- `npm.cmd run build -- --manifest`: correcto, salida 0; persiste aviso de chunks
+  >500 kB. Log `%TEMP%/graphdata-step16-build.txt`. Restaurados los bytes iniciales
+  de `tsconfig.app.tsbuildinfo` tras el build, sin cambios incidentales.
+- `node scripts/audit-bundle.mjs`: correcto. Recharts, Leaflet, DataGrid y CSS de
+  Leaflet permanecen fuera del arranque. JS inicial 697.656 bytes / gzip 221.212;
+  CSS inicial 40 / gzip 48, iguales al paso 15. Es comprobación del bundle, no
+  nueva medición temporal ni perfil de renders.
+- Playwright MCP comprobado operativo; página existente y Vite 4175 reutilizados.
+  [catalog-options-consumers.js](../tests/browser/catalog-options-consumers.js):
+  **cuatro grupos aprobados**, 22 lecturas y dos errores HTTP simulados esperados;
+  cero excepciones, mensajes inesperados o avisos MUI de selección. Verifica
+  recuperación de catálogo paginado en gráficos, caché compartida al ir al mapa
+  sin GET adicionales, cantidad preservada ante fallo/reintento de presentaciones
+  y opciones completas en los tres subformularios. Su última ejecución documentada
+  era del paso 11, anterior a los cambios de consumidores de los pasos 12/14;
+  esta ejecución cubre esa integración con el código final. Rutas y listeners
+  retirados en `finally`; sin respuestas retenidas. Sin capturas: no hay cambios
+  visuales y el recorrido comprueba comportamiento con aserciones.
+- `git diff --check`: correcto. Aplicación, pruebas y package.json/lockfile sin
+  cambios durante el cierre.
+
+**Reutilización y documentación.** Se reutilizan como evidencia histórica, sin
+contarlos como ejecuciones nuevas, los recorridos del paso 15 de carga diferida
+en producción/CSS de mapas, análisis/navegación y logout/acceso B; los del paso
+12 de detalle/sublistas, borradores, archivos y guardado; y los de autenticación,
+CRUD representativos, controles comunes y geocodificación. Contrastados los
+cambios posteriores: las invalidaciones añadidas en el paso 14 tienen cobertura
+automatizada ejecutada de nuevo; el CSS y la retirada del paso 15 ya cuentan con
+regresión de navegador final. No se repiten baterías equivalentes sin cambios.
+
+Skills React/composición aplicadas a la revisión de propietarios, estado derivado
+y edición independiente, sin añadir contextos o memoización. Versiones del
+lockfile reconfirmadas: React 19.3.1, Query 5.107.1, RTK 2.6.1, Vite 8.3.5,
+Axios 1.21.0 y RHF 7.55.0. Context7 operativo, consultado sobre claves, cancelación
+y limpieza de Query; no ofrece 5.107.1 exacta. Documentación general contrastada
+con código instalado y suite completa; se conserva esa limitación. Referencias:
+[claves](https://tanstack.com/query/v5/docs/framework/react/guides/query-keys),
+[cancelación](https://tanstack.com/query/v5/docs/framework/react/guides/query-cancellation)
+y [QueryClient](https://tanstack.com/query/v5/docs/reference/QueryClient).
+
+**Límites y pendientes fuera del cierre.** Las pruebas HTTP y autenticación del
+recorrido son simuladas; no se acreditan persistencia, cookies, permisos efectivos,
+relaciones ni escrituras contra un backend real. Queda validarlos con ese entorno.
+Persisten los 10 errores/9 advertencias de lint inventariados y el chunk compartido
+grande (GraphLayout/DataGrid); cualquier optimización posterior requiere medición
+representativa de vistas autenticadas. No se amplían aquí formularios por pasos,
+lotes o exportaciones. **Paso 16 cerrado; los 16 pasos del plan están completados
+dentro de su alcance, con la deuda y las limitaciones anteriores explícitas.**
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,
