@@ -81,6 +81,11 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
 
 ### Convivencia y retirada
 
+- Desde el paso 15, Redux contiene únicamente `auth` y `analysisFilters`.
+  Los dominios remotos usan Query; se retiraron los slices/thunks sustituidos,
+  `LegacyEntityList`, `useEntityList` y `createLatestListRequest` sin consumidores.
+  Las reglas de convivencia siguientes explican la transición histórica; no
+  reintroducir esas piezas. Se conserva el dispatch ligado a sesión para auth.
 - La arquitectura anterior describe el destino; el estado implementado está en
   [el progreso](docs/refactor-progress.md). Los módulos aún no migrados conservan
   HTTP en thunks y datos en slices. El paso 7 permite que los thunks de permisos

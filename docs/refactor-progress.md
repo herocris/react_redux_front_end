@@ -8,11 +8,12 @@ La preparación inicial no instaló dependencias ni creó services. **El paso 6
 incorpora la infraestructura de TanStack Query, el paso 9 migra permisos y el
 paso 11 extiende la migración a los demás catálogos, sus opciones y actividad;
 el paso 12 migra confiscaciones y subdecomisos; el paso 13 añade los filtros
-aplicados compartidos en Redux y el paso 14 conecta mapas/gráficos con Query.**
+aplicados compartidos en Redux, el paso 14 conecta mapas/gráficos con Query y el
+paso 15 retira la infraestructura sustituida y difiere el CSS de Leaflet.**
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1 a 14 completados**; siguiente paso pendiente:
-**15, limpieza y rendimiento**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1 a 15 completados**; siguiente paso pendiente:
+**16, cierre de integración**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -98,7 +99,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | 12. Confiscaciones | Completado | Services y Query para listas, detalle y subdecomisos; borradores, archivos, paginación, errores, concurrencia y sesión verificados. |
 | 13. Filtros Redux | Completado | Slice serializable, aplicación explícita desde RHF, selector tipado y reset de sesión; transiciones y navegador verificados. |
 | 14. Mapas y gráficos | Completado | Services/Query con contexto Redux, RHF aislado, estados remotos y capas verificados. |
-| 15. Limpieza/rendimiento | Pendiente | No retirar todavía infraestructura con consumidores. |
+| 15. Limpieza/rendimiento | Completado | Retirados slices/thunks y adaptador antiguos sin consumidores; CSS Leaflet diferido, bundle y perfil local medidos; regresión selectiva aprobada. |
 | 16. Integración | Pendiente | Ejecutar al completar los pasos anteriores. |
 
 ## Contratos y pendientes que deben contrastarse
@@ -1487,6 +1488,146 @@ transporte no revierte escrituras del servidor. Continúan deuda de lint y aviso
 de bundle. La retirada de las implementaciones remotas antiguas y la adaptación
 de sus pruebas quedan para el siguiente paso.
 **Paso 14 cerrado; paso 15 pendiente y sin iniciar.**
+
+### Paso 15 — Retirada y revisión de rendimiento (9 de noviembre de 2026)
+
+Inicio en HEAD `01e1c97`, workspace limpio. Leídos AGENTS.md, plan y progreso;
+ejecutado únicamente el prompt del paso 15. Sin cambios de dependencias ni del
+plan. El paso 16 permanece pendiente: no se ejecuta el cierre general ni la
+suite completa de ese paso. Código y pruebas consolidados en `fa24f3e`; este
+registro y la guía se consolidan en un commit documental separado. Se reutilizan
+las verificaciones anteriores, sin cambios funcionales posteriores;
+`git diff --cached --check` se verifica antes de cada commit.
+
+**Retirada y propietarios.** Búsqueda en aplicación, store y pruebas antes y
+después de retirar las piezas; no quedan referencias ejecutables a las retiradas.
+
+- Eliminados slices, acciones, thunks y barrels de mapas/gráficos antiguos y sus
+  registros en el store. Los consumidores de pantalla ya estaban migrados en el
+  paso 14; solo las pruebas de convivencia conservaban dependencias antiguas.
+  Redux contiene exclusivamente `auth` y `analysisFilters`. Query conserva los
+  resultados remotos, sin copias ni cambios en services, claves o invalidación.
+- Retirados `LegacyEntityList`, `useEntityList`, su export y sus tipos de protocolo
+  sin consumidores. `EntityList` controlado se conserva. Retirados los tipos de
+  estado remoto antiguos de confiscaciones/subdecomisos y mapas/gráficos, tipos
+  de los thunks retirados y tipos compartidos sin usos. Se mantienen entidades,
+  formularios vigentes y `TableOptions`, utilizado por los services.
+- Retirados `createLatestListRequest` y su prueba exclusiva de implementación,
+  sin listados antiguos que los necesiten. La cobertura vigente de cancelación,
+  argumentos rápidos, desmontaje, errores e invalidación reside en las pruebas
+  Query por dominio; se ejecuta nuevamente la de análisis por la retirada.
+- Adaptadas las pruebas de sesión y filtros a los propietarios vigentes. Se
+  elimina el caso exclusivo de transporte de thunks remotos retirados y se
+  conservan lecturas/escrituras Query tardías, limpieza de ambas cachés, señales,
+  logout fallido, login/refresh concurrentes y bloqueo de dispatch tardío/anidado.
+  Las fronteras prueban también las dos claves exactas de Redux y filtros no
+  vacíos antes de su limpieza. El middleware conserva su comportamiento: auth
+  necesita dispatch estable por sesión y protección de respuestas tardías.
+- AGENTS.md registra la situación actual y distingue las reglas históricas de
+  convivencia. No se cambian endpoints, cookies, parámetros, JSON/multipart,
+  relaciones ni los contratos de los services.
+
+**Medición y cambio acotado.** Build de producción antes y después con
+`npm.cmd run build -- --manifest`. El manifiesto permite recorrer dependencias
+estáticas del entry y su bootstrap, excluyendo las rutas dinámicas. Medición
+de bytes reales y suma de gzip por archivo con Node; no son bytes transferidos
+por un servidor ni un benchmark de tiempos.
+
+| Recursos del arranque/login | Antes (bytes / gzip) | Después (bytes / gzip) |
+| --- | --- | --- |
+| JavaScript | 698.444 / 221.387 | 697.656 / 221.212 |
+| CSS | 15.134 / 6.378 | 40 / 48 |
+
+El CSS de Leaflet se importaba en bootstrap para todas las rutas. Ahora se
+importa en MapComponent y ConfiscationMap, bajo sus rutas diferidas; Vite lo
+extrae una sola vez como CSS compartido del chunk TileLayer y espera sus estilos
+antes de evaluar el chunk. Se difieren 15.094 bytes de CSS del arranque. No se
+añade memoización, configuración manual de chunks ni cambio de dependencias.
+
+[audit-bundle.mjs](../scripts/audit-bundle.mjs), ejecutado después del build con
+manifiesto, conserva la medición y falla si Recharts, Leaflet, DataGrid o el CSS
+Leaflet entran en las dependencias iniciales. Localiza las librerías mediante
+marcadores de su salida: si cambian, exige revisar los marcadores. Sus chunks
+actuales (bytes / gzip) son: gráficos `components` 310.274 / 87.888, Leaflet
+`TileLayer` 153.561 / 44.812 y compartido `GraphLayout` con DataGrid
+655.949 / 190.758; todos diferidos respecto al login. Estos tamaños incluyen
+otros módulos del chunk y no equivalen al tamaño individual de cada librería.
+El compartido grande sigue siendo deuda, y DataGrid comparte chunk con layout;
+no se atribuye una mejora de ejecución a retirar código ni al reparto de chunks.
+
+Chrome DevTools MCP operativo: perfil de navegación al login de producción en
+preview 4176, CPU 1x, sin limitación de red ni forzar caché fría, refresh simulado como fallo de
+transporte mediante initScript (no se consulta el backend). Muestra local única:
+**LCP 2.271 ms**, TTFB 20 ms, retraso de render 2.251 ms y **CLS 0,00**.
+Sin datos de campo ni INP, sin comparación temporal antes/después ni perfil React
+de las vistas autenticadas. No sustenta optimizaciones de renders. La producción
+no carga React DevTools. Se pudo analizar la traza en memoria; guardar el archivo
+fue rechazado por los workspace roots configurados del MCP. No se acredita un
+archivo de traza exportado.
+
+**Comprobaciones realizadas.**
+
+- `node --test tests/query-session.test.mjs tests/analysis-filters.test.mjs
+  tests/analysis-query.test.mjs tests/auth.test.mjs`: **28 aprobadas**, cero
+  fallos/canceladas/omitidas. Contratos HTTP de análisis/auth, caché, cancelación,
+  mutaciones e invalidación, filtros y sesión. Log:
+  `%TEMP%/graphdata-step15-tests.txt`.
+- Build inicial y final correctos, salida 0; persiste aviso de chunks >500 kB.
+  Logs `%TEMP%/graphdata-step15-build-before.txt` y
+  `%TEMP%/graphdata-step15-build-final.txt`. Restaurados los bytes iniciales de
+  `tsconfig.app.tsbuildinfo` después de los builds.
+- Lint: **10 errores y 9 advertencias** previos, frente a 16/9 del paso 14.
+  Comparación por archivo/regla/severidad/mensaje: cero diagnósticos nuevos.
+  Persisten diagnósticos anteriores en `confiscation/types.ts` fuera de los tipos
+  retirados. Log `%TEMP%/graphdata-step15-lint.json`.
+- `node scripts/audit-bundle.mjs`: correcto, sin librerías pesadas ni CSS Leaflet
+  en el arranque. Informes locales `%TEMP%/graphdata-step15-bundle-before.json`,
+  `%TEMP%/graphdata-step15-bundle-final.json` y manifiesto inicial
+  `%TEMP%/graphdata-step15-manifest-before.json`.
+- Playwright MCP operativo. Preview de producción 4176 creado y detenido en este paso;
+  servidor de desarrollo existente en 4175 reutilizado para los otros recorridos.
+  HTTP y autenticación simulados en los tres scripts:
+  [lazy-routes.js](../tests/browser/lazy-routes.js), **seis grupos**: login sin
+  chunks protegidos ni CSS Leaflet, indicador accesible, usuarios sin mapas,
+  navegación a gráficos/mapas, atrás y entrada directa en confiscaciones. CSS
+  disponible y panes posicionados al abrir el mapa del formulario. Cero
+  excepciones/mensajes inesperados; 401 de refresh esperado. Captura
+  `.playwright-mcp/step15-map-css.png` inspeccionada: mapa de 500×400, controles,
+  atribución y regreso al formulario visibles, sin recortes. Dos intentos previos
+  ajustaron esperas del recorrido (cambio de ruta y animación Zoom), sin cambios
+  funcionales y sin contarlos como aprobados.
+- [analysis-query.js](../tests/browser/analysis-query.js): **cinco grupos**, siete
+  lecturas de análisis y 503 esperado; filtros, recarga/error/reintento, borradores,
+  navegación, alternancia y desmontaje de capas. Cero excepciones/mensajes
+  inesperados y cero avisos MUI de período; excluido aviso Canvas conocido.
+- [query-session.js](../tests/browser/query-session.js): **cuatro grupos**, ocho
+  peticiones y un fallo HTTP esperado; logout fallido conserva sesión, salida
+  limpia filtros y cachés sin dominios remotos en Redux, acceso B protegido frente
+  a respuesta tardía A. Cero excepciones/mensajes inesperados. Adaptadas sus
+  aserciones de limpieza al estado actual. Scripts liberan rutas/listeners y
+  respuestas pendientes en finally.
+- `git diff --check`: correcto al cierre. Sin cambios en package.json/lockfile.
+  La normalización final de saltos de línea no cambia los escenarios verificados.
+
+**Documentación, reutilización y límites.** Skills React/composición aplicadas:
+propietario único y retirada de compatibilidad, imports pesados bajo rutas
+diferidas, sin memoización generalizada. Versiones del lockfile reconfirmadas:
+React 19.3.1, Vite 8.3.5, RTK 2.6.1, Query 5.107.1 y Leaflet 1.9.4.
+Context7 cubre React 19.3.1 (fixtures) y Vite 8.3.5 exactos; contrastadas además
+las reglas públicas de lazy con documentación React oficial general. Referencias:
+[React lazy](https://react.dev/reference/react/lazy),
+[CSS diferido en Vite 8.3.5](https://github.com/vitejs/vite/blob/v8.3.5/docs/guide/features.md#css-code-splitting)
+y [manifiesto](https://github.com/vitejs/vite/blob/v8.3.5/docs/guide/backend-integration.md).
+
+Se reutilizan los contratos y escenarios vigentes de catálogos/opciones,
+geocodificación, archivos, componentes compartidos y CRUD padre/hijos; no cambian
+sus implementaciones HTTP ni de formularios. La reubicación de CSS se verifica
+en producción y las fronteras globales se vuelven a probar por la retirada del
+store. No se repite toda la suite ni cada CRUD equivalente. No se acreditan
+persistencia, cookies ni escrituras contra el backend real; abortar transporte
+no revierte escrituras del servidor. Pendientes: deuda de lint, chunk compartido
+grande, perfil representativo de vistas autenticadas si se desea optimizarlas y
+cierre de integración del paso 16. **Paso 15 cerrado; paso 16 sin iniciar.**
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,
