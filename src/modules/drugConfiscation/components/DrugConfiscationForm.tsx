@@ -15,19 +15,19 @@ import { DrugConfiscationFormProps } from '../';
 type FormFields = z.infer<typeof drugConfiscationSchema>;
 type FormInput = z.input<typeof drugConfiscationSchema>;
 
-export const DrugConfiscationForm = memo(({ optionsStatus, activeDrugConfiscation, handleOpen, onSaveOrUptdate, drugCollection, drugPresentationCollection, handleOpenDialog }: DrugConfiscationFormProps) => {
+export const DrugConfiscationForm = memo(({ busy = false, optionsStatus, activeDrugConfiscation, handleOpen, onSaveOrUptdate, drugCollection, drugPresentationCollection, handleOpenDialog }: DrugConfiscationFormProps) => {
     const {
         register,
         handleSubmit,
         setError,
-        formState: { errors, isSubmitting },
+        formState: { errors, isSubmitting: formSubmitting },
         control
     } = useForm<FormInput, unknown, FormFields>({
-        defaultValues: { ...activeDrugConfiscation, identificador: activeDrugConfiscation.identificador?.toString() },
+        defaultValues: { ...activeDrugConfiscation, droga: activeDrugConfiscation.droga || '', presentacion: activeDrugConfiscation.presentacion || '',  identificador: activeDrugConfiscation.identificador?.toString() },
         resolver: zodResolver(drugConfiscationSchema)
     });
-    console.log(activeDrugConfiscation);
 
+    const isSubmitting = formSubmitting || busy;
     const submitting = useRef(false);
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         if (optionsStatus.pending || optionsStatus.error) return;
@@ -41,8 +41,7 @@ export const DrugConfiscationForm = memo(({ optionsStatus, activeDrugConfiscatio
             submitting.current = false;
         }
     };
-    console.log('carga formulario');
-    
+
     return (
         <Zoom in={true} style={{ transitionDelay: '50ms' }}>
             <Box
@@ -62,7 +61,7 @@ export const DrugConfiscationForm = memo(({ optionsStatus, activeDrugConfiscatio
                     if (submitting.current || isSubmitting) { event.preventDefault(); return; }
                     void handleSubmit(onSubmit)(event);
                 }}>
-                    <fieldset inert={isSubmitting} disabled={isSubmitting} style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
+                    <fieldset disabled={isSubmitting} style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
                     <Grid container sx={{ display: 'flex', alignItems: 'center', alignContent: 'center' }}>
                         <Grid size={{ xs: 12 }} container spacing={2} sx={{ mt: 0, display: 'flex', alignItems: 'center', alignContent: 'center', gap: 2 }}>
                             <Grid size={{ xs: 12, md: 6 }}>
@@ -129,7 +128,7 @@ export const DrugConfiscationForm = memo(({ optionsStatus, activeDrugConfiscatio
                                 <Save />
                             </Button>
                             {activeDrugConfiscation.identificador &&
-                                <Button variant='contained' color="error" disabled={isSubmitting} loading={false} sx={{ width: '100%' }} onClick={() => handleOpenDialog()}>
+                                <Button aria-label="Borrar subdecomiso" variant='contained' color="error" disabled={isSubmitting} loading={false} sx={{ width: '100%' }} onClick={() => handleOpenDialog()}>
                                     <Delete />
                                 </Button>
                             }

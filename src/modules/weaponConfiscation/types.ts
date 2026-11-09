@@ -18,10 +18,11 @@ export interface WeaponConfiscationState {
 }
 
 export interface WeaponConfiscationFormProps {
+    busy?: boolean
     optionsStatus: OptionsStatus
     activeWeaponConfiscation: WeaponConfiscation
-    handleOpen: Function
+    handleOpen: (open: boolean) => void
     onSaveOrUptdate: (data: WeaponConfiscation) => Promise<void>
     weaponCollection: SelectOptions[]
-    handleOpenDialog: Function
+    handleOpenDialog: () => void
 }

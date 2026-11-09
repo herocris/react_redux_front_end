@@ -22,11 +22,12 @@ export interface DrugConfiscationState {
 }
 
 export interface DrugConfiscationFormProps {
+    busy?: boolean
     optionsStatus: OptionsStatus
     activeDrugConfiscation: DrugConfiscation
-    handleOpen: Function
+    handleOpen: (open: boolean) => void
     onSaveOrUptdate: (data: DrugConfiscation) => Promise<void>
     drugCollection: SelectOptions[]
     drugPresentationCollection: SelectOptions[]
-    handleOpenDialog: Function
+    handleOpenDialog: () => void
 }

@@ -13,19 +13,19 @@ import { WeaponConfiscationFormProps } from '../';
 
 type FormFields = z.infer<typeof weaponConfiscationSchema>;
 type FormInput = z.input<typeof weaponConfiscationSchema>;
-export const WeaponConfiscationForm = ({ optionsStatus, activeWeaponConfiscation, handleOpen, onSaveOrUptdate, weaponCollection, handleOpenDialog }: WeaponConfiscationFormProps) => {
+export const WeaponConfiscationForm = ({ busy = false, optionsStatus, activeWeaponConfiscation, handleOpen, onSaveOrUptdate, weaponCollection, handleOpenDialog }: WeaponConfiscationFormProps) => {
     const {
         register,
         handleSubmit,
         setError,
-        formState: { errors, isSubmitting },
+        formState: { errors, isSubmitting: formSubmitting },
         control
     } = useForm<FormInput, unknown, FormFields>({
-        defaultValues: { ...activeWeaponConfiscation, identificador: activeWeaponConfiscation.identificador?.toString() },
+        defaultValues: { ...activeWeaponConfiscation, arma: activeWeaponConfiscation.arma || '',  identificador: activeWeaponConfiscation.identificador?.toString() },
         resolver: zodResolver(weaponConfiscationSchema)
     });
-    console.log(errors);
 
+    const isSubmitting = formSubmitting || busy;
     const submitting = useRef(false);
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         if (optionsStatus.pending || optionsStatus.error) return;
@@ -58,7 +58,7 @@ export const WeaponConfiscationForm = ({ optionsStatus, activeWeaponConfiscation
                     if (submitting.current || isSubmitting) { event.preventDefault(); return; }
                     void handleSubmit(onSubmit)(event);
                 }}>
-                    <fieldset inert={isSubmitting} disabled={isSubmitting} style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
+                    <fieldset disabled={isSubmitting} style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
                     <Grid container sx={{ display: 'flex', alignItems: 'center', alignContent: 'center' }}>
                         <Grid size={{ xs: 12 }} sx={{ mt: 2, display: 'flex', alignItems: 'center', alignContent: 'center', gap: 2 }}>
                             <MultipleSelectButton disabled={optionsStatus.pending || !!optionsStatus.error}
@@ -97,7 +97,7 @@ export const WeaponConfiscationForm = ({ optionsStatus, activeWeaponConfiscation
                                 <Save/>
                             </Button>
                             {activeWeaponConfiscation.identificador &&
-                                <Button variant='contained' color="error" disabled={isSubmitting} loading={false} sx={{ width: '100%' }} onClick={() => handleOpenDialog()}>
+                                <Button aria-label="Borrar subdecomiso" variant='contained' color="error" disabled={isSubmitting} loading={false} sx={{ width: '100%' }} onClick={() => handleOpenDialog()}>
                                     <Delete/>
                                 </Button>
                             }

@@ -1,4 +1,4 @@
-﻿async (page) => {
+async (page) => {
     const passed = [], errors = [], consoleErrors = [], reads = [];
     let fail = 'drug';
     let expectedErrors = 0, legacySelectWarnings = 0;
@@ -62,7 +62,7 @@
         check(await subform.getByLabel('Cantidad', { exact: true }).inputValue() === '9', 'Subform lost draft');
         await selectCount(subform, 'Droga', 3); await selectCount(subform, 'Presentación', 3);
         passed.push('subdecomiso conserva edición ante fallo de presentaciones y obtiene todas las opciones');
-        for (const [p, name] of [[2, 'Arma'], [3, 'Arma']]) {
+        for (const [p, name] of [[2, 'Arma'], [3, 'Munición']]) {
             await page.locator('#panel' + p + '-header').click();
             const content = page.locator('#panel' + p + '-header').locator('..').locator('..');
             await content.getByRole('button').filter({ has: page.locator('[data-testid="AddCircleIcon"]') }).click();

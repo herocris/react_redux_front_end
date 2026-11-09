@@ -1,42 +1,21 @@
-import { useState } from "react";
-import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
-import { RootState } from "../../../store";
-import { Confiscation } from "../";
-import { useNavigate } from "react-router";
-import { startSaveConfiscation, startUpdateConfiscation } from "../thunks";
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router';
+import type { Confiscation } from '../types';
+import { confiscationMutationOptions } from '../queries/confiscationQueries';
 
-export const useConfiscationForm = () => {
-    
+export const useConfiscationForm = (initial?: Confiscation) => {
     const navigate = useNavigate();
-    const [openMap, setOpenMap] = useState(false)
-    const { activeConfiscation, loading, errorMessage } = useAppSelector((state: RootState) => state.confiscation);
-    const dispatch = useAppDispatch();
-
-    const onSaveOrUptdate = async (confiscation: Confiscation) => {
-        console.log(confiscation);
-        if (activeConfiscation.id === undefined) {
-            await dispatch(startSaveConfiscation(confiscation)).then((idConf) => {
-                navigate(`/confiscation/edit/${idConf}`)
-            })
-        } else {
-            await dispatch(startUpdateConfiscation({ ...confiscation, id: activeConfiscation.id })).then(() => {
-                //navigate(`/confiscation/edit/${activeConfiscation.identificador}`)
-            })
-        }
-    }
-
-
-    const handleOpenMap = (open: boolean) => {
-        setOpenMap(open)
-    }
-
-
+    const client = useQueryClient();
+    const [openMap, setOpenMap] = useState(false);
+    const mutation = useMutation(confiscationMutationOptions(client, (data, write) => {
+        if (write.type === 'create' && data) navigate(`/confiscation/edit/${data.id}`);
+    }));
     return {
-        loading,
-        activeConfiscation,
-        openMap,
-        errorMessage,
-        onSaveOrUptdate,
-        handleOpenMap
-    }
-}
+        openMap, handleOpenMap: setOpenMap,
+        onSaveOrUptdate: async (values: Confiscation) => {
+            await mutation.mutateAsync(initial?.id === undefined
+                ? { type: 'create', values } : { type: 'update', values: { ...values, id: initial.id } });
+        },
+    };
+};

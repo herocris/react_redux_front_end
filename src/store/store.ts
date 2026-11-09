@@ -1,19 +1,11 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { isSessionBoundary, sessionMiddleware } from './sessionMiddleware'
-import { confiscationSlice } from '../modules/confiscation/slices/confiscationSlice'
-import { drugConfiscationSlice } from '../modules/drugConfiscation/slices/drugConfiscationSlice'
-import { weaponConfiscationSlice } from '../modules/weaponConfiscation/slices/weaponConfiscationSlice'
-import { ammunitionConfiscationSlice } from '../modules/ammunitionConfiscation/slices/ammunitionConfiscationSlice'
 import { authSlice } from '../modules/auth/slices/authSlice'
 import { graphSlice } from '../modules/graph/slices/graphSlice'
 import { mapSlice } from '../modules/map/slices/mapSlice'
 
 const appReducer = combineReducers({
     auth: authSlice.reducer,
-    confiscation:confiscationSlice.reducer,
-    drugConfiscation:drugConfiscationSlice.reducer,
-    weaponConfiscation:weaponConfiscationSlice.reducer,
-    ammunitionConfiscation:ammunitionConfiscationSlice.reducer,
     graph:graphSlice.reducer,
     map:mapSlice.reducer,
 })

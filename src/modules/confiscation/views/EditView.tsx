@@ -1,55 +1,29 @@
-import { ConfiscationForm,SubConfiscations } from '../components'
-import { GrapLayout } from '../../../shared/layout/GraphLayout'
-import { BackFloatingButton } from '../../../components'
-import {  useParams } from 'react-router'
+import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'react-router';
+import { Alert, Button, CircularProgress } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import { useConfiscationForm } from '../hooks';
-import { useEffect, useState } from 'react';
-import { Alert, Button } from '@mui/material';
+import { ConfiscationForm, SubConfiscations } from '../components';
+import { GrapLayout } from '../../../shared/layout/GraphLayout';
+import { BackFloatingButton } from '../../../components';
 import { getApiErrorText } from '../../../api/apiErrors';
-import { useAppDispatch } from '../../../hooks/hooks';
-import { startLoadingConfiscation } from '../thunks';
-
+import { confiscationDetailOptions } from '../queries/confiscationQueries';
 
 export const EditView = () => {
-  const { activeConfiscation } = useConfiscationForm()
-  const { confiscationId } = useParams();
-
-  const dispatch = useAppDispatch();
-
-  const [loadedId, setLoadedId] = useState<string>();
-  const [loadError, setLoadError] = useState('');
-  const [attempt, setAttempt] = useState(0);
-  useEffect(() => {
-    let current = true;
-    if (confiscationId) {
-      dispatch(startLoadingConfiscation(confiscationId)).then(() => {
-        if (current) setLoadedId(confiscationId);
-      }).catch((error: unknown) => {
-        if (current) setLoadError(getApiErrorText(error));
-      });
-    }
-    return () => { current = false; };
-  }, [confiscationId, dispatch, attempt]);
-
-  return (
-    <GrapLayout>
-      <Grid container spacing={3}>
-        <Grid size={{ xs: 12, md: 1 }}>
-          <BackFloatingButton />
+    const { confiscationId = '' } = useParams();
+    const query = useQuery(confiscationDetailOptions(confiscationId));
+    return <GrapLayout>
+        <Grid container spacing={3}>
+            <Grid size={{ xs: 12, md: 1 }}><BackFloatingButton /></Grid>
+            <Grid size={{ xs: 12, md: 5 }}>
+                {query.isFetching && <CircularProgress aria-label="Cargando decomiso" size={24} />}
+                {query.isError && <Alert severity="error">{getApiErrorText(query.error)}
+                    <Button disabled={query.isFetching} onClick={() => void query.refetch()}>Reintentar</Button>
+                </Alert>}
+                {query.data && <ConfiscationForm key={confiscationId} initial={query.data} />}
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+                {query.data && <SubConfiscations key={confiscationId} />}
+            </Grid>
         </Grid>
-        <Grid size={{ xs: 12, md: 5 }}>
-          {loadError && <Alert severity="error">{loadError}<Button onClick={() => { setLoadError(''); setAttempt(value => value + 1); }}>Reintentar</Button></Alert>}
-          {loadedId === confiscationId &&
-            <ConfiscationForm/>
-          }
-        </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
-          {loadedId === confiscationId && activeConfiscation.id &&
-          <SubConfiscations />
-          }
-        </Grid>
-      </Grid>
-    </GrapLayout>
-  )
-}
+    </GrapLayout>;
+};

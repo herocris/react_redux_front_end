@@ -25,8 +25,8 @@ test('infraestructura Query y aislamiento de sesión durante la convivencia con 
     const { sessionMutationOptions } = await load('/src/queries/sessionMutationOptions.ts');
     const { default: api } = await load('/src/api/graphdataApi.ts');
     const { authSlice: { actions: auth } } = await load('/src/modules/auth/slices/authSlice.ts');
-    const { confiscationSlice: { actions: role } } = await load('/src/modules/confiscation/slices/confiscationSlice.ts');
-    const roleThunks = await load('/src/modules/confiscation/thunks/confiscationThunks.ts');
+    const { mapSlice: { actions: role } } = await load('/src/modules/map/slices/mapSlice.ts');
+    const roleThunks = await load('/src/modules/map/thunks/mapThunks.ts');
     const authThunks = await load('/src/modules/auth/thunks/aurthThunks.ts');
     const originalAdapter = api.defaults.adapter;
     t.after(() => { api.defaults.adapter = originalAdapter; client.clear(); });
@@ -39,8 +39,8 @@ test('infraestructura Query y aislamiento de sesión durante la convivencia con 
         return { promise, resolve, reject };
     };
     const tick = () => new Promise(resolve => setImmediate(resolve));
-    const list = page => roleThunks.startLoadingConfiscations(page, 'id', 'asc', 10, '', '');
-    const data = id => ({ data: [{ identificador: id, nombre: id }], total: 1, current_page: 1 });
+    const list = () => roleThunks.startLoadingMapItems({ start_date: '2026-01-01', end_date: '2026-12-31', drugs: [], weapons: [], ammunitions: [] });
+    const data = id => ({ mapItems: [{ id, nombre: id }] });
     const intercept = () => {
         const pending = [];
         api.defaults.adapter = config => {
@@ -104,8 +104,8 @@ test('infraestructura Query y aislamiento de sesión durante la convivencia con 
             for (const key of Object.keys(store.getState()).filter(key => key !== 'auth')) {
                 store.dispatch({ type: `${key}/onLoading`, payload: true });
             }
-            store.dispatch(role.setConfiscations([{ id: 'old', nombre: 'old' }]));
-            store.dispatch(role.onSetActiveConfiscation({ id: 'old', nombre: 'old' }));
+            store.dispatch(role.setMapitems([{ id: 'old', nombre: 'old' }]));
+
             client.setQueryData(['private'], 'old');
             client.getMutationCache().build(client, { mutationKey: ['old'], mutationFn: async () => 'old' });
             store.dispatch(boundary);
@@ -176,23 +176,23 @@ test('infraestructura Query y aislamiento de sesión durante la convivencia con 
         store.dispatch(auth.onLogin(session('A')));
         const pending = intercept();
         const read = store.dispatch(list(1));
-        const rejectedRead = assert.rejects(read, axios.isCancel);
-        const write = store.dispatch(roleThunks.startSaveConfiscation({ nombre: 'A' }));
+        const rejectedRead = assert.rejects(read);
+        const write = store.dispatch(async dispatch => { await api.post('/legacy-write', { nombre: 'A' }); dispatch(role.setMapitems([{ id: 'A' }])); });
         const rejected = assert.rejects(write, axios.isCancel);
         store.dispatch(auth.onLogout());
         store.dispatch(auth.onLogin(session('B')));
         const current = store.dispatch(list(1));
-        assert.equal(store.getState().confiscation.loading, true);
+        assert.equal(store.getState().map.loading, true);
         pending.slice(0, 2).forEach(request => assert.equal(request.config.signal.aborted, true));
         pending[0].finish(data('A'));
         pending[1].finish(data('A'));
         pending[1].finish({ identificador: 'A', nombre: 'A' });
         await Promise.all([rejectedRead, rejected]);
-        assert.equal(store.getState().confiscation.loading, true);
-        assert.deepEqual(store.getState().confiscation.confiscations, []);
+        assert.equal(store.getState().map.loading, true);
+        assert.deepEqual(store.getState().map.Mapitems, []);
         pending[2].finish(data('B'));
         await current;
-        assert.equal(store.getState().confiscation.confiscations[0].id, 'B');
+        assert.equal(store.getState().map.Mapitems[0].id, 'B');
     });
 
     await t.test('dispatch tardío y thunks anidados quedan bloqueados aun cuando el trabajo ignora cancelación', async () => {
@@ -200,28 +200,14 @@ test('infraestructura Query y aislamiento de sesión durante la convivencia con 
         const gate = deferred();
         const pending = store.dispatch(async dispatch => {
             await gate.promise;
-            dispatch(role.setConfiscations([{ id: 'A', nombre: 'A' }]));
+            dispatch(role.setMapitems([{ id: 'A', nombre: 'A' }]));
             dispatch(inner => inner(auth.onLogin(session('A'))));
         });
         store.dispatch(auth.onLogin(session('B')));
         gate.resolve();
         await pending;
         assert.equal(store.getState().auth.user.nombre, 'B');
-        assert.deepEqual(store.getState().confiscation.confiscations, []);
-    });
-
-    await t.test('se conserva la exclusividad del listado antiguo dentro de la misma sesión/store', async () => {
-        store.dispatch(auth.onLogin(session('A')));
-        const pending = intercept();
-        const first = store.dispatch(list(1));
-        const second = store.dispatch(list(2));
-        assert.equal(pending[0].config.signal.aborted, true);
-        pending[0].finish(data('old'));
-        await first;
-        assert.equal(store.getState().confiscation.loading, true);
-        pending[1].finish(data('current'));
-        await second;
-        assert.equal(store.getState().confiscation.confiscations[0].id, 'current');
+        assert.deepEqual(store.getState().map.Mapitems, []);
     });
 
     await t.test('refresh y login antiguos no restauran sesión tras logout o un acceso más reciente', async () => {

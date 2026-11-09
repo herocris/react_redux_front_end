@@ -8,14 +8,15 @@ import { DrugConfiscation } from '../../drugConfiscation';
 
 
 interface ListSubConfiscationProps {
-    setOpen: Function
+    setOpen: (open: boolean) => void
     list: DrugConfiscation[] | WeaponConfiscation[] | AmmunitionConfiscation[]
-    setActiveSubConfiscation: Function
+    setActiveSubConfiscation: (id: string | number) => void
+    disabled?: boolean
 }
 
 const { VITE_LOCAL_PHOTOS_URL } = getEnvVariables();
 
-export const ListSubConfiscation = memo(({ setOpen, list, setActiveSubConfiscation }: ListSubConfiscationProps) => {
+export const ListSubConfiscation = memo(({ setOpen, list, setActiveSubConfiscation, disabled }: ListSubConfiscationProps) => {
     const clickItemList = (id: string) => {
         setActiveSubConfiscation(id)
         setOpen(true)
@@ -24,18 +25,17 @@ export const ListSubConfiscation = memo(({ setOpen, list, setActiveSubConfiscati
         setActiveSubConfiscation(0)
         setOpen(true)
     }
-    console.log('carga listItem', list);
     return (
         <Zoom in={true} style={{ transitionDelay: '50ms' }}>
             <Box sx={{ width: '100%' }}>
-                <Button fullWidth color="success" variant="contained" sx={{ mb: 1 }} onClick={() => newItemList()}>
+                <Button aria-label="Añadir subdecomiso" disabled={disabled} fullWidth color="success" variant="contained" sx={{ mb: 1 }} onClick={() => newItemList()}>
                     <AddCircleIcon fontSize="medium" />
                 </Button>
                 <List sx={{ width: '100%', maxHeight: 220, overflow: 'auto', background: 'background.default' }}>
                     {list.length > 0
                         ?
                         list.map((itemList: DrugConfiscation | WeaponConfiscation | AmmunitionConfiscation, index) => (
-                            <ListItemButton key={index} onClick={() => clickItemList(itemList?.identificador as string)}>
+                            <ListItemButton disabled={disabled} key={itemList.identificador ?? index} onClick={() => clickItemList(itemList?.identificador as string)}>
                                 <ListItemAvatar>
                                     <Badge badgeContent={itemList.cantidad} color="primary" sx={{ margin: 0 }}>
                                         <Avatar alt={"Remy Sharp"} src={`${VITE_LOCAL_PHOTOS_URL}/${itemList?.foto}` as string} />

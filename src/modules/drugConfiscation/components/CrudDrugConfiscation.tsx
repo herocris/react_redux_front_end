@@ -1,54 +1,32 @@
+import { Alert, Box, Button, CircularProgress, TablePagination } from '@mui/material';
 import { useDrugConfiscation } from '../hooks';
-import { Box } from '@mui/material';
-import { DrugConfiscationForm } from './';
+import { DrugConfiscationForm } from './DrugConfiscationForm';
 import { ListSubConfiscation } from '../../confiscation/components';
-import { AlertDialog } from '../../../components';
+import { ConfirmDialog } from '../../../components/ConfirmDialog';
 
 export const CrudDrugConfiscation = () => {
-    const { optionsStatus,
-        drugConfiscations,
-        activeDrugConfiscation,
-        openDrugConfiscationForm,
-        drugCollection,
-        drugPresentationCollection,
-        openDialogDrugConfiscation,
-        onDeleteDrugConfiscation,
-        onSaveOrUptdateDrugConfiscation,
-        setIdDrugConfiscation,
-        handleOpenDrugConfiscationForm,
-        handleOpenDialogDrugConfiscation,
-    } = useDrugConfiscation();
-
-
-    return (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            {openDrugConfiscationForm
-                ?
-                <div>
-                    <DrugConfiscationForm optionsStatus={optionsStatus}
-                        activeDrugConfiscation={activeDrugConfiscation}
-                        drugCollection={drugCollection}
-                        drugPresentationCollection={drugPresentationCollection}
-                        onSaveOrUptdate={onSaveOrUptdateDrugConfiscation}
-                        handleOpen={handleOpenDrugConfiscationForm}
-                        handleOpenDialog={handleOpenDialogDrugConfiscation}
-                    />
-                    {openDialogDrugConfiscation &&
-                        <AlertDialog
-                            title='Borrar'
-                            dialogMessage="Deseas borrar el decomiso?"
-                            DeleteEntity={onDeleteDrugConfiscation}
-                            handleOpen={handleOpenDialogDrugConfiscation} />
-                    }
-                </div>
-                :
-                <ListSubConfiscation
-                    setOpen={handleOpenDrugConfiscationForm}
-                    list={drugConfiscations}
-                    setActiveSubConfiscation={setIdDrugConfiscation}
-                />
-
-            }
-        </Box>
-    )
-}
+    const view = useDrugConfiscation();
+    return <Box sx={{ width: '100%' }}>
+        {view.listLoading && <CircularProgress aria-label="Cargando subdecomisos" size={24} />}
+        {view.listError && <Alert severity="error">{view.listError}
+            <Button disabled={view.listLoading} onClick={view.retryList}>Reintentar listado</Button></Alert>}
+        {view.openDrugConfiscationForm ? <>
+            <DrugConfiscationForm optionsStatus={view.optionsStatus}
+                activeDrugConfiscation={view.activeDrugConfiscation} drugCollection={view.drugCollection}
+                drugPresentationCollection={view.drugPresentationCollection}
+                onSaveOrUptdate={view.onSaveOrUptdateDrugConfiscation} handleOpen={view.handleOpenDrugConfiscationForm}
+                handleOpenDialog={view.handleOpenDialogDrugConfiscation} busy={view.loading} />
+            {view.openDialogDrugConfiscation && <ConfirmDialog title="Borrar" message="Deseas borrar el decomiso?"
+                confirmLabel="Ok" busy={view.loading} onCancel={view.handleOpenDialogDrugConfiscation} onConfirm={view.onDeleteDrugConfiscation}>
+                {view.errorMessage && <Alert severity="error">{view.errorMessage}</Alert>}
+            </ConfirmDialog>}
+        </> : <>
+            <ListSubConfiscation setOpen={view.handleOpenDrugConfiscationForm} list={view.drugConfiscations}
+                disabled={view.listUnavailable} setActiveSubConfiscation={view.setIdDrugConfiscation} />
+            <TablePagination component="div" count={view.total} page={view.page} rowsPerPage={view.pageSize}
+                onPageChange={(_, page) => view.onPageChange(page)}
+                onRowsPerPageChange={event => view.onPageSizeChange(Number(event.target.value))}
+                rowsPerPageOptions={[5, 10, 25]} />
+        </>}
+    </Box>;
+};
