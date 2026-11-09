@@ -4,6 +4,7 @@ import { getSessionSignal } from '../../../api/sessionScope';
 import { sessionMutationOptions } from '../../../queries/sessionMutationOptions';
 import { confiscationService, type ConfiscationEntity } from '../services/confiscationService';
 import type { Confiscation } from '../types';
+import { invalidateAnalysis } from '../../analysisFilters/invalidateAnalysis';
 
 export const confiscationKeys = {
     all: ['confiscation'] as const,
@@ -34,7 +35,10 @@ export const confiscationMutationOptions = (client: QueryClient,
             }
         },
         onSuccess: async (data, write) => {
-            await client.invalidateQueries({ queryKey: confiscationKeys.all });
+            await Promise.all([
+                client.invalidateQueries({ queryKey: confiscationKeys.all }),
+                invalidateAnalysis(client),
+            ]);
             if (signal.aborted) return;
             if (write.type === 'delete') {
                 // Children of a removed parent cannot remain reusable.

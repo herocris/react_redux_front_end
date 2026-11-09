@@ -1,4 +1,5 @@
 import { Cell, Pie, PieChart, PieLabelRenderProps, SectorProps, Sector, Tooltip } from 'recharts';
+import type { PieGraph as PieGraphData } from '../types';
 import { TooltipIndex } from 'recharts/types/state/tooltipSlice';
 
 const randomHexColor = (): string => {
@@ -29,7 +30,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 };
 
 interface PieGraphProps {
-    data: any[]
+    data: PieGraphData[]
     isAnimationActive?: boolean,
     defaultIndex?: TooltipIndex;
 }
@@ -47,7 +48,7 @@ type PieSectorData = {
     value?: number;
     paddingAngle?: number;
     dataKey?: string;
-    payload?: any;
+    payload?: PieGraphData;
 };
 type PieSectorDataItem = React.SVGProps<SVGPathElement> & Partial<SectorProps> & PieSectorData;
 
@@ -78,7 +79,7 @@ const renderActiveShape = ({
     return (
         <g>
             {/* <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>
-                {payload.name}
+                {payload?.name}
             </text> */}
             <Sector
                 cx={cx}
@@ -100,7 +101,7 @@ const renderActiveShape = ({
             />
             <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
             <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-            <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`${payload.name} ${value}`}</text>
+            <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`${payload?.name} ${value}`}</text>
             {/* <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
                 {`(Rate ${((percent ?? 1) * 100).toFixed(2)}%)`}
             </text> */}
@@ -137,7 +138,7 @@ export const PieGraph = ({ data, isAnimationActive = true, defaultIndex = undefi
                 dataKey="value"
                 isAnimationActive={isAnimationActive}
             >
-                {data?.map((entry, _index) => (
+                {data?.map((entry) => (
                     <Cell key={`cell-${entry.name}`} fill={randomHexColor()} />
                 ))}
             </Pie>

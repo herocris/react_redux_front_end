@@ -15,7 +15,7 @@ import { applyAnalysisFilters } from '../../analysisFilters/slices/analysisFilte
 
 type FormFields = z.infer<typeof graphSchema>;
 const initStateForm: FormFields = { //asingandole tipo FormFields (graphSchema) para que no de problemas al ponerlo en defaultValues del useForm
-    period: 0,
+    period: 1,
     typeConfiscation: "Drogas",
     typeGraph: "bar",
     start_date: '',
@@ -64,7 +64,7 @@ const graphIconList = [
 const periodList = [{ value: 1, description: 'Meses' }, { value: 2, description: 'Años' }]
 
 
-export const FormGraph = ({ optionsStatus, drugCollection, weaponCollection, ammunitionCollection, setGraphType, getGraphData }: FormGraphProps) => {
+export const FormGraph = ({ optionsStatus, drugCollection, weaponCollection, ammunitionCollection, setGraphType, getGraphData, initialFilters }: FormGraphProps) => {
     const dispatch = useAppDispatch();
 
 
@@ -73,7 +73,7 @@ export const FormGraph = ({ optionsStatus, drugCollection, weaponCollection, amm
         formState: { errors, },
         control,
     } = useForm<z.input<typeof graphSchema>, unknown, FormFields>({
-        defaultValues: initStateForm,
+        defaultValues: { ...initStateForm, ...initialFilters },
         resolver: zodResolver(graphSchema)
     });
     const confiscationSelected = useWatch({ control, name: 'typeConfiscation' });
@@ -88,7 +88,7 @@ export const FormGraph = ({ optionsStatus, drugCollection, weaponCollection, amm
             weapons: data.weapons ?? [],
             ammunitions: data.ammunitions ?? [],
         }));
-        getGraphData(data, data.typeConfiscation)
+        getGraphData(data)
     };
 
     return (

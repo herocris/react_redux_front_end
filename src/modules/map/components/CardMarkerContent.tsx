@@ -8,13 +8,13 @@ import { CardMarkerContentProps } from '../';
 
 //const { VITE_LOCAL_PHOTOS_URL } = getEnvVariables();
 
-const isDrugConfiscation = (item: any): item is DrugConfiscation =>
+const isDrugConfiscation = (item: DrugConfiscation | WeaponConfiscation | AmmunitionConfiscation): item is DrugConfiscation =>
   'droga_nombre' in item
 
-const isWeaponConfiscation = (item: any): item is WeaponConfiscation =>
+const isWeaponConfiscation = (item: DrugConfiscation | WeaponConfiscation | AmmunitionConfiscation): item is WeaponConfiscation =>
   'arma_nombre' in item
 
-const isAmmunitionConfiscation = (item: any): item is AmmunitionConfiscation =>
+const isAmmunitionConfiscation = (item: DrugConfiscation | WeaponConfiscation | AmmunitionConfiscation): item is AmmunitionConfiscation =>
   'municion_nombre' in item
 
 export const CardMarkerContent = ({ itemSubConfiscation }: CardMarkerContentProps) => {

@@ -1,15 +1,16 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Zoom, Box } from '@mui/material';
-import { MapComponentProps, MapItem, MarkerContent } from '../';
+import { MapComponentProps, MarkerContent } from '../';
 import { HeatmapLayer } from './HeatmapLayer';
 import { Icon } from 'leaflet';
 import locationIcon from '/src/modules/map/icons/location_icon2.png';
+import { useMemo } from 'react';
+
+const customIcon = new Icon({ iconUrl: locationIcon, iconSize: [40, 40] });
 
 export const MapComponent = ({ Mapitems, typeMap, heightMap = "75vh" }: MapComponentProps) => {
-  const customIcon = new Icon({
-    iconUrl: locationIcon,
-    iconSize: [40, 40],// Ancho, alto 
-  });
+  const validItems = useMemo(() => Mapitems.filter(item => Number.isFinite(item.latitud) && Number.isFinite(item.longitud)), [Mapitems]);
+  const points = useMemo(() => validItems.map(item => ({ lat: item.latitud, lng: item.longitud, intensity: 0.9 })), [validItems]);
   return (
     <>
       <Zoom in={true} style={{ transitionDelay: '150ms' }}  >
@@ -21,10 +22,7 @@ export const MapComponent = ({ Mapitems, typeMap, heightMap = "75vh" }: MapCompo
           >
             {typeMap == 'hot' &&
               <HeatmapLayer
-                points={Mapitems.map((ite: MapItem) => {
-                  return { lat: ite.latitud, lng: ite.longitud, intensity: 0.9 }
-                })
-                }
+                points={points}
               />
             }
             <TileLayer
@@ -32,8 +30,8 @@ export const MapComponent = ({ Mapitems, typeMap, heightMap = "75vh" }: MapCompo
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {typeMap == 'location' &&
-              Mapitems?.map((marker, index) => (
-                <Marker key={index} position={[marker.latitud, marker.longitud]} icon={customIcon}>
+              validItems.map(marker => (
+                <Marker key={marker.id} position={[marker.latitud, marker.longitud]} icon={customIcon}>
                   <Popup>
                     <MarkerContent marker={marker} />
                   </Popup>

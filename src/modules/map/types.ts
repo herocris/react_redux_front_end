@@ -1,4 +1,5 @@
 import type { OptionsStatus } from '../resouce/queries/optionsStatus';
+import type { AppliedAnalysisFilters } from '../analysisFilters/types';
 import { SelectOptions } from "../../shared/interfaces/sharedInterfaces";
 import { AmmunitionConfiscation } from "../ammunitionConfiscation";
 import { DrugConfiscation } from "../drugConfiscation";
@@ -36,8 +37,8 @@ export interface FormGraphProps {
     drugCollection: SelectOptions[]
     weaponCollection: SelectOptions[]
     ammunitionCollection: SelectOptions[]
-    setMapType: Function
-    getMapData: Function
+    initialFilters: AppliedAnalysisFilters
+    setMapType: (type: string) => void
 }
 
 export interface MapComponentProps {

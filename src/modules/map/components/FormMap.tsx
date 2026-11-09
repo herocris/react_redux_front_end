@@ -37,7 +37,7 @@ const graphIconList = [
     },
 ]
 
-export const FormMap = ({ optionsStatus, drugCollection, weaponCollection, ammunitionCollection, setMapType, getMapData }: FormGraphProps) => {
+export const FormMap = ({ optionsStatus, drugCollection, weaponCollection, ammunitionCollection, setMapType, initialFilters }: FormGraphProps) => {
     const dispatch = useAppDispatch();
 
     const {
@@ -46,7 +46,7 @@ export const FormMap = ({ optionsStatus, drugCollection, weaponCollection, ammun
         control,
         //setValue
     } = useForm<z.input<typeof mapSchema>, unknown, FormFields>({
-        defaultValues: initStateForm,
+        defaultValues: { ...initStateForm, ...initialFilters },
         resolver: zodResolver(mapSchema)
     });
     //console.log('carga formulario');
@@ -61,7 +61,6 @@ export const FormMap = ({ optionsStatus, drugCollection, weaponCollection, ammun
             weapons: data.weapons ?? [],
             ammunitions: data.ammunitions ?? [],
         }));
-        getMapData(data)
     };
 
     return (

@@ -5,6 +5,7 @@ import { sessionMutationOptions } from '../../../queries/sessionMutationOptions'
 import { confiscationKeys } from '../../confiscation/queries/confiscationQueries';
 import { ammunitionConfiscationService } from '../services/ammunitionConfiscationService';
 import type { AmmunitionConfiscation } from '../types';
+import { invalidateAnalysis } from '../../analysisFilters/invalidateAnalysis';
 
 export const ammunitionConfiscationKeys = {
     all: ['ammunitionConfiscation'] as const,
@@ -30,6 +31,7 @@ export const ammunitionConfiscationMutationOptions = (client: QueryClient, paren
         },
         onSuccess: async () => {
             await Promise.all([
+                invalidateAnalysis(client),
                 client.invalidateQueries({ queryKey: ammunitionConfiscationKeys.parent(parent) }),
                 client.invalidateQueries({ queryKey: confiscationKeys.detail(parent) }),
                 client.invalidateQueries({ queryKey: confiscationKeys.lists() }),
