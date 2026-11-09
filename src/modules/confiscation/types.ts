@@ -1,5 +1,4 @@
 import { Control, FieldErrors } from "react-hook-form"
-import { TableOptions } from "../../shared/interfaces/sharedInterfaces"
 import type { z } from 'zod';
 import type { confiscationSchema } from './validators';
 
@@ -13,14 +12,6 @@ export interface Confiscation {
     municipalidad: string,
     latitud: number,
     longitud: number,
-}
-
-export interface ConfiscationState {
-    confiscations: Confiscation[],
-    activeConfiscation: Confiscation,
-    tableOptions: TableOptions,
-    loading: boolean
-    errorMessage: object
 }
 
 export interface ConfiscationMapModalProps {

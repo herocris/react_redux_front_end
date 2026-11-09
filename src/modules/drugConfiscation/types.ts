@@ -1,5 +1,5 @@
 import type { OptionsStatus } from '../resouce/queries/optionsStatus';
-import { SelectOptions, TableOptions } from "../../shared/interfaces/sharedInterfaces"
+import { SelectOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface DrugConfiscation {
     identificador?: string,
@@ -11,14 +11,6 @@ export interface DrugConfiscation {
     presentacion: number,
     presentacion_nombre?: string,
     foto: string | File
-}
-
-export interface DrugConfiscationState {
-    drugConfiscations: DrugConfiscation[],
-    activeDrugConfiscation: DrugConfiscation,
-    tableOptions: TableOptions,
-    loading: boolean
-    errorMessage: object
 }
 
 export interface DrugConfiscationFormProps {

@@ -1,5 +1,5 @@
 import type { OptionsStatus } from '../resouce/queries/optionsStatus';
-import { SelectOptions, TableOptions } from "../../shared/interfaces/sharedInterfaces"
+import { SelectOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface AmmunitionConfiscation {
     identificador?: string,
@@ -9,14 +9,6 @@ export interface AmmunitionConfiscation {
     municion_nombre?: string,
     foto: string | File
 }
-export interface AmmunitionConfiscationState {
-    ammunitionConfiscations: AmmunitionConfiscation[],
-    activeAmmunitionConfiscation: AmmunitionConfiscation,
-    tableOptions: TableOptions,
-    loading: boolean
-    errorMessage: object
-}
-
 export interface AmmunitionConfiscationFormProps {
     busy?: boolean
     optionsStatus: OptionsStatus

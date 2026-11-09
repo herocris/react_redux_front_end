@@ -39,8 +39,8 @@ test('filtros aplicados: transiciones, contrato y fronteras de sesión', async t
         assert.deepEqual(next.analysisFilters.drugs, ['007', 3, '99']);
         const replaced = rootReducer(next, applyAnalysisFilters({ ...filters, weapons: [] }));
         assert.deepEqual(replaced.analysisFilters, { ...filters, weapons: [] });
-        assert.equal(replaced.map, next.map);
-        assert.equal(replaced.graph, next.graph);
+        assert.equal(replaced.auth, next.auth);
+        assert.deepEqual(Object.keys(replaced).sort(), ['analysisFilters', 'auth']);
     });
 
     await t.test('solo filtros comunes serializables: sin opciones, archivos, resultados ni controles visuales', () => {

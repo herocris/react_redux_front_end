@@ -82,8 +82,9 @@ async (page) => {
                 new URL(entry.name).pathname === path).name;
             const { store } = await import(moduleURL('/src/store/store.ts'));
             const { queryClient } = await import(moduleURL('/src/queries/queryClient.ts'));
-            return { rows: Number('permission' in store.getState()),
-                options: Number('resource' in store.getState()),
+            const state = store.getState();
+            return { remoteDomains: Object.keys(state).filter(key => !['auth', 'analysisFilters'].includes(key)).length,
+                appliedFilters: Object.values(state.analysisFilters).reduce((count, value) => count + value.length, 0),
                 queries: queryClient.getQueryCache().getAll().length,
                 mutations: queryClient.getMutationCache().getAll().length };
         });

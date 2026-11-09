@@ -1,5 +1,5 @@
 import type { OptionsStatus } from '../resouce/queries/optionsStatus';
-import { SelectOptions, TableOptions } from "../../shared/interfaces/sharedInterfaces"
+import { SelectOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface WeaponConfiscation {
     identificador?: string,
@@ -9,14 +9,6 @@ export interface WeaponConfiscation {
     arma_nombre?: string,
     foto: string | File
 }
-export interface WeaponConfiscationState {
-    weaponConfiscations: WeaponConfiscation[],
-    activeWeaponConfiscation: WeaponConfiscation,
-    tableOptions: TableOptions,
-    loading: boolean
-    errorMessage: object
-}
-
 export interface WeaponConfiscationFormProps {
     busy?: boolean
     optionsStatus: OptionsStatus

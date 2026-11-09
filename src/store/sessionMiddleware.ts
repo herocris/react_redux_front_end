@@ -7,7 +7,7 @@ export const isSessionBoundary = (action: unknown) =>
     onLogin.match(action) || onLogout.match(action) || onChecking.match(action);
 
 // Runs before RTK's thunk middleware. The same dispatch identity is shared by
-// thunks in one session, preserving createLatestListRequest's per-store key.
+// auth thunks in one session, preserving their per-store request coordination.
 export const sessionMiddleware: Middleware = api => {
     let signal = getSessionSignal();
     let scopedDispatch: Dispatch;

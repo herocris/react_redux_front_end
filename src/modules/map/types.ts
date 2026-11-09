@@ -14,20 +14,6 @@ export interface MapItem {
     weapon_confiscations:WeaponConfiscation[]
     ammunition_confiscations:AmmunitionConfiscation[]
 }
-export interface MapState {
-    Mapitems: MapItem[]
-    loading: boolean
-    errorMessage: object
-}
-
-export interface MapForm {
-    start_date: string;
-    end_date: string;
-    drugs: number[];
-    weapons: number[];
-    ammunitions: number[];
-}
-
 export interface CardMarkerContentProps {
     itemSubConfiscation: DrugConfiscation | WeaponConfiscation | AmmunitionConfiscation
 }

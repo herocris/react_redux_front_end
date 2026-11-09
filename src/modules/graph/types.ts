@@ -20,34 +20,6 @@ export type PieGraph = {
     name: string;
     value: number;
 };
-export interface GraphState {
-    barLineGraph: BarLineGraph[]
-    pieGraph: PieGraph[]
-    loading: boolean
-    errorMessage: object
-}
-
-export interface DrugGraphForm {
-    period: number;
-    start_date: string;
-    end_date: string;
-    drugs: number[];
-    typeGraph: string
-}
-export interface WeaponGraphForm {
-    period: number;
-    start_date: string;
-    end_date: string;
-    weapons: number[];
-    typeGraph: string
-}
-export interface AmmunitionGraphForm {
-    period: number;
-    start_date: string;
-    end_date: string;
-    ammunitions: number[];
-    typeGraph: string
-}
 export interface FormGraphProps {
     optionsStatus: OptionsStatus
     drugCollection: SelectOptions[]

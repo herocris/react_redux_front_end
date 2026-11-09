@@ -1,3 +1,4 @@
+import 'leaflet/dist/leaflet.css';
 import { useCallback } from 'react';
 import type { ConfiscationMapModalProps } from '../types';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
