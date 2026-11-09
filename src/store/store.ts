@@ -3,16 +3,18 @@ import { isSessionBoundary, sessionMiddleware } from './sessionMiddleware'
 import { authSlice } from '../modules/auth/slices/authSlice'
 import { graphSlice } from '../modules/graph/slices/graphSlice'
 import { mapSlice } from '../modules/map/slices/mapSlice'
+import { analysisFiltersSlice } from '../modules/analysisFilters/slices/analysisFiltersSlice'
 
 const appReducer = combineReducers({
     auth: authSlice.reducer,
     graph:graphSlice.reducer,
     map:mapSlice.reducer,
+    analysisFilters: analysisFiltersSlice.reducer,
 })
 
 export const rootReducer: typeof appReducer = (state, action) => {
   if (isSessionBoundary(action)) {
-    // Reset every legacy remote domain, including options, maps and graphs.
+    // Reset legacy remote domains and applied filters at every session boundary.
     // Preserve auth until its own reducer applies the requested transition.
     const initial = appReducer(undefined, { type: '@@session/reset' })
     return appReducer({ ...initial, auth: state?.auth ?? initial.auth }, action)

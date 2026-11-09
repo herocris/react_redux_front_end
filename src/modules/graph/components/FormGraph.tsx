@@ -9,6 +9,8 @@ import { graphSchema } from '../validators';
 import { useWatch } from 'react-hook-form';
 import { DatePickerField,OptionSelector,MultipleSelectButton } from '../../../components';
 import { FormGraphProps } from '../types';
+import { useAppDispatch } from '../../../hooks/hooks';
+import { applyAnalysisFilters } from '../../analysisFilters/slices/analysisFiltersSlice';
 
 
 type FormFields = z.infer<typeof graphSchema>;
@@ -63,6 +65,7 @@ const periodList = [{ value: 1, description: 'Meses' }, { value: 2, description:
 
 
 export const FormGraph = ({ optionsStatus, drugCollection, weaponCollection, ammunitionCollection, setGraphType, getGraphData }: FormGraphProps) => {
+    const dispatch = useAppDispatch();
 
 
     const {
@@ -78,6 +81,13 @@ export const FormGraph = ({ optionsStatus, drugCollection, weaponCollection, amm
 
     const onSubmit: SubmitHandler<z.infer<typeof graphSchema>> = async (data) => {
         if (optionsStatus.pending || optionsStatus.error) return;
+        dispatch(applyAnalysisFilters({
+            start_date: data.start_date,
+            end_date: data.end_date,
+            drugs: data.drugs,
+            weapons: data.weapons ?? [],
+            ammunitions: data.ammunitions ?? [],
+        }));
         getGraphData(data, data.typeConfiscation)
     };
 
@@ -155,7 +165,7 @@ export const FormGraph = ({ optionsStatus, drugCollection, weaponCollection, amm
                             <OptionSelector name='typeGraph' setOption={value => setGraphType(value)} iconList={graphIconList} control={control} />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 12 }} sx={{ mt: 2, display: 'flex', flexDirection: 'row', gap: 2 }}>
-                            <Button disabled={optionsStatus.pending || !!optionsStatus.error} type='submit' variant='contained' loading={false} sx={{ width: '100%' }}>
+                            <Button aria-label='Aplicar filtros' disabled={optionsStatus.pending || !!optionsStatus.error} type='submit' variant='contained' loading={false} sx={{ width: '100%' }}>
                                 <Save/>
                             </Button>
                         </Grid>

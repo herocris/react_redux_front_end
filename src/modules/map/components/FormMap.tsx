@@ -9,6 +9,8 @@ import { mapSchema } from '../validators';
 import { MultipleSelectButton, DatePickerField, OptionSelector } from '../../../components';
 //import { useState } from 'react';
 import { FormGraphProps } from '../';
+import { useAppDispatch } from '../../../hooks/hooks';
+import { applyAnalysisFilters } from '../../analysisFilters/slices/analysisFiltersSlice';
 
 type FormFields = z.infer<typeof mapSchema>;
 const initStateForm: FormFields = { //asingandole tipo FormFields (mapSchema) para que no de problemas al ponerlo en defaultValues del useForm
@@ -36,6 +38,7 @@ const graphIconList = [
 ]
 
 export const FormMap = ({ optionsStatus, drugCollection, weaponCollection, ammunitionCollection, setMapType, getMapData }: FormGraphProps) => {
+    const dispatch = useAppDispatch();
 
     const {
         handleSubmit,
@@ -51,7 +54,13 @@ export const FormMap = ({ optionsStatus, drugCollection, weaponCollection, ammun
 
     const onSubmit: SubmitHandler<z.infer<typeof mapSchema>> = async (data) => {
         if (optionsStatus.pending || optionsStatus.error) return;
-        console.log(data);
+        dispatch(applyAnalysisFilters({
+            start_date: data.start_date,
+            end_date: data.end_date,
+            drugs: data.drugs,
+            weapons: data.weapons ?? [],
+            ammunitions: data.ammunitions ?? [],
+        }));
         getMapData(data)
     };
 
@@ -118,7 +127,7 @@ export const FormMap = ({ optionsStatus, drugCollection, weaponCollection, ammun
 
                         </Grid>
                         <Grid size={{ xs: 12, sm: 12 }} sx={{ mt: 2, display: 'flex', flexDirection: 'row', gap: 2 }}>
-                            <Button disabled={optionsStatus.pending || !!optionsStatus.error} type='submit' variant='contained' loading={false} sx={{ width: '100%' }}>
+                            <Button aria-label='Aplicar filtros' disabled={optionsStatus.pending || !!optionsStatus.error} type='submit' variant='contained' loading={false} sx={{ width: '100%' }}>
                                 <Save />
                             </Button>
                         </Grid>
