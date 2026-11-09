@@ -6,11 +6,12 @@ Se consolidaron los cambios anteriores en 12 commits locales y se prepararon
 las instrucciones para continuar en conversaciones independientes.
 La preparación inicial no instaló dependencias ni creó services. **El paso 6
 incorpora la infraestructura de TanStack Query, el paso 9 migra permisos y el
-paso 11 extiende la migración a los demás catálogos, sus opciones y actividad.**
+paso 11 extiende la migración a los demás catálogos, sus opciones y actividad;
+el paso 12 migra confiscaciones y subdecomisos.**
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1 a 11 completados**; siguiente paso pendiente:
-**12, confiscaciones y subdecomisos**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1 a 12 completados**; siguiente paso pendiente:
+**13, filtros compartidos en Redux**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -93,7 +94,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | 9. Piloto de permisos | Completado | CRUD y opciones en Query; invalidación, catálogo paginado, página vacía, fallos/reintentos y sesión probados. |
 | 10. Componentes comunes | Completado | Alertas, confirmaciones y marco modal compuestos; controles RHF tipados, selección sin copia local y errores con campos explícitos; consumidores representativos verificados. |
 | 11. Catálogos y actividad | Completado | Services y Query en seis CRUD y actividad; opciones completas migradas en todos sus consumidores, invalidación y convivencia verificadas. |
-| 12. Confiscaciones | Pendiente | Mantener geocodificación y completar flujos, tipos y datos. |
+| 12. Confiscaciones | Completado | Services y Query para listas, detalle y subdecomisos; borradores, archivos, paginación, errores, concurrencia y sesión verificados. |
 | 13. Filtros Redux | Pendiente | Aún no hay slice de filtros aplicados compartidos. |
 | 14. Mapas y gráficos | Pendiente | Mantienen flujos actuales y datos remotos en slices. |
 | 15. Limpieza/rendimiento | Pendiente | No retirar todavía infraestructura con consumidores. |
@@ -111,8 +112,8 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
   normalizar valores ni eliminar campos extra; falta contrastarlos con backend real.
 - El interceptor conserva rechazos y puede entregar el cuerpo HTTP. Evitar
   asumir AxiosError/status disponibles en todos los casos.
-- Confiscaciones conserva la exclusividad del listado antiguo por store.
-  Los catálogos y actividad usan caché por argumentos y señal de Query, con
+- Confiscaciones, subdecomisos, catálogos y actividad usan caché por argumentos
+  y señal de Query; los sublistados incluyen el padre en sus claves, con
   cancelación al retirar el último consumidor; se conserva el aislamiento de sesión.
 - Las escrituras migradas invalidan su dominio tras éxito y recargan totales;
   el consumidor ajusta páginas vacías confirmadas conservando filtros y orden.
@@ -1150,6 +1151,135 @@ Un catálogo que cambia durante el recorrido requiere reintento; no se presume
 instantánea transaccional. Abortar transporte no revierte escrituras del servidor.
 Continúan deuda de lint, aviso de bundle y deuda previa de subformularios indicada.
 **Paso 11 cerrado; paso 12 pendiente y sin iniciar.**
+
+### Paso 12 — Confiscaciones y subdecomisos (9 de noviembre de 2026)
+
+Al comenzar, HEAD `1165556` y workspace limpio. Se leyeron AGENTS.md, plan y
+progreso y se contrastaron consumidores, contratos y pruebas. Ejecutado únicamente
+el prompt del paso 12. Plan, dependencias, mapas/gráficos y filtros compartidos
+sin migraciones adicionales. Código y pruebas consolidados en el commit `c836313`;
+este registro se guarda en un commit documental separado. Al consolidar se
+reutilizan las comprobaciones anteriores, sin cambios funcionales, y se comprueba
+`git diff --cached --check` antes de cada commit.
+
+**Cambios y decisiones.**
+
+- Services tipados por módulo en confiscaciones y drogas/armas/municiones
+  decomisadas. Conservan cliente Axios/cookies, endpoints, parámetros y rechazos.
+  Confiscaciones mantiene JSON con POST/PUT; los hijos mantienen alta multipart
+  y edición POST/FormData con `_method=PUT`, enviando foto al editar solo si es
+  File. Se conservan fecha, coordenadas, cantidad, peso, archivo y relaciones.
+  Los mapeadores adaptan identificadores/nombres como antes, sin reinterpretar IDs.
+- Query posee listas, detalle, carga y errores. Las claves incluyen todos los
+  parámetros; los hijos incluyen el padre. Sus señales llegan a los services.
+  Las mutaciones consumen services directamente mediante `sessionMutationOptions`.
+  Tras éxito esperan invalidación/recarga y comprueban otra vez la sesión antes
+  de navegar o cerrar. Un fallo conserva selección y formulario, sin invalidar
+  como si hubiera éxito. Las escrituras hijas invalidan su padre, sus listas y
+  el detalle/listados principales; no invalidan los hijos de otro padre.
+  Borrar un padre cancela/retira sus consultas hijas y su detalle cacheado.
+- El listado principal usa EntityList controlado, con error/reintento y respaldo
+  de filas desde la caché de Query; solo conserva la clave de respaldo en un ref.
+  No permite acciones sobre resultados de otra clave. Los sublistados incorporan
+  paginación visible, carga/error/reintento y bloquean selección ante fallo.
+  Ambos corrigen páginas vacías con totales confirmados del servidor.
+- EditView consulta el detalle y separa carga inicial de recarga. RHF toma una
+  instantánea al montar el formulario; una recarga no ejecuta reset ni sobrescribe
+  campos. La clave por padre reinicia explícitamente edición y subformularios al
+  cambiar de decomiso. La selección hija se toma al abrir; las recargas no la
+  reemplazan. Se mantiene el mismo formulario durante envío/fallo y los archivos
+  permanecen en RHF. La geocodificación y sus controles conservan implementación.
+- Los tres subformularios reciben el bloqueo de mutación, incluido borrado;
+  se retira inert de sus fieldsets conservando disabled y controles accesibles.
+  Relaciones nuevas comienzan visualmente vacías en RHF en vez de mostrar un 0
+  ajeno al catálogo; no se cambia la validación numérica positiva ni el payload.
+  Municiones muestra «Munición» y los botones de borrar tienen nombre accesible.
+  Props de apertura/cierre tipadas; no se crea formulario universal ni contexto.
+- Tras buscar consumidores en aplicación, store y pruebas se retiran los cuatro
+  slices/thunks y sus exports. Redux conserva sesión, mapas y gráficos antiguos.
+  LegacyEntityList y createLatestListRequest ya no tienen consumidores de
+  aplicación; su retirada global queda para el paso 15, sin adelantarlo.
+  list-loading conserva pruebas directas del helper mientras exista.
+
+**Comprobaciones automatizadas.**
+
+- [confiscation-save.test.mjs](../tests/confiscation-save.test.mjs) traslada
+  cobertura a services/Query en los cuatro dominios: HTTP/JSON/multipart,
+  relaciones, fecha/coordenadas, archivos nuevos/existentes, causas y reintento,
+  claves/deduplicación, cambios rápidos/desmontaje, invalidación tras éxito,
+  totales remotos, padres independientes y sesión retirada, también durante
+  la recarga esperada por una mutación. Borrar padre retira sus hijos cacheados.
+- image-validation prueba ahora los services; query-session usa mapas como
+  dominio Redux restante y una escritura de prueba ligada al dispatch para
+  comprobar convivencia. Se retira su escenario de exclusividad del listado de
+  confiscaciones: las garantías vigentes se prueban por claves de Query.
+- `node --test tests/confiscation-save.test.mjs tests/query-session.test.mjs
+  tests/list-loading.test.mjs tests/form-validation.test.mjs
+  tests/image-validation.test.mjs tests/server-form-errors.test.mjs`:
+  **71 aprobadas**, cero fallos/canceladas/omitidas.
+  Log: `%TEMP%/graphdata-step12-tests-final.txt`.
+- `npm.cmd run build`: correcto, salida 0; persiste aviso de chunks >500 kB.
+  Log: `%TEMP%/graphdata-step12-build-final.txt`. Se restaura
+  tsconfig.app.tsbuildinfo a sus bytes iniciales.
+- Lint final: **28 errores y 11 advertencias**, frente a 56/18 del paso 11;
+  **cero diagnósticos nuevos** por archivo/regla/severidad/mensaje.
+  Log: `%TEMP%/graphdata-step12-lint-final.json`.
+- `git diff --check`: correcto tras retirar espacios finales generados.
+  La limpieza final solo normaliza espacios/finales de línea de archivos
+  cambiados; se reutilizan los resultados funcionales anteriores a esa limpieza.
+  Sin cambios en package.json/lockfile.
+
+**Navegador.** Playwright MCP operativo, página reutilizada y servidor Vite
+existente en 4175 (el intento de arrancar otro confirmó el puerto ocupado).
+HTTP/autenticación simulados:
+
+- [confiscation-save.js](../tests/browser/confiscation-save.js): siete grupos,
+  doce escrituras y ocho lecturas del detalle; carga fallida/reintento,
+  bloqueo y mismo formulario ante 422, archivos/relaciones conservados en los
+  tres hijos, alta y navegación solo tras éxito. Se verifica ahora invalidación
+  del detalle sin sobrescribir la edición. Cero excepciones/mensajes inesperados.
+- [confiscation-query.js](../tests/browser/confiscation-query.js): seis grupos,
+  ocho lecturas de sublistado y siete de listado principal; borrado fallido y
+  reintento, última fila/página vacía y total remoto, orden conservado en el
+  principal, recargas fallidas con filas y reintento, borradores de padre/hijo
+  conservados y cambio de padre con respuesta tardía. Cuatro HTTP esperados;
+  cero excepciones/mensajes inesperados. Captura
+  `.playwright-mcp/confiscation-query.png` inspeccionada: campos, selectores
+  vacíos, archivos, acciones y acordeones sin recortes.
+- [catalog-options-consumers.js](../tests/browser/catalog-options-consumers.js):
+  cuatro grupos, 22 lecturas y dos fallos simulados; opciones completas,
+  fallo/reintento conservando borrador y compatibilidad con mapas/gráficos.
+  Cero excepciones/mensajes inesperados; seis avisos MUI conocidos de
+  `period=0` en gráficos, fuera de este paso (ya no de los subformularios).
+- [query-session.js](../tests/browser/query-session.js): cuatro grupos y ocho
+  peticiones; salida fallida conserva sesión, salida correcta limpia Redux/Query
+  y respuesta tardía A no contamina B. Un HTTP esperado y aviso Canvas conocido;
+  cero excepciones/mensajes inesperados.
+
+Los intentos iniciales no se cuentan como aprobados: se ajustaron fixtures y
+localizadores (fieldset disabled y dos iconos Delete distintos), y pruebas
+antiguas que aún importaban slices retirados. Se corrigió la inferencia de la
+unión de resultados de mutación antes del build final. Los scripts completos
+pasaron después y liberan respuestas/rutas/listeners en finally.
+
+**Documentación, reutilización y límites.** Skills React/composición aplicadas:
+datos con un propietario, estado derivado y reinicio por clave del padre.
+Versiones resueltas reconfirmadas: React 19.3.1, Query 5.107.1, Axios 1.21.0,
+RHF 7.55.0 y MUI 6.4.7. Context7 consultado sobre claves, cancelación e invalidación;
+no ofrece Query 5.107.1 exacta. Documentación oficial general contrastada con
+tipos instalados, build y pruebas:
+[cancelación](https://tanstack.com/query/v5/docs/framework/react/guides/query-cancellation)
+e [invalidación](https://tanstack.com/query/v5/docs/framework/react/guides/invalidations-from-mutations).
+
+Se reutilizan resultados históricos de geocodificación, controles compartidos,
+carga diferida, autenticación y contratos de los catálogos, cuyas implementaciones
+y escenarios no cambian. Se vuelve a verificar sesión/opciones por la retirada
+de reducers y la integración con subformularios. No se repite toda la suite
+ni los CRUD de catálogos. No se acreditan cookies, persistencia ni respuestas
+del backend real; abortar transporte no revierte escrituras del servidor.
+Sin perfiles ni mejoras medidas de rendimiento. Continúan deuda de lint,
+aviso de bundle y defaults de gráficos para su paso correspondiente.
+**Paso 12 cerrado; paso 13 pendiente y sin iniciar.**
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,
