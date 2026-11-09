@@ -1,31 +1,15 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { isSessionBoundary, sessionMiddleware } from './sessionMiddleware'
-import { userSlice } from '../modules/user/slices/userSlice'
-import { drugPresentationSlice } from '../modules/drugPresentation/slices/drugPresentationSlice'
 import { confiscationSlice } from '../modules/confiscation/slices/confiscationSlice'
 import { drugConfiscationSlice } from '../modules/drugConfiscation/slices/drugConfiscationSlice'
 import { weaponConfiscationSlice } from '../modules/weaponConfiscation/slices/weaponConfiscationSlice'
 import { ammunitionConfiscationSlice } from '../modules/ammunitionConfiscation/slices/ammunitionConfiscationSlice'
-import { activitySlice } from '../modules/activity/slices/activitySlice'
-import { ammunitionSlice } from '../modules/ammunition/slices/ammunitionSlice'
 import { authSlice } from '../modules/auth/slices/authSlice'
-import { drugSlice } from '../modules/drug/slices/drugSlice'
-import { resourceSlice } from '../modules/resouce/slices/resourceSlice'
 import { graphSlice } from '../modules/graph/slices/graphSlice'
 import { mapSlice } from '../modules/map/slices/mapSlice'
-import { roleSlice } from '../modules/rol/slices/rolSlice'
-import { weaponSlice } from '../modules/weapon/slices/weaponSlice'
 
 const appReducer = combineReducers({
     auth: authSlice.reducer,
-    user: userSlice.reducer,
-    resource:resourceSlice.reducer,
-    role:roleSlice.reducer,
-    activity:activitySlice.reducer,
-    ammunition:ammunitionSlice.reducer,
-    drug:drugSlice.reducer,
-    weapon:weaponSlice.reducer,
-    drugPresentation:drugPresentationSlice.reducer,
     confiscation:confiscationSlice.reducer,
     drugConfiscation:drugConfiscationSlice.reducer,
     weaponConfiscation:weaponConfiscationSlice.reducer,

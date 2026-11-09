@@ -3,6 +3,7 @@ async (page) => {
     const errors = [];
     const passed = [];
     const writes = [];
+    let items = [{ identificador: '7', nombre: 'Original', permisos: [2], roles: ['admin'], correo: 'fixture@example.test' }];
     const unexpectedConsole = [];
     let expectedNetworkErrors = 0;
     let createAttempts = 0;
@@ -32,15 +33,15 @@ async (page) => {
         }
         if (!['fetch', 'xhr'].includes(request.resourceType())) return route.fallback();
         const url = new URL(request.url());
-        if (url.pathname.endsWith('/role')) return route.fulfill({ json: { data: [{ identificador: 'admin', nombre: 'Administrador' }, { identificador: 3, nombre: 'Operador' }] } });
+        if (url.pathname.endsWith('/role')) return route.fulfill({ json: { data: [{ identificador: 'admin', nombre: 'Administrador' }, { identificador: 3, nombre: 'Operador' }], current_page: 1, per_page: 100, total: 2, last_page: 1 } });
         if (url.pathname.endsWith('/permission')) return route.fulfill({ json: { data: [{ identificador: 1, nombre: 'Leer' }, { identificador: 2, nombre: 'Editar' }], current_page: 1, per_page: 100, total: 2, last_page: 1 } });
         if (url.pathname.endsWith('/refresh')) return route.fulfill({ json: {
             user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: [],
         } });
         if (url.pathname.endsWith('/user') && request.method() === 'GET') {
             return route.fulfill({ json: {
-                data: [{ identificador: '7', nombre: 'Original', permisos: [2], roles: ['admin'], correo: 'fixture@example.test' }],
-                current_page: 1, per_page: 10, total: 1, last_page: 1, orderBy: 'id', order: 'asc',
+                data: items,
+                current_page: 1, per_page: 10, total: items.length, last_page: 1, orderBy: 'id', order: 'asc',
             } });
         }
         if (request.method() !== 'GET') {
@@ -57,12 +58,16 @@ async (page) => {
                 await createGate;
                 return route.fulfill({ status: 422, json: { error: { nombre: ['Ya existe ese usuario.'], permisos: ['Revisa los permisos.'], campoAjeno: ['Error general.'] } } });
             }
-            return route.fulfill({ json: { identificador: '8', nombre: 'Nueva', permisos: [1], roles: [3], correo: 'fixture@example.test' } });
+            const created = { identificador: '8', nombre: 'Nueva', permisos: [1], roles: [3], correo: 'fixture@example.test' };
+            items.push(created);
+            return route.fulfill({ json: created });
         }
         if (url.pathname.endsWith('/user/7') && request.method() === 'PUT') {
             editAttempts++;
             if (editAttempts === 1) return route.abort('failed');
-            return route.fulfill({ json: { identificador: '7', nombre: 'Editada', permisos: [2, 1], roles: ['admin', 3], correo: 'fixture@example.test' } });
+            const updated = { identificador: '7', nombre: 'Editada', permisos: [2, 1], roles: ['admin', 3], correo: 'fixture@example.test' };
+            items = items.map(item => item.identificador === updated.identificador ? updated : item);
+            return route.fulfill({ json: updated });
         }
         if (url.pathname.endsWith('/user/7') && request.method() === 'DELETE') {
             deleteAttempts++;
@@ -70,6 +75,7 @@ async (page) => {
                 await deleteGate;
                 return route.fulfill({ status: 500, json: { error: 'No se pudo borrar.' } });
             }
+            items = items.filter(item => item.identificador !== '7');
             return route.fulfill({ json: {} });
         }
         return route.fulfill({ json: { data: [] } });

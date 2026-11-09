@@ -1,3 +1,4 @@
+import type { OptionsStatus } from '../resouce/queries/optionsStatus';
 import { SelectOptions } from "../../shared/interfaces/sharedInterfaces";
 import { AmmunitionConfiscation } from "../ammunitionConfiscation";
 import { DrugConfiscation } from "../drugConfiscation";
@@ -31,6 +32,7 @@ export interface CardMarkerContentProps {
 }
 
 export interface FormGraphProps {
+    optionsStatus: OptionsStatus
     drugCollection: SelectOptions[]
     weaponCollection: SelectOptions[]
     ammunitionCollection: SelectOptions[]

@@ -3,6 +3,7 @@ async (page) => {
     const errors = [];
     const passed = [];
     const writes = [];
+    let items = [{ identificador: '7', descripcion: 'Original', logo: 'logo.png' }];
     const unexpectedConsole = [];
     let expectedNetworkErrors = 0;
     let createAttempts = 0;
@@ -34,8 +35,8 @@ async (page) => {
         } });
         if (url.pathname.endsWith('/weapon') && request.method() === 'GET') {
             return route.fulfill({ json: {
-                data: [{ identificador: '7', descripcion: 'Original', logo: 'logo.png' }],
-                current_page: 1, per_page: 10, total: 1, last_page: 1, orderBy: 'id', order: 'asc',
+                data: items,
+                current_page: 1, per_page: 10, total: items.length, last_page: 1, orderBy: 'id', order: 'asc',
             } });
         }
         if (request.method() !== 'GET') writes.push({ method: request.method(), path: url.pathname, body: request.postData() || '' });
@@ -45,16 +46,21 @@ async (page) => {
                 await createGate;
                 return route.fulfill({ status: 422, json: { error: { descripcion: ['Ya existe esa arma.'] } } });
             }
-            return route.fulfill({ json: { identificador: '8', descripcion: 'Nueva', logo: 'nueva.png' } });
+            const created = { identificador: '8', descripcion: 'Nueva', logo: 'nueva.png' };
+            items.push(created);
+            return route.fulfill({ json: created });
         }
         if (url.pathname.endsWith('/weapon/7') && request.method() === 'POST') {
             editAttempts++;
             if (editAttempts === 1) return route.abort('failed');
-            return route.fulfill({ json: { identificador: '7', descripcion: 'Editada', logo: 'logo.png' } });
+            const updated = { identificador: '7', descripcion: 'Editada', logo: 'logo.png' };
+            items = items.map(item => item.identificador === updated.identificador ? updated : item);
+            return route.fulfill({ json: updated });
         }
         if (url.pathname.endsWith('/weapon/7') && request.method() === 'DELETE') {
             deleteAttempts++;
             if (deleteAttempts === 1) return route.fulfill({ status: 500, json: { error: 'No se pudo borrar.' } });
+            items = items.filter(item => item.identificador !== '7');
             return route.fulfill({ json: {} });
         }
         return route.fulfill({ json: { data: [] } });

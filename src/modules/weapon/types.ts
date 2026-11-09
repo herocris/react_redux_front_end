@@ -8,13 +8,6 @@ export interface Weapon {
     logo: string | File
 }
 
-export interface WeaponState {
-    weapons: Weapon[],
-    activeWeapon: Weapon,
-    tableOptions: TableOptions,
-    loading: boolean
-    errorMessage: ApiErrorMessage
-}
 
 export interface WeaponFormModalProps {
     handleOpen: (open: boolean) => void;
@@ -29,3 +22,5 @@ export type WeaponResponse = Omit<Weapon, 'id' | 'identificador' | 'logo'> & {
 };
 
 export type WeaponListResponse = TableOptions & { data: WeaponResponse[] };
+
+export type WeaponEntity = Omit<WeaponResponse, 'identificador'> & { id: string };

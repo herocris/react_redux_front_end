@@ -1,3 +1,4 @@
+import type { OptionsStatus } from '../resouce/queries/optionsStatus';
 import { SelectOptions, TableOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface WeaponConfiscation {
@@ -17,6 +18,7 @@ export interface WeaponConfiscationState {
 }
 
 export interface WeaponConfiscationFormProps {
+    optionsStatus: OptionsStatus
     activeWeaponConfiscation: WeaponConfiscation
     handleOpen: Function
     onSaveOrUptdate: (data: WeaponConfiscation) => Promise<void>

@@ -1,21 +1,30 @@
+import { logoColumn } from '../../../components/logoColumn';
+import { Button } from '@mui/material';
+import type { GridColDef } from '@mui/x-data-grid';
+import type { WeaponEntity } from '../types';
 import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import { WeaponError } from '../components/WeaponError';
 
-import { AddFloatingButton, LegacyEntityList as EntityList, } from '../../../components';
+import { AddFloatingButton, EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { WeaponFormModal } from '../components';
 import { useWeaponView } from '../hooks';
 
+const columns: GridColDef<WeaponEntity>[] = [
+  { field: 'id', headerName: 'id', flex: 1 },
+  { field: 'descripcion', headerName: 'descripcion', flex: 1 },
+  logoColumn(),
+];
+
 export const WeaponView = () => {
   const {
     DeleteWeapon,
-    LoadingEntities,
-    columnsTable,
+    paginationModel, sortModel, filterModel,
+    onPaginationModelChange, onSortModelChange, onFilterModelChange,
+    listLoading, listError, retryList, rowCount, onEdit, onDelete,
     handleOpen,
     handleOpenDialog,
     loading,
-    setIdWeapon,
-    tableOptions,
     openDialog,
     open,
     weapons,
@@ -27,15 +36,13 @@ export const WeaponView = () => {
     <>
       <GrapLayout>
         {!open && !openDialog && <WeaponError message={errorMessage} />}
-        <EntityList
-          handleOpen={handleOpen}
-          handleOpenDialog={handleOpenDialog}
-          LoadingEntities={LoadingEntities}
-          setIdEntity={setIdWeapon}
-          EntityCollection={weapons}
-          tableOptions={tableOptions}
-          loading={loading}
-          columnsTable={columnsTable} />
+        <WeaponError message={listError} />
+        {listError && <Button onClick={retryList} disabled={listLoading}>Reintentar listado</Button>}
+        <EntityList rows={weapons} columns={columns} rowCount={rowCount} loading={listLoading}
+          paginationModel={paginationModel} sortModel={sortModel} filterModel={filterModel}
+          onPaginationModelChange={onPaginationModelChange}
+          onSortModelChange={onSortModelChange} onFilterModelChange={onFilterModelChange}
+          onEdit={onEdit} onDelete={onDelete} />
         {open &&
           <WeaponFormModal
             handleOpen={handleOpen}

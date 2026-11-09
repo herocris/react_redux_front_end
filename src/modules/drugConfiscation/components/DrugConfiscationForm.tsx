@@ -1,3 +1,4 @@
+import { CatalogOptionsStatus } from '../../resouce/components/CatalogOptionsStatus';
 import { useRef } from 'react';
 import { getApiErrorText } from '../../../api/apiErrors';
 import { Alert, Box, Button, IconButton, TextField, Zoom } from '@mui/material'
@@ -14,7 +15,7 @@ import { DrugConfiscationFormProps } from '../';
 type FormFields = z.infer<typeof drugConfiscationSchema>;
 type FormInput = z.input<typeof drugConfiscationSchema>;
 
-export const DrugConfiscationForm = memo(({ activeDrugConfiscation, handleOpen, onSaveOrUptdate, drugCollection, drugPresentationCollection, handleOpenDialog }: DrugConfiscationFormProps) => {
+export const DrugConfiscationForm = memo(({ optionsStatus, activeDrugConfiscation, handleOpen, onSaveOrUptdate, drugCollection, drugPresentationCollection, handleOpenDialog }: DrugConfiscationFormProps) => {
     const {
         register,
         handleSubmit,
@@ -29,6 +30,7 @@ export const DrugConfiscationForm = memo(({ activeDrugConfiscation, handleOpen, 
 
     const submitting = useRef(false);
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
+        if (optionsStatus.pending || optionsStatus.error) return;
         if (submitting.current) return;
         submitting.current = true;
         try {
@@ -55,6 +57,7 @@ export const DrugConfiscationForm = memo(({ activeDrugConfiscation, handleOpen, 
                     <Cancel />
                 </IconButton>
                 {errors.root?.server && <Alert severity="error">{errors.root.server.message}</Alert>}
+                <CatalogOptionsStatus {...optionsStatus} />
                 <form onSubmit={(event) => {
                     if (submitting.current || isSubmitting) { event.preventDefault(); return; }
                     void handleSubmit(onSubmit)(event);
@@ -63,7 +66,7 @@ export const DrugConfiscationForm = memo(({ activeDrugConfiscation, handleOpen, 
                     <Grid container sx={{ display: 'flex', alignItems: 'center', alignContent: 'center' }}>
                         <Grid size={{ xs: 12 }} container spacing={2} sx={{ mt: 0, display: 'flex', alignItems: 'center', alignContent: 'center', gap: 2 }}>
                             <Grid size={{ xs: 12, md: 6 }}>
-                                <MultipleSelectButton
+                                <MultipleSelectButton disabled={optionsStatus.pending || !!optionsStatus.error}
                                     name="droga"
                                     label="Droga"
                                     options={drugCollection}
@@ -75,7 +78,7 @@ export const DrugConfiscationForm = memo(({ activeDrugConfiscation, handleOpen, 
                                 />
                             </Grid>
                             <Grid size={{ xs: 12, md: 6 }}>
-                                <MultipleSelectButton
+                                <MultipleSelectButton disabled={optionsStatus.pending || !!optionsStatus.error}
                                     name="presentacion"
                                     label="Presentación"
                                     options={drugPresentationCollection}
@@ -122,7 +125,7 @@ export const DrugConfiscationForm = memo(({ activeDrugConfiscation, handleOpen, 
                             />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 12 }} sx={{ mt: 2, display: 'flex', flexDirection: 'row', gap: 2 }}>
-                            <Button aria-label="Guardar" type='submit' variant='contained' loading={isSubmitting} sx={{ width: '100%' }}>
+                            <Button disabled={optionsStatus.pending || !!optionsStatus.error} aria-label="Guardar" type='submit' variant='contained' loading={isSubmitting} sx={{ width: '100%' }}>
                                 <Save />
                             </Button>
                             {activeDrugConfiscation.identificador &&

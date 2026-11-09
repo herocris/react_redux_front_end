@@ -5,7 +5,7 @@ import { ListSubConfiscation } from '../../confiscation/components/';
 import { AlertDialog } from '../../../components';
 
 export const CrudAmmunitionConfiscation = () => {
-    const {
+    const { optionsStatus,
         ammunitionConfiscations,
         activeAmmunitionConfiscation,
         openAmmunitionConfiscationForm,
@@ -22,7 +22,7 @@ export const CrudAmmunitionConfiscation = () => {
             {openAmmunitionConfiscationForm
                 ?
                 <div>
-                    <AmmunitionConfiscationForm
+                    <AmmunitionConfiscationForm optionsStatus={optionsStatus}
                         activeAmmunitionConfiscation={activeAmmunitionConfiscation}
                         ammunitionCollection={ammunitionCollection}
                         onSaveOrUptdate={onSaveOrUptdateAmmunitionConfiscation}

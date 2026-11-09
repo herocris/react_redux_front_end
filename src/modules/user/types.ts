@@ -15,6 +15,7 @@ export interface User {
 }
 
 export interface UserFormModalProps {
+    roleOptionsStatus: PermissionOptionsStatusProps;
     permissionOptionsStatus: PermissionOptionsStatusProps;
     handleOpen: (open: boolean) => void;
     permisos: { value: string | number; description: string }[]
@@ -25,16 +26,11 @@ export interface UserFormModalProps {
     errorMessage: ApiErrorMessage
 }
 
-export interface UserState {
-    users: User[],
-    activeUser: User,
-    tableOptions: TableOptions,
-    loading: boolean
-    errorMessage: ApiErrorMessage
-}
 
 // Select identifiers and unchanged relation objects returned by the server.
 export type UserPermission = string | number | Permission;
 export type UserRole = string | number | Role;
 export type UserResponse = Omit<User, 'id' | 'identificador'> & { identificador: string };
 export type UserListResponse = TableOptions & { data: UserResponse[] };
+
+export type UserEntity = Omit<UserResponse, 'identificador'> & { id: string };

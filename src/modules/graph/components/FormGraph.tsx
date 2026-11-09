@@ -1,3 +1,4 @@
+import { CatalogOptionsStatus } from '../../resouce/components/CatalogOptionsStatus';
 import { Box, Button, Zoom } from '@mui/material'
 import { Timeline, BarChart, PieChart,Save, AllInbox, HomeRepairServiceOutlined, Vaccines } from '@mui/icons-material';
 import Grid from '@mui/material/Grid2';
@@ -61,7 +62,7 @@ const graphIconList = [
 const periodList = [{ value: 1, description: 'Meses' }, { value: 2, description: 'Años' }]
 
 
-export const FormGraph = ({ drugCollection, weaponCollection, ammunitionCollection, setGraphType, getGraphData }: FormGraphProps) => {
+export const FormGraph = ({ optionsStatus, drugCollection, weaponCollection, ammunitionCollection, setGraphType, getGraphData }: FormGraphProps) => {
 
 
     const {
@@ -76,6 +77,7 @@ export const FormGraph = ({ drugCollection, weaponCollection, ammunitionCollecti
     //console.log(errors);
 
     const onSubmit: SubmitHandler<z.infer<typeof graphSchema>> = async (data) => {
+        if (optionsStatus.pending || optionsStatus.error) return;
         getGraphData(data, data.typeConfiscation)
     };
 
@@ -89,6 +91,7 @@ export const FormGraph = ({ drugCollection, weaponCollection, ammunitionCollecti
                     display: 'flex',
                     flexDirection: 'column'
                 }}>
+                <CatalogOptionsStatus {...optionsStatus} />
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Grid container sx={{ display: 'flex', alignItems: 'center', alignContent: 'center' }}>
                         <Grid size={{ xs: 12 }} container spacing={2} sx={{ mt: 0, display: 'flex', alignItems: 'center', alignContent: 'center', gap: 2 }}>
@@ -113,7 +116,7 @@ export const FormGraph = ({ drugCollection, weaponCollection, ammunitionCollecti
                             <OptionSelector name='typeConfiscation' iconList={confiscationIconList} control={control} />
                             <Grid size={{ xs: 12, md: 12 }}>
                                 {(confiscationSelected == 'Drogas' && drugCollection.length > 0) &&
-                                    <MultipleSelectButton
+                                    <MultipleSelectButton disabled={optionsStatus.pending || !!optionsStatus.error}
                                         name="drugs"
                                         label="Drogas"
                                         options={drugCollection}
@@ -125,7 +128,7 @@ export const FormGraph = ({ drugCollection, weaponCollection, ammunitionCollecti
                                     />
                                 }
                                 {confiscationSelected == 'Armas' &&
-                                    <MultipleSelectButton
+                                    <MultipleSelectButton disabled={optionsStatus.pending || !!optionsStatus.error}
                                         name="weapons"
                                         label="Armas"
                                         options={weaponCollection}
@@ -137,7 +140,7 @@ export const FormGraph = ({ drugCollection, weaponCollection, ammunitionCollecti
                                     />
                                 }
                                 {confiscationSelected == 'Municiones' &&
-                                    <MultipleSelectButton
+                                    <MultipleSelectButton disabled={optionsStatus.pending || !!optionsStatus.error}
                                         name="ammunitions"
                                         label="Municiones"
                                         options={ammunitionCollection}
@@ -152,7 +155,7 @@ export const FormGraph = ({ drugCollection, weaponCollection, ammunitionCollecti
                             <OptionSelector name='typeGraph' setOption={value => setGraphType(value)} iconList={graphIconList} control={control} />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 12 }} sx={{ mt: 2, display: 'flex', flexDirection: 'row', gap: 2 }}>
-                            <Button type='submit' variant='contained' loading={false} sx={{ width: '100%' }}>
+                            <Button disabled={optionsStatus.pending || !!optionsStatus.error} type='submit' variant='contained' loading={false} sx={{ width: '100%' }}>
                                 <Save/>
                             </Button>
                         </Grid>

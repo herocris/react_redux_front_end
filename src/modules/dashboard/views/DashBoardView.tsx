@@ -1,20 +1,24 @@
+import { ApiErrorAlert } from '../../../components/ApiErrorAlert';
+import { logoColumn } from '../../../components/logoColumn';
+import type { GridColDef } from '@mui/x-data-grid';
+import type { DrugEntity } from '../../drug/types';
 import Grid from '@mui/material/Grid2';
 import { BarGraph, LineGraph } from '../../graph/components';
-import { LegacyEntityList as EntityList, } from '../../../components';
+import { EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { useDrugView } from '../../drug/hooks';
 import {MapComponent } from '../../map';
-import { Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import { barLineGraph, Mapitems } from '../demoData';
 
 
+const columns: GridColDef<DrugEntity>[] = [{ field: 'id', headerName: 'id', flex: 1 }, { field: 'descripcion', headerName: 'descripcion', flex: 1 }, logoColumn()];
+
 export const DashBoardView = () => {
   const {
-    LoadingEntities,
-    columnsTable,
-    loading,
-    tableOptions,
-    drugs,
+    paginationModel, sortModel, filterModel,
+    onPaginationModelChange, onSortModelChange, onFilterModelChange,
+    listLoading, listError, retryList, rowCount, drugs,
   } = useDrugView()
 
   return (
@@ -41,17 +45,12 @@ export const DashBoardView = () => {
         </Grid>
         <Typography variant='h4' sx={{ mb: 3 }}>Demo Dashboard</Typography>
         <Typography variant='h5' sx={{ mb: 3 }}>Material UI DataGrid</Typography>
-        <EntityList
-          handleOpen={() => { }}
-          handleOpenDialog={() => { }}
-          LoadingEntities={LoadingEntities}
-          setIdEntity={() => { }}
-          EntityCollection={drugs}
-          tableOptions={tableOptions}
-          loading={loading}
-          columnsTable={columnsTable}
-          editable={false}
-        />
+        <ApiErrorAlert message={listError} />
+        {listError && <Button onClick={retryList} disabled={listLoading}>Reintentar listado</Button>}
+        <EntityList rows={drugs} columns={columns} rowCount={rowCount} loading={listLoading}
+          paginationModel={paginationModel} sortModel={sortModel} filterModel={filterModel}
+          onPaginationModelChange={onPaginationModelChange}
+          onSortModelChange={onSortModelChange} onFilterModelChange={onFilterModelChange} />
         
       </GrapLayout>
     </>

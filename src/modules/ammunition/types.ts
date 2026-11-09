@@ -8,13 +8,6 @@ export interface Ammunition {
     logo: string | File
 }
 
-export interface AmmunitionState {
-    ammunitions: Ammunition[],
-    activeAmmunition: Ammunition,
-    tableOptions: TableOptions,
-    loading: boolean
-    errorMessage: ApiErrorMessage
-}
 
 export interface AmmunitionFormModalProps {
     handleOpen: (open: boolean) => void;
@@ -29,3 +22,5 @@ export type AmmunitionResponse = Omit<Ammunition, 'id' | 'identificador' | 'logo
 };
 
 export type AmmunitionListResponse = TableOptions & { data: AmmunitionResponse[] };
+
+export type AmmunitionEntity = Omit<AmmunitionResponse, 'identificador'> & { id: string };

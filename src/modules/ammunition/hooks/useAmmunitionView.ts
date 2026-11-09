@@ -1,85 +1,91 @@
-import { useCallback, useState } from 'react';
-import { clearActiveAmmunition, onClearErrorMessage, onSetActiveAmmunition} from "../slices";
-import { startDeleteAmmunition, startLoadingAmmunitions, startSaveAmmunition, startUpdateAmmunition } from "../thunks";
-import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
-import { RootState } from "../../../store";
-import type { Ammunition } from '../types';
+import { useEffect, useRef, useState } from 'react';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { GridFilterModel, GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
+import { getApiErrorMessage } from '../../../api/apiErrors';
+import type { Ammunition, AmmunitionEntity } from '../types';
+import { ammunitionListOptions, ammunitionMutationOptions } from '../queries/ammunitionQueries';
 
 export const useAmmunitionView = () => {
-  const { activeAmmunition, ammunitions, tableOptions, loading, errorMessage } = useAppSelector((state: RootState) => state.ammunition);
-  const dispatch = useAppDispatch();
-
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 10 });
+  const [sortModel, setSortModel] = useState<GridSortModel>([]);
+  const [filterModel, setFilterModel] = useState<GridFilterModel>({ items: [] });
+  const [activeAmmunition, setActiveAmmunition] = useState<Ammunition>({ descripcion: '', logo: '' });
   const [open, setOpen] = useState(false);
-  const handleOpen = (valOp:boolean) => {
-    if (loading) return;
-    dispatch(onClearErrorMessage());
-    if (!valOp) dispatch(clearActiveAmmunition())
-    setOpen(valOp);
-  }
-
   const [openDialog, setOpenDialog] = useState(false);
+  const client = useQueryClient();
+  const listOptions = ammunitionListOptions({
+    page: paginationModel.page + 1, per_page: paginationModel.pageSize,
+    sortBy: sortModel[0]?.field || 'id', orderType: sortModel[0]?.sort || 'asc',
+    search_by: filterModel.items[0]?.field || '', valueSearch: String(filterModel.items[0]?.value ?? ''),
+  });
+  const query = useQuery({ ...listOptions, placeholderData: keepPreviousData });
+  // Retain only the cache key. Query remains the owner of the previous result.
+  const lastSuccessfulKey = useRef(listOptions.queryKey);
+  useEffect(() => {
+    if (query.isSuccess && !query.isPlaceholderData) lastSuccessfulKey.current = listOptions.queryKey;
+  }, [query.isSuccess, query.isPlaceholderData, listOptions.queryKey]);
+  const data = query.data ?? client.getQueryData(lastSuccessfulKey.current);
+  const mutation = useMutation(ammunitionMutationOptions(client, () => {
+    setOpen(false);
+    setOpenDialog(false);
+    setActiveAmmunition({ descripcion: '', logo: '' });
+  }));
+  const loading = mutation.isPending;
+
+  // Reconcile server-confirmed empty pages, never placeholder rows or pending totals.
+  useEffect(() => {
+    if (!query.data || query.isPlaceholderData || query.isFetching || query.isError ||
+        query.data.rows.length > 0) return;
+    const lastPage = Math.max(0, Math.ceil(query.data.tableOptions.total / paginationModel.pageSize) - 1);
+    if (paginationModel.page > lastPage) setPaginationModel(model => ({ ...model, page: lastPage }));
+  }, [query.data, query.isPlaceholderData, query.isFetching, query.isError, paginationModel]);
+
+  const handleOpen = (value: boolean) => {
+    if (loading) return;
+    mutation.reset();
+    setActiveAmmunition({ descripcion: '', logo: '' });
+    setOpen(value);
+  };
   const handleOpenDialog = () => {
     if (loading) return;
-    dispatch(onClearErrorMessage());
-    if (openDialog) dispatch(clearActiveAmmunition());
-    setOpenDialog(value => !value);
-  }
-
-  const setIdAmmunition = (id: string) => {
-    const ammunition = ammunitions.find((row: Ammunition) => row.id === id);
-    if (ammunition) dispatch(onSetActiveAmmunition(ammunition))
+    mutation.reset();
+    setActiveAmmunition({ descripcion: '', logo: '' });
+    setOpenDialog(false);
   };
-
+  const select = (row: AmmunitionEntity, action: 'edit' | 'delete') => {
+    if (loading || query.isPlaceholderData || !query.data) return;
+    mutation.reset();
+    setActiveAmmunition(row);
+    if (action === 'edit') setOpen(true);
+    else setOpenDialog(true);
+  };
   const DeleteAmmunition = async () => {
-    if (activeAmmunition.id === undefined) return;
-    try {
-      await dispatch(startDeleteAmmunition({ ...activeAmmunition, id: activeAmmunition.id }));
-      setOpenDialog(false);
-    } catch {
-      // The thunk publishes the error; keep the dialog open for a retry.
-    }
+    if (loading || activeAmmunition.id === undefined) return;
+    try { await mutation.mutateAsync({ type: 'delete', id: activeAmmunition.id }); }
+    catch { /* Mutation owns the error; keep selection and dialog for retry. */ }
   };
-
-  const onSaveOrUptdate = async (ammunition: Ammunition) => {
-    if (activeAmmunition.id === undefined) {
-      await dispatch(startSaveAmmunition(ammunition));
-    } else {
-      await dispatch(startUpdateAmmunition({ ...ammunition, id: activeAmmunition.id }));
-    }
-    handleOpen(false);
+  const onSaveOrUptdate = async (values: Ammunition) => {
+    if (loading) return;
+    await mutation.mutateAsync(activeAmmunition.id === undefined
+      ? { type: 'create', values }
+      : { type: 'update', values: { ...values, id: activeAmmunition.id } });
   };
-
-  const LoadingEntities = useCallback((
-    page: number,
-    sortBy: string,
-    sortType: string,
-    pageSize: number,
-    filterField: string,
-    filterValue: string,
-    signal?: AbortSignal
-  ) => {
-    return dispatch(startLoadingAmmunitions(page, sortBy, sortType, pageSize, filterField, filterValue, signal))
-      .catch(() => {
-        // The thunk records errors in the module state.
-      });
-  }, [dispatch]);
-
-  const columnsTable = ['id', 'descripcion', 'logo']
-
   return {
-    tableOptions,
-    loading,
-    open,
-    openDialog,
-    columnsTable,
-    ammunitions,
-    activeAmmunition,
-    errorMessage,
-    handleOpen,
-    handleOpenDialog,
-    setIdAmmunition,
-    DeleteAmmunition,
-    LoadingEntities,
-    onSaveOrUptdate,
-  }
-}
+    ammunitions: data?.rows ?? [], rowCount: data?.tableOptions.total ?? 0,
+    paginationModel, sortModel, filterModel,
+    onPaginationModelChange: setPaginationModel,
+    onSortModelChange: (model: GridSortModel) => {
+      setSortModel(model); setPaginationModel(value => ({ ...value, page: 0 }));
+    },
+    onFilterModelChange: (model: GridFilterModel) => {
+      setFilterModel(model); setPaginationModel(value => ({ ...value, page: 0 }));
+    },
+    listLoading: query.isFetching, listError: query.isError ? getApiErrorMessage(query.error) : '',
+    retryList: () => { void query.refetch(); },
+    loading, open, openDialog, activeAmmunition,
+    errorMessage: mutation.isError ? getApiErrorMessage(mutation.error) : '',
+    handleOpen, handleOpenDialog, DeleteAmmunition, onSaveOrUptdate,
+    onEdit: (row: AmmunitionEntity) => select(row, 'edit'),
+    onDelete: (row: AmmunitionEntity) => select(row, 'delete'),
+  };
+};

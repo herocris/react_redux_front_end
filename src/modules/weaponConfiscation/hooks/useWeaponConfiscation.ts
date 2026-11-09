@@ -1,3 +1,5 @@
+import { combineOptionsStatus } from '../../resouce/queries/optionsStatus';
+import { useWeaponOptions } from '../../weapon/queries/useWeaponOptions';
 import { useCallback, useEffect, useState } from "react";
 import { clearActiveWeaponConfiscation, onSetActiveWeaponConfiscation } from "../slices";
 import { startDeleteWeaponConfiscation, startLoadingWeaponConfiscations, startSaveWeaponConfiscation, startUpdateWeaponConfiscation } from "../thunks";
@@ -5,14 +7,14 @@ import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
 import { RootState } from "../../../store";
 import { WeaponConfiscation } from '../';
 import { useParams } from "react-router";
-import { startLoadingWeaponNames } from "../../resouce/thunks";
 
 
 export const useWeaponConfiscation = () => {
   const { confiscationId } = useParams();
   
   const { activeWeaponConfiscation, weaponConfiscations,loading, errorMessage } = useAppSelector((state: RootState) => state.weaponConfiscation);
-  const { weaponCollection } = useAppSelector((state: RootState) => state.resource);
+  const { options: weaponCollection, query: weaponQuery } = useWeaponOptions();
+  const optionsStatus = combineOptionsStatus(weaponQuery);
   const { activeConfiscation } = useAppSelector((state: RootState) => state.confiscation);
 
   const dispatch = useAppDispatch();
@@ -65,7 +67,7 @@ export const useWeaponConfiscation = () => {
   }
 
 
-  const onLoadingWeaponConfiscation = async (
+  const onLoadingWeaponConfiscation = useCallback(async (
     page: number,
     sortBy: string,
     sortType: string,
@@ -76,19 +78,19 @@ export const useWeaponConfiscation = () => {
     if (confiscationId) {
       await dispatch(startLoadingWeaponConfiscations(parseInt(confiscationId), page, sortBy, sortType, pageSize, filterField, filterValue))
     }
-  }
+  }, [dispatch, confiscationId]);
 
   useEffect(() => {
     console.log('carga lista Weapon');
     onLoadingWeaponConfiscation(1, '', '', 10, '', '')
     console.log('carga selects Weapon');
-    dispatch(startLoadingWeaponNames());
-  }, [])
+  }, [onLoadingWeaponConfiscation])
 
 
 
 
   return {
+    optionsStatus,
     loading,
     openDialogWeaponConfiscation,
     openWeaponConfiscationForm,

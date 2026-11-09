@@ -12,13 +12,6 @@ export interface Role {
     nombre: string,
     permisos?: RolePermission[]
 }
-export interface RoleState {
-    roles: Role[],
-    activeRole: Role,
-    tableOptions: TableOptions,
-    loading: boolean
-    errorMessage: ApiErrorMessage
-}
 export interface RoleFormModalProps {
     permissionOptionsStatus: PermissionOptionsStatusProps;
     handleOpen: (open: boolean) => void;
@@ -31,3 +24,5 @@ export interface RoleFormModalProps {
 
 export type RoleResponse = Omit<Role, "id" | "identificador"> & { identificador: string };
 export type RoleListResponse = TableOptions & { data: RoleResponse[] };
+
+export type RoleEntity = Omit<RoleResponse, 'identificador'> & { id: string };

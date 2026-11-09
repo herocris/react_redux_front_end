@@ -5,7 +5,7 @@ import { ListSubConfiscation } from '../../confiscation/components';
 import { AlertDialog } from '../../../components';
 
 export const CrudDrugConfiscation = () => {
-    const {
+    const { optionsStatus,
         drugConfiscations,
         activeDrugConfiscation,
         openDrugConfiscationForm,
@@ -25,7 +25,7 @@ export const CrudDrugConfiscation = () => {
             {openDrugConfiscationForm
                 ?
                 <div>
-                    <DrugConfiscationForm
+                    <DrugConfiscationForm optionsStatus={optionsStatus}
                         activeDrugConfiscation={activeDrugConfiscation}
                         drugCollection={drugCollection}
                         drugPresentationCollection={drugPresentationCollection}

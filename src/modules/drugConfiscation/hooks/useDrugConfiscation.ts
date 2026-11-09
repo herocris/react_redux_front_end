@@ -1,3 +1,6 @@
+import { combineOptionsStatus } from '../../resouce/queries/optionsStatus';
+import { useDrugPresentationOptions } from '../../drugPresentation/queries/useDrugPresentationOptions';
+import { useDrugOptions } from '../../drug/queries/useDrugOptions';
 import { useCallback, useEffect, useState } from "react";
 import { clearActiveDrugConfiscation, onSetActiveDrugConfiscation} from "../slices";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
@@ -5,14 +8,15 @@ import { RootState } from "../../../store";
 import { DrugConfiscation } from '../';
 import { useParams } from "react-router";
 import { startDeleteDrugConfiscation, startLoadingDrugConfiscations, startSaveDrugConfiscation, startUpdateDrugConfiscation } from "../thunks";
-import { startLoadingDrugNames, startLoadingDrugPresentationNames } from "../../resouce/thunks";
 
 
 export const useDrugConfiscation = () => {
   const { confiscationId } = useParams();
   
   const { activeDrugConfiscation, drugConfiscations,loading, errorMessage } = useAppSelector((state: RootState) => state.drugConfiscation);
-  const { drugCollection, drugPresentationCollection } = useAppSelector((state: RootState) => state.resource);
+  const { options: drugCollection, query: drugQuery } = useDrugOptions();
+  const { options: drugPresentationCollection, query: drugPresentationQuery } = useDrugPresentationOptions();
+  const optionsStatus = combineOptionsStatus(drugQuery, drugPresentationQuery);
   const { activeConfiscation } = useAppSelector((state: RootState) => state.confiscation);
 
   const dispatch = useAppDispatch();
@@ -64,7 +68,7 @@ export const useDrugConfiscation = () => {
   }
 
 
-  const onLoadingDrugConfiscation = async (
+  const onLoadingDrugConfiscation = useCallback(async (
     page: number,
     sortBy: string,
     sortType: string,
@@ -75,19 +79,18 @@ export const useDrugConfiscation = () => {
     if (confiscationId) {
       await dispatch(startLoadingDrugConfiscations(parseInt(confiscationId), page, sortBy, sortType, pageSize, filterField, filterValue))
     }
-  }
+  }, [dispatch, confiscationId]);
 
   useEffect(() => {
     console.log('carga lista drugs');
     onLoadingDrugConfiscation(1, '', '', 10, '', '')
     console.log('carga selects drugs');
-    dispatch(startLoadingDrugNames());
-    dispatch(startLoadingDrugPresentationNames());
-  }, [])
+  }, [onLoadingDrugConfiscation])
 
 
 
   return {
+    optionsStatus,
     loading,
     openDialogDrugConfiscation,
     openDrugConfiscationForm,

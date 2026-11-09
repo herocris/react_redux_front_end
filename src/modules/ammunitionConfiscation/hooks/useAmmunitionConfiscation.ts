@@ -1,3 +1,5 @@
+import { combineOptionsStatus } from '../../resouce/queries/optionsStatus';
+import { useAmmunitionOptions } from '../../ammunition/queries/useAmmunitionOptions';
 import { useCallback, useEffect, useState } from "react";
 import { startDeleteAmmunitionConfiscation, startLoadingAmmunitionConfiscations, startSaveAmmunitionConfiscation, startUpdateAmmunitionConfiscation } from "../thunks";
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
@@ -5,14 +7,14 @@ import { RootState } from "../../../store";
 import { AmmunitionConfiscation } from '../';
 import { useParams } from "react-router";
 import { clearActiveAmmunitionConfiscation, onSetActiveAmmunitionConfiscation } from "../slices";
-import { startLoadingAmmunitionNames } from "../../resouce/thunks";
 
 
 export const useAmmunitionConfiscation = () => {
   const { confiscationId } = useParams();
 
   const { activeAmmunitionConfiscation, ammunitionConfiscations, loading, errorMessage } = useAppSelector((state: RootState) => state.ammunitionConfiscation);
-  const { ammunitionCollection } = useAppSelector((state: RootState) => state.resource);
+  const { options: ammunitionCollection, query: ammunitionQuery } = useAmmunitionOptions();
+  const optionsStatus = combineOptionsStatus(ammunitionQuery);
   const { activeConfiscation } = useAppSelector((state: RootState) => state.confiscation);
 
   const dispatch = useAppDispatch();
@@ -65,7 +67,7 @@ export const useAmmunitionConfiscation = () => {
   }
 
 
-  const onLoadingAmmunitionConfiscation = async (
+  const onLoadingAmmunitionConfiscation = useCallback(async (
     page: number,
     sortBy: string,
     sortType: string,
@@ -76,18 +78,18 @@ export const useAmmunitionConfiscation = () => {
     if (confiscationId) {
       await dispatch(startLoadingAmmunitionConfiscations(parseInt(confiscationId), page, sortBy, sortType, pageSize, filterField, filterValue))
     }
-  }
+  }, [dispatch, confiscationId]);
 
   useEffect(() => {
     console.log('carga lista ammunitions');
     onLoadingAmmunitionConfiscation(1, '', '', 10, '', '')
     console.log('carga selects ammunitions');
-    dispatch(startLoadingAmmunitionNames());
-  }, [])
+  }, [onLoadingAmmunitionConfiscation])
 
 
 
   return {
+    optionsStatus,
     loading,
     openDialogAmmunitionConfiscation,
     openAmmunitionConfiscationForm,

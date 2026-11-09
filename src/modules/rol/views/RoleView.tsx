@@ -1,22 +1,29 @@
+import { Button } from '@mui/material';
+import type { GridColDef } from '@mui/x-data-grid';
+import type { RoleEntity } from '../types';
 import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import { PermissionOptionsStatus } from '../../permission/components/PermissionOptionsStatus';
 import { RoleError } from '../components/RoleError';
 
-import { AddFloatingButton, LegacyEntityList as EntityList, } from '../../../components';
+import { AddFloatingButton, EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { RoleFormModal } from '../components/RoleFormModal';
 import { useRoleView } from '../hooks/useRoleView';
 
+const columns: GridColDef<RoleEntity>[] = [
+  { field: 'id', headerName: 'id', flex: 1 },
+  { field: 'nombre', headerName: 'nombre', flex: 1 }
+];
+
 export const RoleView = () => {
   const {
     DeleteRole,
-    LoadingEntities,
-    columnsTable,
+    paginationModel, sortModel, filterModel,
+    onPaginationModelChange, onSortModelChange, onFilterModelChange,
+    listLoading, listError, retryList, rowCount, onEdit, onDelete,
     handleOpen,
     handleOpenDialog,
     loading,
-    setIdRole,
-    tableOptions,
     openDialog,
     open,
     permisos,
@@ -32,15 +39,13 @@ export const RoleView = () => {
         {!open && <PermissionOptionsStatus pending={permissionOptionsQuery.isPending}
           error={permissionOptionsQuery.error} retry={() => { void permissionOptionsQuery.refetch(); }} />}
         {!open && !openDialog && <RoleError message={errorMessage} />}
-        <EntityList
-          handleOpen={handleOpen}
-          handleOpenDialog={handleOpenDialog}
-          LoadingEntities={LoadingEntities}
-          setIdEntity={setIdRole}
-          EntityCollection={roles}
-          tableOptions={tableOptions}
-          loading={loading}
-          columnsTable={columnsTable} />
+        <RoleError message={listError} />
+        {listError && <Button onClick={retryList} disabled={listLoading}>Reintentar listado</Button>}
+        <EntityList rows={roles} columns={columns} rowCount={rowCount} loading={listLoading}
+          paginationModel={paginationModel} sortModel={sortModel} filterModel={filterModel}
+          onPaginationModelChange={onPaginationModelChange}
+          onSortModelChange={onSortModelChange} onFilterModelChange={onFilterModelChange}
+          onEdit={onEdit} onDelete={onDelete} />
         {open &&
           <RoleFormModal
             handleOpen={handleOpen}

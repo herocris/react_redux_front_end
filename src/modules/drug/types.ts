@@ -8,13 +8,6 @@ export interface Drug {
     logo: string | File
 }
 
-export interface DrugState {
-    drugs: Drug[],
-    activeDrug: Drug,
-    tableOptions: TableOptions,
-    loading: boolean
-    errorMessage: ApiErrorMessage
-}
 
 export interface DrugFormModalProps {
     handleOpen: (open: boolean) => void;
@@ -29,3 +22,5 @@ export type DrugResponse = Omit<Drug, 'id' | 'identificador' | 'logo'> & {
 };
 
 export type DrugListResponse = TableOptions & { data: DrugResponse[] };
+
+export type DrugEntity = Omit<DrugResponse, 'identificador'> & { id: string };

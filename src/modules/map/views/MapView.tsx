@@ -6,7 +6,8 @@ import { useMap } from "../hooks";
 
 
 export const MapView = () => {
-    const { 
+    const {
+        optionsStatus,
         ammunitionCollection, 
         drugCollection, 
         weaponCollection,  
@@ -23,7 +24,7 @@ export const MapView = () => {
         <GrapLayout>
             <Grid container spacing={3}>
                 <Grid size={{ xs: 12, md: 5, lg: 3 }}>
-                    <FormMap
+                    <FormMap optionsStatus={optionsStatus}
                         weaponCollection={weaponCollection}
                         drugCollection={drugCollection}
                         ammunitionCollection={ammunitionCollection}

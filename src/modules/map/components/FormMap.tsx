@@ -1,3 +1,4 @@
+import { CatalogOptionsStatus } from '../../resouce/components/CatalogOptionsStatus';
 import { Box, Button, Zoom } from '@mui/material'
 import Grid from '@mui/material/Grid2';
 import  {Whatshot,LocationOn,Save} from '@mui/icons-material';
@@ -34,7 +35,7 @@ const graphIconList = [
     },
 ]
 
-export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection, setMapType, getMapData }: FormGraphProps) => {
+export const FormMap = ({ optionsStatus, drugCollection, weaponCollection, ammunitionCollection, setMapType, getMapData }: FormGraphProps) => {
 
     const {
         handleSubmit,
@@ -49,6 +50,7 @@ export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection
     //console.log(errors);
 
     const onSubmit: SubmitHandler<z.infer<typeof mapSchema>> = async (data) => {
+        if (optionsStatus.pending || optionsStatus.error) return;
         console.log(data);
         getMapData(data)
     };
@@ -63,6 +65,7 @@ export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection
                     display: 'flex',
                     flexDirection: 'column'
                 }}>
+                <CatalogOptionsStatus {...optionsStatus} />
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Grid container sx={{ display: 'flex', alignItems: 'center', alignContent: 'center' }}>
                         <Grid size={{ xs: 12 }} container spacing={2} sx={{ mt: 0, display: 'flex', alignItems: 'center', alignContent: 'center', gap: 2 }}>
@@ -76,7 +79,7 @@ export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection
 
                             <Grid size={{ xs: 12, md: 12 }}>
                                 {drugCollection.length > 0 &&
-                                    <MultipleSelectButton
+                                    <MultipleSelectButton disabled={optionsStatus.pending || !!optionsStatus.error}
                                         name="drugs"
                                         label="Drogas"
                                         options={drugCollection}
@@ -88,7 +91,7 @@ export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection
                                     />
                                 }
                                 {weaponCollection.length > 0 &&
-                                    <MultipleSelectButton
+                                    <MultipleSelectButton disabled={optionsStatus.pending || !!optionsStatus.error}
                                         name="weapons"
                                         label="Armas"
                                         options={weaponCollection}
@@ -100,7 +103,7 @@ export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection
                                     />
                                 }
                                 {ammunitionCollection.length > 0 &&
-                                    <MultipleSelectButton
+                                    <MultipleSelectButton disabled={optionsStatus.pending || !!optionsStatus.error}
                                         name="ammunitions"
                                         label="Municiones"
                                         options={ammunitionCollection}
@@ -115,7 +118,7 @@ export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection
 
                         </Grid>
                         <Grid size={{ xs: 12, sm: 12 }} sx={{ mt: 2, display: 'flex', flexDirection: 'row', gap: 2 }}>
-                            <Button type='submit' variant='contained' loading={false} sx={{ width: '100%' }}>
+                            <Button disabled={optionsStatus.pending || !!optionsStatus.error} type='submit' variant='contained' loading={false} sx={{ width: '100%' }}>
                                 <Save />
                             </Button>
                         </Grid>

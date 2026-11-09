@@ -65,7 +65,7 @@ async (page) => {
 
         await page.getByRole('button', { name: 'Reintentar carga' }).click();
         await page.getByRole('progressbar').waitFor();
-        check(await page.getByRole('alert').count() === 0, 'Previous error not cleared');
+        check(await row.count() === 1, 'Previous rows lost during retry');
         check(calls[2].query === calls[1].query, 'Retry changed parameters');
         check(attempts === 3, 'Retry duplicated request');
         releaseRetry();
@@ -82,6 +82,12 @@ async (page) => {
         check(calls[3].query === calls[4].query, 'Network retry changed parameters');
         passed.push('network failure normalized and retry recovers without losing selection');
 
+        // The original sort is still fresh in Query; make it stale to test a new empty response.
+        await page.evaluate(async () => {
+            const url = performance.getEntriesByType('resource').find(entry => new URL(entry.name).pathname === '/src/queries/queryClient.ts').name;
+            const { queryClient } = await import(url);
+            await queryClient.invalidateQueries({ queryKey: ['activity'], refetchType: 'none' });
+        });
         await dateHeader.click();
         await row.waitFor({ state: 'hidden' });
         await page.getByRole('progressbar').waitFor({ state: 'hidden' });

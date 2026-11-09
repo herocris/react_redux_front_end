@@ -1,3 +1,4 @@
+import type { OptionsStatus } from '../resouce/queries/optionsStatus';
 import { SelectOptions } from "../../shared/interfaces/sharedInterfaces";
 
 export interface BarLineGraph {
@@ -37,6 +38,7 @@ export interface AmmunitionGraphForm {
     typeGraph: string
 }
 export interface FormGraphProps {
+    optionsStatus: OptionsStatus
     drugCollection: SelectOptions[]
     weaponCollection: SelectOptions[]
     ammunitionCollection: SelectOptions[]

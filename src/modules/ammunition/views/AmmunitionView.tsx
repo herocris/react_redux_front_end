@@ -1,21 +1,30 @@
+import { logoColumn } from '../../../components/logoColumn';
+import { Button } from '@mui/material';
+import type { GridColDef } from '@mui/x-data-grid';
+import type { AmmunitionEntity } from '../types';
 import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import { AmmunitionError } from '../components/AmmunitionError';
 
-import { AddFloatingButton, LegacyEntityList as EntityList, } from '../../../components';
+import { AddFloatingButton, EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { AmmunitionFormModal } from '../components';
 import { useAmmunitionView } from '../hooks';
 
+const columns: GridColDef<AmmunitionEntity>[] = [
+  { field: 'id', headerName: 'id', flex: 1 },
+  { field: 'descripcion', headerName: 'descripcion', flex: 1 },
+  logoColumn(),
+];
+
 export const AmmunitionView = () => {
   const {
     DeleteAmmunition,
-    LoadingEntities,
-    columnsTable,
+    paginationModel, sortModel, filterModel,
+    onPaginationModelChange, onSortModelChange, onFilterModelChange,
+    listLoading, listError, retryList, rowCount, onEdit, onDelete,
     handleOpen,
     handleOpenDialog,
     loading,
-    setIdAmmunition,
-    tableOptions,
     openDialog,
     open,
     ammunitions,
@@ -27,15 +36,13 @@ export const AmmunitionView = () => {
     <>
       <GrapLayout>
         {!open && !openDialog && <AmmunitionError message={errorMessage} />}
-        <EntityList
-          handleOpen={handleOpen}
-          handleOpenDialog={handleOpenDialog}
-          LoadingEntities={LoadingEntities}
-          setIdEntity={setIdAmmunition}
-          EntityCollection={ammunitions}
-          tableOptions={tableOptions}
-          loading={loading}
-          columnsTable={columnsTable} />
+        <AmmunitionError message={listError} />
+        {listError && <Button onClick={retryList} disabled={listLoading}>Reintentar listado</Button>}
+        <EntityList rows={ammunitions} columns={columns} rowCount={rowCount} loading={listLoading}
+          paginationModel={paginationModel} sortModel={sortModel} filterModel={filterModel}
+          onPaginationModelChange={onPaginationModelChange}
+          onSortModelChange={onSortModelChange} onFilterModelChange={onFilterModelChange}
+          onEdit={onEdit} onDelete={onDelete} />
         {open &&
           <AmmunitionFormModal
             handleOpen={handleOpen}

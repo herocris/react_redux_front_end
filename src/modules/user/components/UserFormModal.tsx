@@ -1,3 +1,4 @@
+import { CatalogOptionsStatus } from '../../resouce/components/CatalogOptionsStatus';
 import { MultipleSelectButton } from '../../../components/MultipleSelectButton';
 import { PermissionOptionsStatus } from '../../permission/components/PermissionOptionsStatus';
 import Grid from '@mui/material/Grid2';
@@ -16,7 +17,7 @@ import { FormModal } from '../../../components/FormModal';
 
 type FormFields = z.infer<typeof userSchema>;
 export const UserFormModal = ({
-    permissionOptionsStatus,
+    permissionOptionsStatus, roleOptionsStatus,
     handleOpen,
     permisos,
     roles,
@@ -30,7 +31,7 @@ export const UserFormModal = ({
     });
 
     const busy = loading || isSubmitting;
-    const optionsUnavailable = permissionOptionsStatus.pending || !!permissionOptionsStatus.error;
+    const optionsUnavailable = permissionOptionsStatus.pending || !!permissionOptionsStatus.error || roleOptionsStatus.pending || !!roleOptionsStatus.error;
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         if (optionsUnavailable) return;
         try {
@@ -44,7 +45,7 @@ export const UserFormModal = ({
         <FormModal titleId="user-title" title={activeUser.id?'Editar usuario':'Crear usuario'} busy={busy}
             onClose={() => handleOpen(false)} onSubmit={handleSubmit(onSubmit)}
             status={<><UserError message={errors.root?.server?.message || errorMessage} />
-                    <PermissionOptionsStatus {...permissionOptionsStatus} /></>}>
+                    <PermissionOptionsStatus {...permissionOptionsStatus} /><CatalogOptionsStatus {...roleOptionsStatus} /></>}>
             <Grid container>
                 <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
                     <TextField
@@ -66,7 +67,7 @@ export const UserFormModal = ({
                         {...register("password")} error={!!errors.password} helperText={errors.password?.message} />
                 </Grid>
                 <MultipleSelectButton name="roles" control={control} label="Roles"
-                    options={roles} multiple disabled={busy} />
+                    options={roles} multiple disabled={busy || optionsUnavailable} />
                 <MultipleSelectButton name="permisos" control={control} label="Permisos"
                     options={permisos} multiple disabled={busy || optionsUnavailable} />
                 <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 2, mt: 2 }}>

@@ -83,7 +83,7 @@ async (page) => {
             const { store } = await import(moduleURL('/src/store/store.ts'));
             const { queryClient } = await import(moduleURL('/src/queries/queryClient.ts'));
             return { rows: Number('permission' in store.getState()),
-                options: Number('permisosCollection' in store.getState().resource),
+                options: Number('resource' in store.getState()),
                 queries: queryClient.getQueryCache().getAll().length,
                 mutations: queryClient.getMutationCache().getAll().length };
         });

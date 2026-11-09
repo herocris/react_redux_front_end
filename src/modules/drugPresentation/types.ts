@@ -8,13 +8,6 @@ export interface DrugPresentation {
     logo: string | File
 }
 
-export interface DrugPresentationState {
-    drugPresentations: DrugPresentation[],
-    activeDrugPresentation: DrugPresentation,
-    tableOptions: TableOptions,
-    loading: boolean
-    errorMessage: ApiErrorMessage
-}
 
 export interface DrugPresentationFormModalProps {
     handleOpen: (open: boolean) => void;
@@ -29,3 +22,5 @@ export type DrugPresentationResponse = Omit<DrugPresentation, 'id' | 'identifica
 };
 
 export type DrugPresentationListResponse = TableOptions & { data: DrugPresentationResponse[] };
+
+export type DrugPresentationEntity = Omit<DrugPresentationResponse, 'identificador'> & { id: string };

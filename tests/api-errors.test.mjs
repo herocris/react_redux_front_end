@@ -17,8 +17,6 @@ test('errores HTTP y thunks con el cliente real y un transporte simulado', async
     t.after(() => server.close());
     const { default: api } = await server.ssrLoadModule('/src/api/graphdataApi.ts');
     const { getApiErrorMessage, getApiErrorText } = await server.ssrLoadModule('/src/api/apiErrors.ts');
-    const { userSlice } = await server.ssrLoadModule('/src/modules/user/slices/userSlice.ts');
-    const thunks = await server.ssrLoadModule('/src/modules/user/thunks/userThunks.ts');
     const auth = await server.ssrLoadModule('/src/modules/auth/thunks/aurthThunks.ts');
     const { authSlice } = await server.ssrLoadModule('/src/modules/auth/slices/authSlice.ts');
     const originalAdapter = api.defaults.adapter;
@@ -50,46 +48,6 @@ test('errores HTTP y thunks con el cliente real y un transporte simulado', async
         for (const reason of [null, undefined, {}, '<html>Error</html>', { error: { correo: null } }]) {
             assert.match(getApiErrorText(reason), /No se pudo completar/);
         }
-    });
-
-    await t.test('los cuatro thunks publican el error, terminan loading y conservan los datos', async () => {
-        const requests = [
-            () => thunks.startLoadingUsers(1, 'id', 'asc', 10, '', ''),
-            () => thunks.startSaveUser(user),
-            () => thunks.startUpdateUser(user),
-            () => thunks.startDeleteUser(user),
-        ];
-        for (const reason of [networkError, validation, null]) {
-            for (const request of requests) {
-                const store = configureStore({ reducer: userSlice.reducer });
-                store.dispatch(userSlice.actions.setUsers([user]));
-                store.dispatch(userSlice.actions.onSetActiveUser(user));
-                api.defaults.adapter = async () => { throw reason; };
-                await assert.rejects(store.dispatch(request()), error => error === reason);
-                const state = store.getState();
-                assert.equal(state.loading, false);
-                assert.deepEqual(state.users, [user]);
-                assert.deepEqual(state.activeUser, user);
-                assert.deepEqual(state.errorMessage, getApiErrorMessage(reason));
-            }
-        }
-    });
-
-    await t.test('un reintento exitoso limpia el error y conserva el contrato de identificador', async () => {
-        const store = configureStore({ reducer: userSlice.reducer });
-        store.dispatch(userSlice.actions.onSetErrorMessage('Error anterior'));
-        api.defaults.adapter = async config => {
-            assert.equal(config.withCredentials, true);
-            assert.equal(config.url, '/user');
-            assert.equal(config.method, 'post');
-            assert.deepEqual(store.getState().errorMessage, {});
-            return { data: { identificador: '7', nombre: user.nombre, correo: user.correo },
-                status: 200, statusText: 'OK', headers: {}, config };
-        };
-        await store.dispatch(thunks.startSaveUser(user));
-        assert.deepEqual(store.getState().users, [user]);
-        assert.equal(store.getState().loading, false);
-        assert.deepEqual(store.getState().errorMessage, {});
     });
 
     await t.test('login y registro terminan con un mensaje ante fallos de red', async t => {
