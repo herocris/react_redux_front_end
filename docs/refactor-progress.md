@@ -8,11 +8,11 @@ La preparación inicial no instaló dependencias ni creó services. **El paso 6
 incorpora la infraestructura de TanStack Query, el paso 9 migra permisos y el
 paso 11 extiende la migración a los demás catálogos, sus opciones y actividad;
 el paso 12 migra confiscaciones y subdecomisos; el paso 13 añade los filtros
-aplicados compartidos en Redux.**
+aplicados compartidos en Redux y el paso 14 conecta mapas/gráficos con Query.**
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1 a 13 completados**; siguiente paso pendiente:
-**14, conectar mapas y gráficos**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1 a 14 completados**; siguiente paso pendiente:
+**15, limpieza y rendimiento**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -97,7 +97,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | 11. Catálogos y actividad | Completado | Services y Query en seis CRUD y actividad; opciones completas migradas en todos sus consumidores, invalidación y convivencia verificadas. |
 | 12. Confiscaciones | Completado | Services y Query para listas, detalle y subdecomisos; borradores, archivos, paginación, errores, concurrencia y sesión verificados. |
 | 13. Filtros Redux | Completado | Slice serializable, aplicación explícita desde RHF, selector tipado y reset de sesión; transiciones y navegador verificados. |
-| 14. Mapas y gráficos | Pendiente | Mantienen flujos actuales y datos remotos en slices. |
+| 14. Mapas y gráficos | Completado | Services/Query con contexto Redux, RHF aislado, estados remotos y capas verificados. |
 | 15. Limpieza/rendimiento | Pendiente | No retirar todavía infraestructura con consumidores. |
 | 16. Integración | Pendiente | Ejecutar al completar los pasos anteriores. |
 
@@ -1369,6 +1369,124 @@ Las fechas vacías indican contexto sin aplicar: no lanzar consultas de análisi
 con esos defaults. Estas conexiones no se consideran implementadas aquí.
 Continúan deuda de lint, aviso de bundle y default `period=0` de gráficos.
 **Paso 13 cerrado; paso 14 pendiente y sin iniciar.**
+
+### Paso 14 — Conectar mapas y gráficos (9 de noviembre de 2026)
+
+Inicio en HEAD `3255bdf`, workspace limpio. Leídos AGENTS.md, plan y progreso;
+ejecutado únicamente el prompt del paso 14. Sin cambios de dependencias ni del
+plan. No se ejecuta la retirada global ni la revisión de rendimiento del paso 15.
+Código y pruebas consolidados en `7cc1f79`; este registro se consolida en un
+commit documental separado. Se reutilizan las comprobaciones anteriores, sin
+cambios funcionales posteriores; `git diff --cached --check` se verifica antes
+de cada commit.
+
+**Cambios y decisiones.**
+
+- Services por dominio en `map/services/mapService.ts` y
+  `graph/services/graphService.ts`. Conservan Axios compartido/cookies, endpoints
+  `confiscation/map`, `drugGraphIndex`, `weaponGraphIndex` y
+  `ammunitionGraphIndex`, fechas, IDs sin conversión y arrays entre corchetes.
+  Graph mantiene `period=month/year` y `typeGraph`. Devuelven datos tipados,
+  propagan la causa y reciben la señal de Query. No se atribuye validación de
+  respuestas a los genéricos de Axios.
+- Consultas y claves centralizadas en `queries/` de cada módulo. Query es el
+  propietario de resultados, carga y error; los hooks ya no leen ni escriben
+  resultados Redux ni consumen thunks. Las claves incluyen el snapshot aplicado
+  completo y, para gráficos, período, categoría y tipo enviado al endpoint.
+  Reutilizan la política global del paso 6 (30 s de vigencia, 5 min de retención,
+  sin reintento automático). Las señales llegan al transporte; cambiar argumentos
+  o desmontar retira la lectura anterior, sin exclusividad global entre claves.
+- Ambos hooks consumen `selectAppliedAnalysisFilters`. RHF toma esos defaults
+  al montar; no hay reset por resultados, recarga u opciones. Solo Aplicar publica
+  el snapshot validado. Navegar restaura fechas y selecciones aplicadas, sin
+  conservar borradores descartados al desmontar. Fechas vacías no consultan;
+  gráficos también espera selección en su categoría.
+- Los controles exclusivos siguen locales. Mapa alterna ubicación/calor sin GET.
+  El tipo visual de gráfico cambia inmediatamente sin GET; como `typeGraph`
+  también pertenece al contrato HTTP, su valor enviado se captura con período y
+  categoría solo al Aplicar. Defaults locales: mes, Drogas y barra; no inventan
+  fechas ni IDs. El formulario y la consulta comparten esos defaults. Se retira
+  el `period=0` ajeno a las opciones, eliminando su aviso MUI. Al volver a gráficos
+  se reinician los controles exclusivos; el contexto común permanece en Redux.
+- Estado accesible común de contexto sin aplicar, carga/recarga, error/reintento
+  y vacío. Una recarga de la misma clave puede conservar sus datos; otra clave no
+  muestra los resultados anteriores. Reintentar usa el snapshot, no el borrador.
+  Se completan callbacks y tipos de datos de gráficos/tarjetas, retirando Function
+  y any de esos consumidores, sin crear formularios universales ni contextos.
+- MapComponent conserva React Leaflet como propietario de marcadores/mapa,
+  usa claves de identificador e ignora coordenadas no finitas como la capa de
+  calor. Icono estable y puntos derivados estables para evitar recrear la capa
+  durante recargas sin cambio de datos. Se conserva el cleanup de HeatmapLayer:
+  `removeLayer` invoca `onRemove` de leaflet.heat 0.2.0, que retira canvas y
+  listeners `moveend`/`zoomanim`; contrastado con el código instalado. El recorrido
+  verifica alternancia repetida y desmontaje/remontaje, sin acumulación de canvas
+  ni excepciones. No se añaden listeners nuevos.
+- Las mutaciones existentes del padre y los tres hijos invalidan también las
+  dos familias de análisis tras éxito. Mantienen callbacks protegidos por sesión
+  y comprobación después del await; un fallo no invalida. Esta conexión evita
+  reutilizar análisis vigentes anteriores a una escritura.
+- Slices, thunks, exports y registro Redux antiguos quedan conservados para su
+  retirada coordinada en el paso 15, junto con sus pruebas de convivencia.
+  Ningún consumidor de pantalla de mapas/gráficos los usa ni duplica resultados
+  de Query allí. No se retira `createLatestListRequest` ni LegacyEntityList.
+
+**Comprobaciones realizadas.**
+
+- [analysis-query.test.mjs](../tests/analysis-query.test.mjs): contratos de los
+  cuatro endpoints, señales y causas, claves completas, defaults deshabilitados,
+  deduplicación/caché, argumentos rápidos/desmontaje y respuestas tardías en ambos
+  dominios, error/reintento, invalidación tras éxito/fallo en las cuatro mutaciones
+  y limpieza real del cliente de aplicación ante logout/acceso B con lecturas A.
+- `node --test tests/analysis-query.test.mjs tests/analysis-filters.test.mjs
+  tests/query-session.test.mjs tests/confiscation-save.test.mjs`:
+  **59 aprobadas**, cero fallos/canceladas/omitidas.
+  Log: `%TEMP%/graphdata-step14-tests-final.txt`. Dos primeros intentos terminaron
+  los casos pero conservaron timers de GC del runner; se interrumpieron y se
+  fijó retención infinita solo en los clientes de pruebas, como en las suites
+  existentes. La ejecución final termina correctamente sin cambiar política app.
+- Build final correcto, salida 0. Log:
+  `%TEMP%/graphdata-step14-build-final.txt`. Persiste aviso de chunks >500 kB;
+  restaurados los bytes iniciales de `tsconfig.app.tsbuildinfo`. Un intento previo
+  detectó el índice requerido por Recharts: PieGraph pasa a alias de objeto
+  compatible, sin any ni casts de datos, antes del build aprobado.
+- Lint: **16 errores y 9 advertencias**, frente a 28/11 del paso 13. Comparación
+  por archivo/regla/severidad/mensaje: cero diagnósticos nuevos; ninguno en archivos
+  modificados. Log: `%TEMP%/graphdata-step14-lint-final.json`.
+- Playwright MCP operativo, reutilizado servidor Vite 4175 (otro arranque confirmó
+  puerto ocupado). [analysis-query.js](../tests/browser/analysis-query.js),
+  HTTP/auth simulados: **cinco grupos aprobados**, seis lecturas de análisis y
+  un 503 esperado. Defaults/borradores sin GET; Aplicar y parámetros exclusivos;
+  vacío; recarga con controles aplicados sin sobrescribir RHF; fechas/IDs al
+  navegar; fallo/reintento conservando selección pendiente; tres alternancias de
+  calor/ubicación sin GET ni canvas acumulados; vuelta entre vistas y logout.
+  Cero excepciones/mensajes inesperados y cero avisos MUI de período. Se excluye
+  el aviso Canvas conocido. Los intentos iniciales ajustaron localizadores de
+  selects con valor y codificación del script, sin contarlos como aprobados.
+  Rutas/listeners retirados en finally. Sin capturas ni perfiles: recorrido de
+  comportamiento sobre componentes existentes y estados MUI, sin rediseño visual.
+- `git diff --check`: correcto. Sin cambios en package.json/lockfile.
+
+**Documentación, reutilización y límites.** Skills React/composición aplicadas:
+un propietario remoto, estado derivado y edición independiente. Lockfile:
+React 19.3.1, Query 5.107.1, Axios 1.21.0, RHF 7.55.0, Recharts 3.3.0,
+React Leaflet 5.0.0, Leaflet 1.9.4 y leaflet.heat 0.2.0.
+Context7 consultado para claves, enabled y cancelación de Query; no ofrece
+5.107.1 exacta, se contrasta documentación general con tipos instalados y pruebas.
+Context7 sí cubre Leaflet **1.9.4 exacta**, consultado sobre removeLayer/onRemove.
+Referencias oficiales:
+[cancelación Query](https://tanstack.com/query/v5/docs/framework/react/guides/query-cancellation),
+[consultas deshabilitadas](https://tanstack.com/query/v5/docs/framework/react/guides/disabling-queries)
+y [ciclo de capas Leaflet](https://leafletjs.com/reference-1.9.4.html#layer-onremove).
+
+Se reutilizan comprobaciones históricas de autenticación, geocodificación,
+catálogos/opciones, archivos/formularios compartidos y carga diferida, sin cambios
+en sus implementaciones. Se repiten las pruebas de confiscaciones y sesión por
+la nueva invalidación; no se repite toda la suite ni CRUD equivalentes. No se
+acreditan backend real, persistencia, cookies ni rendimiento medido. Cancelar
+transporte no revierte escrituras del servidor. Continúan deuda de lint y aviso
+de bundle. La retirada de las implementaciones remotas antiguas y la adaptación
+de sus pruebas quedan para el siguiente paso.
+**Paso 14 cerrado; paso 15 pendiente y sin iniciar.**
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,
