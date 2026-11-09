@@ -15,7 +15,7 @@ export const AuthLayout = ({ children, title = '' }: AuthLayoutProps) => {
             <Grow
                 in={true}
                 style={{ transformOrigin: '1 0 0' }}
-                {...(true ? { timeout: 1000 } : {})}
+                timeout={1000}
             >
                 <Grid
                     className='box-shadow'

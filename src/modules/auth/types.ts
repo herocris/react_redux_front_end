@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import type { FieldPath, FieldValues, UseFormRegister } from 'react-hook-form';
 
 export interface LoginData {
     email:string
@@ -11,11 +12,11 @@ export interface RegisterData {
     passwordConfirmation:string
 }
 
-export interface PasswordFieldProps {
-    name:string
+export interface PasswordFieldProps<T extends FieldValues> {
+    name: FieldPath<T>
     errorMessage: string|undefined
     hasError:boolean
-    register:Function
+    register: UseFormRegister<T>
 }
 
 export interface AuthLayoutProps {

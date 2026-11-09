@@ -3,7 +3,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { memo } from "react";
 
 interface AddFloatingButtonProps {
-    handleOpen: Function;
+    handleOpen: (open: boolean) => void;
 }
 export const AddFloatingButton = memo(({ handleOpen }: AddFloatingButtonProps) => {
     return (

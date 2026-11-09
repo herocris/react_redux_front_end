@@ -2,9 +2,10 @@ import {  FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, Ty
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useState } from 'react';
 import { PasswordFieldProps } from '../types';
+import type { FieldValues } from 'react-hook-form';
 
 
-export const PasswordField = ({ name, errorMessage, hasError = false, register }: PasswordFieldProps) => {
+export const PasswordField = <T extends FieldValues,>({ name, errorMessage, hasError = false, register }: PasswordFieldProps<T>) => {
     const [showPassword, setShowPassword] = useState(false)
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {

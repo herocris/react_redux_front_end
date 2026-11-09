@@ -40,6 +40,27 @@ assert.ok(!sizes.some(entry => entry.startup && entry.file.endsWith('.css') &&
     /leaflet-container/.test(readFileSync(`dist/${entry.file}`, 'utf8'))), 'Leaflet CSS loaded at startup');
 const sum = entries => entries.reduce((total, entry) => ({ bytes: total.bytes + entry.bytes,
     gzip: total.gzip + entry.gzip }), { bytes: 0, gzip: 0 });
+
+// Analysis views do not render tables. Keep DataGrid out of their static graph,
+// including shared chunks pulled in by a component barrel.
+const routes = {};
+for (const [name, key] of Object.entries({
+    graph: 'src/modules/graph/views/GraphView.tsx',
+    map: Object.keys(manifest).find(key => manifest[key].name === 'map'),
+})) {
+    const routeFiles = new Set();
+    const visited = new Set();
+    const walk = entryKey => {
+        if (visited.has(entryKey)) return;
+        assert.ok(manifest[entryKey], `Missing ${name} route manifest entry`);
+        visited.add(entryKey);
+        routeFiles.add(manifest[entryKey].file);
+        for (const dependency of manifest[entryKey].imports ?? []) walk(dependency);
+    };
+    walk(key);
+    assert.ok(heavy.dataGrid.every(file => !routeFiles.has(file)), `DataGrid loaded by ${name}`);
+    routes[name] = sum(sizes.filter(entry => routeFiles.has(entry.file) && !entry.startup && entry.file.endsWith('.js')));
+}
 console.log(JSON.stringify({ startupJS: sum(sizes.filter(entry => entry.startup && entry.file.endsWith('.js'))),
     startupCSS: sum(sizes.filter(entry => entry.startup && entry.file.endsWith('.css'))),
-    totalJS: sum(sizes.filter(entry => entry.file.endsWith('.js'))), heavy, files: sizes }, null, 2));
+    totalJS: sum(sizes.filter(entry => entry.file.endsWith('.js'))), routes, heavy, files: sizes }, null, 2));

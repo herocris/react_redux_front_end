@@ -6,10 +6,18 @@ import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
 import { selectSessionUser } from '../../modules/auth/selectors';
 import { startLogout } from '../../modules/auth/thunks';
 import { useNavigate, useLocation } from 'react-router';
-import { useThemeContext } from '../../theme/ThemeContext';
+import { useThemeContext } from '../../theme/themeState';
 import { Brightness4, Brightness7 } from "@mui/icons-material";
 
 const drawerWidth = 240;
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: theme.spacing(0, 1),
+    ...theme.mixins.toolbar,
+}));
 
 interface GrapLayoutProps {
     children: ReactNode;
@@ -44,15 +52,6 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
             setMobileOpen(!mobileOpen);
         }
     };
-
-    const DrawerHeader = styled('div')(({ theme }) => ({
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
-        ...theme.mixins.toolbar,
-    }));
 
     const navigate = useNavigate();
     const authMenuOptions = [

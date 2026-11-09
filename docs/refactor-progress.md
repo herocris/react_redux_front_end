@@ -16,6 +16,8 @@ Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
 antes de ejecutar un paso. Pasos **1 a 16 completados**. Migración cerrada dentro
 del alcance del plan; la deuda y la validación con backend real se detallan en
 el cierre del paso 16. No hay otro paso iniciado.
+El mantenimiento posterior solicitado el 9 de noviembre elimina la deuda de
+lint y el aviso de chunks grandes; la validación con backend real sigue pendiente.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -1726,6 +1728,38 @@ grande (GraphLayout/DataGrid); cualquier optimización posterior requiere medici
 representativa de vistas autenticadas. No se amplían aquí formularios por pasos,
 lotes o exportaciones. **Paso 16 cerrado; los 16 pasos del plan están completados
 dentro de su alcance, con la deuda y las limitaciones anteriores explícitas.**
+
+### Mantenimiento posterior — lint y rendimiento (9 de noviembre de 2026)
+
+Solicitud posterior al cierre de los 16 pasos. Se guarda primero el cierre del
+paso 16 en **`97a1d0a`** y se corrigen lint/rendimiento, sin iniciar otro paso ni
+ampliar el alcance de la migración. La validación con backend real se aplaza por
+la prioridad indicada por el usuario, aunque informa que su servidor está activo.
+
+- Lint pasa de 10 errores/9 advertencias a **cero**, con reglas intactas: callbacks
+  y props RHF tipados, índices sin JSX en `.ts`, contexto del tema separado del
+  proveedor, expresión inútil/condicional constante retiradas y fixture tipado.
+- Perfil React operativo sobre usuarios con diez filas simuladas: tres cambios
+  de tema reemplazaban tres veces DrawerHeader; al mover styled fuera del render
+  se conservan sus nodos. No se demuestra una mejora de duración de render.
+- Imports directos de controles en FormMap/FormGraph separan DataGrid de ambas
+  rutas. JS adicional: gráficos **976.485 → 597.025 bytes** (gzip 284.103 → 175.156),
+  mapas **831.897 → 447.780** (gzip 245.301 → 134.399). Arranque prácticamente igual;
+  CSS inicial sin cambios. Build final sin aviso de chunks >500 kB.
+- Auditoría del bundle ampliada para impedir DataGrid en las dos vistas; nuevo
+  recorrido de producción comprueba descargas y conservación de nodos/formulario.
+- Suite final **208 aprobadas**, lint con `--max-warnings 0` y build correctos;
+  diff sin errores. Playwright: auth **2 grupos**, guardado padre/hijos **7**,
+  rutas/CSS diferidos **6** y análisis/bundle **4**; sin excepciones ni mensajes
+  inesperados. HTTP/auth simulados, sin acreditar persistencia/cookies reales.
+- Sin cambios de dependencias, servicios, endpoints o payloads. Comprobaciones
+  anteriores no afectadas conservadas; sin nueva optimización especulativa.
+
+Método, mediciones antes/después, archivos, logs, incidencias, documentación
+consultada y límites en [el informe de lint y rendimiento](verification-lint-performance-2026-11-09.md).
+Queda la validación contra backend real y, si se requieren más mejoras, mediciones
+representativas de datos/dispositivos. La deuda de lint y el chunk de 655 kB ya
+no son pendientes actuales; se conservan en los registros históricos de cada paso.
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,

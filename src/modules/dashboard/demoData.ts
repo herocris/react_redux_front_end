@@ -1,3 +1,5 @@
+import type { MapItem } from '../map/types';
+
 export const barLineGraph = [
     {
       "name": 2020,
@@ -31,7 +33,7 @@ export const barLineGraph = [
     }
   ]
 
- export const Mapitems: any[] = [
+ const demoMapItems = [
     {
       "id": 1473,
       "fecha": "2025-01-07",
@@ -48,6 +50,7 @@ export const barLineGraph = [
           "peso": 6.21,
           "drug_id": 1,
           "droga": 1,
+          "presentacion": 0,
           "droga_nombre": "droga esse"
         }
       ],
@@ -70,6 +73,7 @@ export const barLineGraph = [
           "peso": 20.23,
           "drug_id": 1,
           "droga": 1,
+          "presentacion": 0,
           "droga_nombre": "droga esse"
         }
       ],
@@ -92,6 +96,7 @@ export const barLineGraph = [
           "peso": 57.54,
           "drug_id": 1,
           "droga": 1,
+          "presentacion": 0,
           "droga_nombre": "droga esse"
         }
       ],
@@ -114,6 +119,7 @@ export const barLineGraph = [
           "peso": 70.58,
           "drug_id": 1,
           "droga": 1,
+          "presentacion": 0,
           "droga_nombre": "droga esse"
         }
       ],
@@ -136,6 +142,7 @@ export const barLineGraph = [
           "peso": 1.84,
           "drug_id": 1,
           "droga": 1,
+          "presentacion": 0,
           "droga_nombre": "droga esse"
         }
       ],
@@ -158,6 +165,7 @@ export const barLineGraph = [
           "peso": 89.75,
           "drug_id": 1,
           "droga": 1,
+          "presentacion": 0,
           "droga_nombre": "droga esse"
         }
       ],
@@ -180,6 +188,7 @@ export const barLineGraph = [
           "peso": 48.61,
           "drug_id": 1,
           "droga": 1,
+          "presentacion": 0,
           "droga_nombre": "droga esse"
         }
       ],
@@ -202,6 +211,7 @@ export const barLineGraph = [
           "peso": 62.52,
           "drug_id": 1,
           "droga": 1,
+          "presentacion": 0,
           "droga_nombre": "droga esse"
         }
       ],
@@ -209,3 +219,5 @@ export const barLineGraph = [
       "ammunition_confiscations": []
     }
   ]
+
+export const Mapitems: MapItem[] = demoMapItems;

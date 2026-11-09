@@ -1,4 +1,4 @@
-import { Control, FieldErrors } from "react-hook-form"
+import type { Control, FieldErrors, SubmitHandler, UseFormHandleSubmit, UseFormRegister } from "react-hook-form"
 import type { z } from 'zod';
 import type { confiscationSchema } from './validators';
 
@@ -26,11 +26,11 @@ export interface ConfiscationMapModalProps {
 }
 
 export interface FieldsFormProps {
-    handleSubmit: Function
-    onSubmit: Function
+    handleSubmit: UseFormHandleSubmit<z.input<typeof confiscationSchema>, z.output<typeof confiscationSchema>>
+    onSubmit: SubmitHandler<z.output<typeof confiscationSchema>>
     loading: boolean
-    register: Function
-    errors: FieldErrors
-    handleOpenMap: Function
-    control: any
+    register: UseFormRegister<z.input<typeof confiscationSchema>>
+    errors: FieldErrors<z.input<typeof confiscationSchema>>
+    handleOpenMap: (open: boolean) => void
+    control: Control<z.input<typeof confiscationSchema>, unknown, z.output<typeof confiscationSchema>>
 }
