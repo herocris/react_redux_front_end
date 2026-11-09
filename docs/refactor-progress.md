@@ -1,16 +1,16 @@
 # Progreso de la refactorización
 
-## Estado al 8 de noviembre de 2026
+## Estado al 9 de noviembre de 2026
 
 Se consolidaron los cambios anteriores en 12 commits locales y se prepararon
 las instrucciones para continuar en conversaciones independientes.
 La preparación inicial no instaló dependencias ni creó services. **El paso 6
-incorpora la infraestructura de TanStack Query y el paso 9 migra el CRUD de
-permisos y sus opciones en roles y usuarios.**
+incorpora la infraestructura de TanStack Query, el paso 9 migra permisos y el
+paso 11 extiende la migración a los demás catálogos, sus opciones y actividad.**
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1, 2, 3, 4, 5, 6, 7, 8, 9 y 10 completados**; siguiente paso pendiente:
-**11, catálogos, opciones y actividad**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1 a 11 completados**; siguiente paso pendiente:
+**12, confiscaciones y subdecomisos**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -92,7 +92,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | 8. EntityList | Completado | Tabla genérica controlada, callbacks de fila y adaptador temporal para los diez consumidores antiguos; CRUD, solo lectura y control externo verificados. |
 | 9. Piloto de permisos | Completado | CRUD y opciones en Query; invalidación, catálogo paginado, página vacía, fallos/reintentos y sesión probados. |
 | 10. Componentes comunes | Completado | Alertas, confirmaciones y marco modal compuestos; controles RHF tipados, selección sin copia local y errores con campos explícitos; consumidores representativos verificados. |
-| 11. Catálogos y actividad | Pendiente | Refactors previos conservados; migración de datos no iniciada. |
+| 11. Catálogos y actividad | Completado | Services y Query en seis CRUD y actividad; opciones completas migradas en todos sus consumidores, invalidación y convivencia verificadas. |
 | 12. Confiscaciones | Pendiente | Mantener geocodificación y completar flujos, tipos y datos. |
 | 13. Filtros Redux | Pendiente | Aún no hay slice de filtros aplicados compartidos. |
 | 14. Mapas y gráficos | Pendiente | Mantienen flujos actuales y datos remotos en slices. |
@@ -106,19 +106,19 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 - `identificador` recibido se adapta a `id` en varios listados; los esquemas
   también conservan `identificador`. No eliminar ni reinterpretar campos por
   deducción. Mantener nombres públicos `rol` y `resouce`.
-- Relaciones de roles/usuarios admiten identificadores y objetos heredados.
-  `z.custom<T>()` sin predicado no valida esos elementos; revisar contra evidencia
-  del contrato antes de endurecer o normalizar sus formatos.
+- Relaciones de roles/usuarios conservan IDs de texto/número y objetos heredados.
+  El paso 11 añade predicados contrastados con tipos/fixtures disponibles, sin
+  normalizar valores ni eliminar campos extra; falta contrastarlos con backend real.
 - El interceptor conserva rechazos y puede entregar el cuerpo HTTP. Evitar
   asumir AxiosError/status disponibles en todos los casos.
-- Conservar cancelación/protección de respuestas obsoletas. Los ocho listados
-  antiguos mantienen una petición vigente por listado/store; permisos usa caché
-  por argumentos y cancela al retirar el último consumidor de cada clave.
-- Las escrituras de permisos invalidan listas/opciones y vuelven a consultar
-  totales; el consumidor ajusta páginas vacías conservando filtros y orden.
-- `resouce` mantiene cargas/errores anteriores de los catálogos restantes.
-  Las opciones de permisos ya usan Query y recorren la paginación, sin copia en
-  Redux; verificar catálogos completos de los demás dominios en el paso 11.
+- Confiscaciones conserva la exclusividad del listado antiguo por store.
+  Los catálogos y actividad usan caché por argumentos y señal de Query, con
+  cancelación al retirar el último consumidor; se conserva el aislamiento de sesión.
+- Las escrituras migradas invalidan su dominio tras éxito y recargan totales;
+  el consumidor ajusta páginas vacías confirmadas conservando filtros y orden.
+- Las opciones de permisos, roles, presentaciones, drogas, armas y municiones
+  usan Query y recorren la paginación; no quedan colecciones remotas en `resouce`
+  ni consumidores de sus thunks/slice. Conserva helpers de estado visual.
 - Guardado de confiscaciones y subdecomisos corregido en el paso 2: el cierre
   espera el éxito y `EditView` separa carga inicial de envío. Véase su registro
   y [verificación](verification-confiscation-save-2026-11-08.md).
@@ -996,6 +996,160 @@ autenticación simulados: no se acreditan cookies, persistencia ni servidor real
 No se hicieron perfiles ni se atribuyen mejoras medidas de rendimiento.
 Continúan deuda de lint y aviso de bundle. Paso 10 cerrado; paso 11 pendiente,
 sin iniciarlo.
+
+### Paso 11 — Catálogos, opciones y actividad (9 de noviembre de 2026)
+
+Al comenzar, HEAD `2544e32` y workspace limpio. Se leyeron AGENTS.md, plan y
+progreso y se contrastaron consumidores, store y pruebas. Se ejecutó únicamente
+el prompt del paso 11, en el orden solicitado. Plan y dependencias sin cambios.
+Código y pruebas consolidados en el commit `fab58bd`; este registro se guarda
+en un commit documental separado. Al preparar los commits solo se retiró una
+línea vacía final; se reutilizan las verificaciones siguientes y se comprobó
+`git diff --cached --check` antes de cada commit.
+
+**Cambios y decisiones.**
+
+- Services por módulo en presentaciones, armas, municiones, drogas, roles,
+  usuarios y actividad. Conservan cliente Axios/cookies, endpoints, parámetros,
+  adaptación de `identificador` a `id` sin coerción y causas de los rechazos.
+  Los cuatro catálogos con imágenes mantienen creación multipart y actualización
+  POST/FormData con `_method=PUT`, enviando logo al actualizar solo si es File.
+  Roles/usuarios mantienen JSON y PUT; actividad solo expone lectura, con la
+  serialización de cambios y formato local de fecha anteriores en su service.
+- Consultas por dominio incluyen página, tamaño, orden, campo y valor de filtro
+  en las claves; pasan su señal al service. Las mutaciones consumen services
+  directamente y usan `sessionMutationOptions`. Solo tras éxito invalidan el
+  dominio, esperan recargas activas y vuelven a comprobar la señal de sesión
+  antes de cerrar. No hay inserción/borrado local que suplante totales remotos.
+- Los hooks de pantalla poseen modelos controlados, selección y diálogos;
+  RHF conserva los borradores. Se separan recarga y envío. La tabla usa EntityList
+  directamente; el dashboard también migra su consumidor de drogas de solo lectura.
+  Se comparte la columna de logo conservando su presentación anterior. Páginas
+  vacías se corrigen solo con resultados actuales confirmados, sin perder orden
+  ni filtro. Las filas placeholder no permiten editar/borrar.
+- El recorrido de actividad detectó que keepPreviousData deja de exponer las
+  filas anteriores al fallar una clave nueva. Los siete hooks conservan únicamente
+  la clave de la última consulta correcta y leen su resultado de la caché de Query
+  como respaldo; no duplican datos remotos en estado local ni Redux. Tampoco se
+  permiten acciones de fila sobre ese respaldo de una clave fallida. Se mantiene
+  la política del cliente del paso 6, incluida su retención temporal de caché.
+- Las opciones se derivan de entidades Query. El helper de datos
+  [readCatalog](../src/api/catalog.ts) recorre todas las páginas incluso con límite
+  del servidor, exige metadatos estables, páginas correctas, IDs únicos y recuento
+  completo; rechaza fallos, cancelación o respuestas parciales sin publicar un
+  catálogo incompleto. Permisos conserva su implementación ya verificada.
+- Migrados todos los consumidores de opciones: roles/usuarios, tres subdecomisos,
+  mapas y gráficos. Carga/error/reintento pertenecen a las consultas, con estado
+  visual explícito, selectores/envío bloqueados ante opciones no disponibles y
+  edición conservada. Mapas/gráficos y subdecomisos conservan resultados/escrituras
+  Redux: aquí solo cambió su fuente de catálogos. El efecto de carga de cada
+  sublistado queda ligado a dispatch/padre mediante callback estable al retirar
+  los dispatch de opciones; no se migraron sus peticiones.
+- Relaciones: los predicados de Zod comprueban IDs string/number o los objetos
+  heredados del contrato tipado (nombre y campos opcionales id/identificador;
+  permisos opcionales en roles). Conservan valores, objetos y campos extra, sin
+  normalizar a IDs ni inventar restricciones de positividad. Rechazan booleanos,
+  null, arrays u objetos sin la forma admitida. La revisión usa contratos/tipos y
+  fixtures existentes; no acredita todas las variantes de un backend real.
+- Tras buscar consumidores en aplicación, store y pruebas se retiraron los siete
+  slices/thunks remotos y exports/estados antiguos, además del estado/thunks/tipos
+  de colecciones de resouce. Se mantiene el nombre resouce para sus helpers visuales.
+  Redux de sesión y dominios de pasos futuros sigue vigente. LegacyEntityList y
+  createLatestListRequest conservan su consumidor de confiscaciones y no se retiran.
+
+**Comprobaciones automatizadas.**
+
+- [catalog-contract.mjs](../tests/helpers/catalog-contract.mjs) y
+  [catalog-query.mjs](../tests/helpers/catalog-query.mjs) reúnen escenarios de
+  comportamiento ejecutados por separado en los seis módulos. Sustituyen las
+  pruebas de thunks retirados: contratos HTTP/JSON/multipart, imagen nueva/existente,
+  relaciones, causas y reintento, catálogo limitado/incompleto/duplicado/cancelado,
+  claves/caché/deduplicación, cambios rápidos/desmontaje, claves coexistentes,
+  invalidación solo tras éxito y señales de sesión, incluso durante su await.
+  Actividad tiene pruebas propias de contratos, fechas/JSON, caché, error/reintento
+  y lecturas tardías. API-errors conserva interceptor/auth y traslada garantías de
+  usuarios a su service/Query. List-loading y convivencia/sesión usan ahora
+  confiscaciones como dominio Redux restante, conservando sus garantías.
+- `node --test tests/drug-presentation.test.mjs tests/weapon.test.mjs
+  tests/ammunition.test.mjs tests/drug.test.mjs tests/rol.test.mjs
+  tests/user.test.mjs tests/activity.test.mjs tests/query-session.test.mjs
+  tests/list-loading.test.mjs tests/api-errors.test.mjs
+  tests/form-validation.test.mjs tests/image-validation.test.mjs
+  tests/confiscation-save.test.mjs tests/permission.test.mjs`: **144 aprobadas**,
+  cero fallos/canceladas/omitidas. Log final:
+  `%TEMP%/graphdata-step11-tests-final.txt`. Los primeros intentos ajustaron el
+  harness para cargar el dominio correcto y comprobar propagación de aborto,
+  sin exigir identidad de señal (el interceptor compone la señal de sesión).
+- `npm.cmd run build`: correcto en el código final, salida 0; persiste aviso
+  de chunks >500 kB. Se restauró tsconfig.app.tsbuildinfo a sus bytes iniciales.
+- `npm.cmd run lint -- --format json --output-file ...`: **56 errores y
+  18 advertencias** frente a 60/24 del paso 10, cero diagnósticos nuevos por
+  archivo/regla/severidad/mensaje. Log: `%TEMP%/graphdata-step11-lint-final.json`.
+- `git diff --check`: correcto al cierre. Sin cambios en package.json/lockfile.
+
+**Navegador.** Playwright MCP operativo. No había servidor en 4175; se inició Vite
+con host local y strictPort. Se reutilizó una página, con HTTP/auth simulados:
+
+- [drug.js](../tests/browser/drug.js), [rol.js](../tests/browser/rol.js) y
+  [user.js](../tests/browser/user.js): siete grupos y seis escrituras por recorrido;
+  fallos de campo/red/borrado, conservación, bloqueo, reintento y cierre tras éxito.
+  Cero excepciones/mensajes inesperados; tres errores simulados por recorrido.
+  Fixtures de los seis CRUD ahora devuelven estado actualizado tras escrituras,
+  porque las consultas recargan desde servidor. No se ejecutaron las baterías
+  equivalentes de presentaciones/armas/municiones. Capturas de drogas y usuarios
+  inspeccionadas: marcos, errores y acciones sin recortes; usuarios enmascara
+  correo/contraseña en la captura como ya hacía su script.
+- [activity.js](../tests/browser/activity.js): cinco grupos, seis GET y ninguna
+  escritura; filas/selección conservadas ante fallos, reintento, parámetros,
+  fecha/cambios y vacío. Dos errores esperados, cero excepciones/mensajes
+  inesperados. Primer intento detectó la regresión de filas corregida arriba;
+  otro encontró la caché vigente al volver al orden inicial: el fixture invalida
+  esa clave explícitamente para comprobar una respuesta nueva vacía. El error
+  de consulta se mantiene visible durante reintento hasta recuperarse.
+- [catalog-query.js](../tests/browser/catalog-query.js): cinco grupos, 30 GET
+  de roles (18 páginas de opciones), dos errores esperados. Última fila de página 2
+  borrada con vuelta a página 1/total 10 y filtro/orden conservados; recarga fallida
+  y reintento; catálogo limitado a dos filas; alta que invalida opciones cacheadas
+  en usuarios; fallo/reintento de opciones sin perder borrador ni permitir envío.
+  Cero excepciones/mensajes inesperados.
+- [catalog-options-consumers.js](../tests/browser/catalog-options-consumers.js):
+  cuatro grupos, 22 lecturas y dos errores simulados. Gráficos recupera catálogo
+  completo; mapas comparte su caché sin GET adicionales; subdecomiso conserva
+  cantidad durante fallo/reintento de presentaciones; selectores de los tres
+  subdecomisos reciben las tres opciones, recorriendo límite de dos por página.
+  Cero excepciones/mensajes inesperados. Se clasificaron aparte 34 avisos MUI
+  conocidos de valores iniciales 0 sin opción correspondiente en subformularios.
+  El primer intento usó «Munición», pero la etiqueta previa es «Arma»; se corrigió
+  solo el localizador. Esa etiqueta y los defaults siguen pendientes del paso 12.
+- [query-session.js](../tests/browser/query-session.js): cuatro grupos aprobados,
+  ocho peticiones, logout fallido y limpieza con lectura pendiente A/acceso B.
+  Cero excepciones/mensajes inesperados; un HTTP esperado y aviso Canvas conocido.
+  Su inspección de Redux se adaptó a la retirada de resource.
+
+Todos los scripts retiran rutas/listeners en finally; las respuestas diferidas
+se liberan. No quedan interceptaciones pendientes. No se hicieron perfiles ni
+se atribuyen mejoras medidas de rendimiento.
+
+**Documentación, reutilización y límites.** Skills React/composición aplicadas:
+opciones derivadas, estado remoto con un propietario y tablas controladas, sin
+contextos ni formularios universales. Versiones resueltas reconfirmadas: React
+19.3.1, Query 5.107.1, Axios 1.21.0, Zod 4.6.7, RHF 7.55.0 y DataGrid 7.27.3.
+Context7 consultado para Query (no ofrece tag 5.107.1 exacto; documentación general
+contrastada con tipos/pruebas) y Zod **4.6.7 exacta** sobre custom con predicado,
+safeParse y conservación de claves. Referencias oficiales:
+[invalidación Query](https://tanstack.com/query/v5/docs/framework/react/guides/invalidations-from-mutations),
+[cancelación Query](https://tanstack.com/query/v5/docs/framework/react/guides/query-cancellation)
+y [API Zod 4.6.7](https://github.com/colinhacks/zod/blob/v4.6.7/packages/docs/content/api.mdx).
+
+Se reutilizan las comprobaciones históricas de geocodificación, autenticación,
+carga diferida y controles compartidos, cuyas implementaciones y escenarios no
+cambian; no se repitió la suite completa ni todos los CRUD equivalentes. Guardado,
+imágenes y validación sí entraron en la selección por la integración de opciones.
+No se verificaron persistencia, cookies, catálogos ni relaciones con backend real.
+Un catálogo que cambia durante el recorrido requiere reintento; no se presume
+instantánea transaccional. Abortar transporte no revierte escrituras del servidor.
+Continúan deuda de lint, aviso de bundle y deuda previa de subformularios indicada.
+**Paso 11 cerrado; paso 12 pendiente y sin iniciar.**
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,
