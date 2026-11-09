@@ -7,11 +7,12 @@ las instrucciones para continuar en conversaciones independientes.
 La preparación inicial no instaló dependencias ni creó services. **El paso 6
 incorpora la infraestructura de TanStack Query, el paso 9 migra permisos y el
 paso 11 extiende la migración a los demás catálogos, sus opciones y actividad;
-el paso 12 migra confiscaciones y subdecomisos.**
+el paso 12 migra confiscaciones y subdecomisos; el paso 13 añade los filtros
+aplicados compartidos en Redux.**
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1 a 12 completados**; siguiente paso pendiente:
-**13, filtros compartidos en Redux**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1 a 13 completados**; siguiente paso pendiente:
+**14, conectar mapas y gráficos**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -95,7 +96,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | 10. Componentes comunes | Completado | Alertas, confirmaciones y marco modal compuestos; controles RHF tipados, selección sin copia local y errores con campos explícitos; consumidores representativos verificados. |
 | 11. Catálogos y actividad | Completado | Services y Query en seis CRUD y actividad; opciones completas migradas en todos sus consumidores, invalidación y convivencia verificadas. |
 | 12. Confiscaciones | Completado | Services y Query para listas, detalle y subdecomisos; borradores, archivos, paginación, errores, concurrencia y sesión verificados. |
-| 13. Filtros Redux | Pendiente | Aún no hay slice de filtros aplicados compartidos. |
+| 13. Filtros Redux | Completado | Slice serializable, aplicación explícita desde RHF, selector tipado y reset de sesión; transiciones y navegador verificados. |
 | 14. Mapas y gráficos | Pendiente | Mantienen flujos actuales y datos remotos en slices. |
 | 15. Limpieza/rendimiento | Pendiente | No retirar todavía infraestructura con consumidores. |
 | 16. Integración | Pendiente | Ejecutar al completar los pasos anteriores. |
@@ -1280,6 +1281,94 @@ del backend real; abortar transporte no revierte escrituras del servidor.
 Sin perfiles ni mejoras medidas de rendimiento. Continúan deuda de lint,
 aviso de bundle y defaults de gráficos para su paso correspondiente.
 **Paso 12 cerrado; paso 13 pendiente y sin iniciar.**
+
+### Paso 13 — Filtros compartidos en Redux (9 de noviembre de 2026)
+
+Inicio en HEAD `b0f2bfd`, workspace limpio. Leídos AGENTS.md, plan y progreso;
+ejecutado únicamente el prompt del paso 13. Sin cambios de dependencias ni del
+plan. No se migran los datos remotos de mapas/gráficos ni se extraen sus services.
+Código y pruebas consolidados en `0532222`; este registro se consolida en un
+commit documental separado. Se reutilizan las verificaciones anteriores porque
+no hay cambios funcionales posteriores; `git diff --cached --check` se ejecuta
+antes de cada commit.
+
+**Cambios y decisiones.**
+
+- Contrastados formularios, esquemas, tipos y thunks: ambos endpoints aceptan
+  `start_date`, `end_date`, `drugs`, `weapons` y `ammunitions`. Son los únicos
+  campos de [AppliedAnalysisFilters](../src/modules/analysisFilters/types.ts).
+  Fechas validadas como strings `YYYY-MM-DD`; IDs string/number conservados sin
+  conversiones, ordenación ni normalización. Defaults: fechas vacías y arrays
+  vacíos, sin inventar una selección o intervalo temporal.
+- [analysisFiltersSlice](../src/modules/analysisFilters/slices/analysisFiltersSlice.ts)
+  se registra como `analysisFilters` en el store. Acciones tipadas
+  `applyAnalysisFilters` (reemplazo completo con copia de arrays) y
+  `resetAnalysisFilters`; selector estable `selectAppliedAnalysisFilters`.
+  El reducer selecciona los cinco campos explícitamente: no almacena propiedades
+  extra de formularios, opciones, archivos, carga, errores ni resultados remotos.
+- FormMap y FormGraph publican el snapshot solo en su submit válido, tras el
+  bloqueo existente por catálogos no disponibles. RHF sigue siendo propietario
+  del borrador; editar no despacha ni consulta. Ambos botones reciben el nombre
+  accesible «Aplicar filtros». Se conservan sus llamadas actuales a los thunks,
+  endpoints, serialización de arrays entre corchetes y parámetros particulares.
+- Período, tipo de decomiso y tipo de gráfico son exclusivos de gráficos; tipo
+  de mapa es exclusivo de mapas. Permanecen en sus propietarios actuales RHF/local,
+  fuera del slice común. La aplicación conserva también las selecciones de las
+  categorías no visibles, sin deducir que deban borrarse por cambiar de categoría.
+- El reducer raíz ya restablecía dominios en `onLogin`, `onLogout` y `onChecking`;
+  incluye ahora los filtros, sin duplicar esa política en otro efecto/reducer.
+  No hay persistencia en almacenamiento ni nueva identidad de sesión.
+
+**Comprobaciones realizadas.**
+
+- [analysis-filters.test.mjs](../tests/analysis-filters.test.mjs): defaults,
+  selector, reemplazo atómico, aislamiento del borrador/arrays, IDs y fechas,
+  exclusión de campos ajenos, serialización, reset explícito y las tres fronteras
+  de sesión. Se ejecuta junto a query-session por la integración con el store:
+  `node --test tests/analysis-filters.test.mjs tests/query-session.test.mjs`,
+  **15 aprobadas**, cero fallos/canceladas/omitidas.
+  Log: `%TEMP%/graphdata-step13-tests.txt`.
+- Build correcto, salida 0; persiste aviso de chunks >500 kB.
+  Log: `%TEMP%/graphdata-step13-build.txt`. Se restauran los bytes iniciales de
+  `tsconfig.app.tsbuildinfo` después del build.
+- Lint final: **28 errores y 11 advertencias** de deuda previa, igual al paso 12.
+  Cero diagnósticos nuevos por archivo/regla/severidad/mensaje y ninguno en los
+  archivos modificados/nuevos. Log: `%TEMP%/graphdata-step13-lint-final.json`.
+- Playwright MCP operativo; reutilizados servidor Vite de 4175 y página.
+  [analysis-filters.js](../tests/browser/analysis-filters.js), HTTP/auth simulados:
+  **cuatro grupos aprobados**, dos peticiones de análisis. Formulario inválido
+  y edición no publican filtros ni piden resultados; submit gráfico conserva
+  fechas/IDs y `period=month`; edición posterior no cambia el snapshot, que
+  persiste al navegar a mapas; submit mapa reemplaza selecciones y conserva el
+  contrato; logout vacía filtros. Cero excepciones y mensajes inesperados.
+  Ocho avisos MUI conocidos de `period=0`. Intentos iniciales ajustaron solo
+  localizadores de secciones de fecha y de selección con valor; no se cuentan
+  como aprobados. El script final retira rutas/listeners en `finally`.
+  Sin capturas: no se cambia la presentación visual, solo el nombre accesible.
+- `git diff --check`: correcto al cierre. Sin cambios en package.json/lockfile.
+
+**Documentación y reutilización.** Skills React/composición aplicadas al submit
+explícito y a la separación de propietarios, sin efectos de sincronización ni
+contextos nuevos. Lockfile reconfirmado: RTK **2.6.1**, React Redux **9.2.0**,
+RHF **7.55.0**, React **19.3.1**. Context7 consultado sobre createSlice,
+PayloadAction, selectors y reset: no ofrece RTK 2.6.1 exacta; documentación
+[oficial general de createSlice](https://redux-toolkit.js.org/api/createSlice)
+contrastada con tipos instalados, build y pruebas. Se reutilizan las verificaciones
+de catálogos/opciones, autenticación, geocodificación, subdecomisos y carga diferida
+de los pasos anteriores, cuyas implementaciones y escenarios no cambian. No se
+repite la suite completa ni se acredita backend real o rendimiento medido.
+
+**Conexión pendiente del paso 14.** Consumir `selectAppliedAnalysisFilters` en
+mapas/gráficos, inicializar la edición RHF desde ese snapshot al entrar sin
+sobrescribir borradores en recargas, extraer services y usar filtros aplicados en
+las claves/argumentos de Query. Por ahora Redux conserva el snapshot al navegar,
+pero los formularios mantienen sus defaults actuales y los resultados siguen
+en los slices remotos antiguos. Los controles exclusivos necesitan sus propios
+argumentos de consulta cuando afecten al endpoint, sin agregarlos al slice común.
+Las fechas vacías indican contexto sin aplicar: no lanzar consultas de análisis
+con esos defaults. Estas conexiones no se consideran implementadas aquí.
+Continúan deuda de lint, aviso de bundle y default `period=0` de gráficos.
+**Paso 13 cerrado; paso 14 pendiente y sin iniciar.**
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,
