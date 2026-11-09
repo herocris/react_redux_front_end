@@ -35,14 +35,13 @@ const graphIconList = [
 ]
 
 export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection, setMapType, getMapData }: FormGraphProps) => {
-    //const [confiscationSelected, setConfiscationSelected] = useState('Drogas')
 
     const {
         handleSubmit,
         formState: { errors, },
         control,
         //setValue
-    } = useForm<FormFields>({
+    } = useForm<z.input<typeof mapSchema>, unknown, FormFields>({
         defaultValues: initStateForm,
         resolver: zodResolver(mapSchema)
     });
@@ -53,22 +52,6 @@ export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection
         console.log(data);
         getMapData(data)
     };
-    //para resetear los select de subdecomisos no seleccionados
-    // useEffect(() => {
-    //     if (confiscationSelected == 'Drogas') {
-    //         console.log('Drogas');
-    //         setValue('ammunitions', [])
-    //         setValue('weapons', [])
-    //     } else if (confiscationSelected == 'Armas') {
-    //         console.log('Armas');
-    //         setValue('ammunitions', [])
-    //         setValue('drugs', [])
-    //     } else if (confiscationSelected == 'Municiones') {
-    //         console.log('Municiones');
-    //         setValue('weapons', [])
-    //         setValue('drugs', [])
-    //     }
-    // }, [confiscationSelected])
 
     return (
         <Zoom in={true} style={{ transitionDelay: '50ms' }}>
@@ -83,7 +66,7 @@ export const FormMap = ({ drugCollection, weaponCollection, ammunitionCollection
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Grid container sx={{ display: 'flex', alignItems: 'center', alignContent: 'center' }}>
                         <Grid size={{ xs: 12 }} container spacing={2} sx={{ mt: 0, display: 'flex', alignItems: 'center', alignContent: 'center', gap: 2 }}>
-                            <OptionSelector name='typeMap' setOption={setMapType} iconList={graphIconList} control={control} />
+                            <OptionSelector name='typeMap' setOption={value => setMapType(value)} iconList={graphIconList} control={control} />
                             <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
                                 <DatePickerField name={'start_date'} control={control} />
                             </Grid>

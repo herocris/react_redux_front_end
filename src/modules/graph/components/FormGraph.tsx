@@ -5,7 +5,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
 import { graphSchema } from '../validators';
-import { useState } from 'react';
+import { useWatch } from 'react-hook-form';
 import { DatePickerField,OptionSelector,MultipleSelectButton } from '../../../components';
 import { FormGraphProps } from '../types';
 
@@ -62,38 +62,22 @@ const periodList = [{ value: 1, description: 'Meses' }, { value: 2, description:
 
 
 export const FormGraph = ({ drugCollection, weaponCollection, ammunitionCollection, setGraphType, getGraphData }: FormGraphProps) => {
-    const [confiscationSelected, setConfiscationSelected] = useState('Drogas')
+
 
     const {
         handleSubmit,
         formState: { errors, },
         control,
-    } = useForm<FormFields>({
+    } = useForm<z.input<typeof graphSchema>, unknown, FormFields>({
         defaultValues: initStateForm,
         resolver: zodResolver(graphSchema)
     });
-    //console.log('carga formulario');
+    const confiscationSelected = useWatch({ control, name: 'typeConfiscation' });
     //console.log(errors);
 
     const onSubmit: SubmitHandler<z.infer<typeof graphSchema>> = async (data) => {
         getGraphData(data, data.typeConfiscation)
     };
-    //para resetear los select de subdecomisos no seleccionados
-    // useEffect(() => {
-    //     if (confiscationSelected == 'Drogas') {
-    //         console.log('Drogas');
-    //         setValue('ammunitions', [])
-    //         setValue('weapons', [])
-    //     } else if (confiscationSelected == 'Armas') {
-    //         console.log('Armas');
-    //         setValue('ammunitions', [])
-    //         setValue('drugs', [])
-    //     } else if (confiscationSelected == 'Municiones') {
-    //         console.log('Municiones');
-    //         setValue('weapons', [])
-    //         setValue('drugs', [])
-    //     }
-    // }, [confiscationSelected])
 
     return (
         <Zoom in={true} style={{ transitionDelay: '50ms' }}>
@@ -126,7 +110,7 @@ export const FormGraph = ({ drugCollection, weaponCollection, ammunitionCollecti
                             <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
                                 <DatePickerField name={'end_date'} control={control} />
                             </Grid>
-                            <OptionSelector name='typeConfiscation' iconList={confiscationIconList} setOption={setConfiscationSelected} control={control} />
+                            <OptionSelector name='typeConfiscation' iconList={confiscationIconList} control={control} />
                             <Grid size={{ xs: 12, md: 12 }}>
                                 {(confiscationSelected == 'Drogas' && drugCollection.length > 0) &&
                                     <MultipleSelectButton
@@ -165,7 +149,7 @@ export const FormGraph = ({ drugCollection, weaponCollection, ammunitionCollecti
                                     />
                                 }
                             </Grid>
-                            <OptionSelector name='typeGraph' setOption={setGraphType} iconList={graphIconList} control={control} />
+                            <OptionSelector name='typeGraph' setOption={value => setGraphType(value)} iconList={graphIconList} control={control} />
                         </Grid>
                         <Grid size={{ xs: 12, sm: 12 }} sx={{ mt: 2, display: 'flex', flexDirection: 'row', gap: 2 }}>
                             <Button type='submit' variant='contained' loading={false} sx={{ width: '100%' }}>

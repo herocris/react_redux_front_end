@@ -1,5 +1,6 @@
+import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import { WeaponError } from '../components/WeaponError';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+
 import { AddFloatingButton, LegacyEntityList as EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { WeaponFormModal } from '../components';
@@ -44,17 +45,10 @@ export const WeaponView = () => {
             errorMessage={errorMessage} />
         }
         {openDialog &&
-          <Dialog open onClose={() => { if (!loading) handleOpenDialog(); }} aria-labelledby="delete-weapon-title" aria-describedby="delete-weapon-description">
-            <DialogTitle id="delete-weapon-title">Borrar arma</DialogTitle>
-            <DialogContent>
-              <DialogContentText id="delete-weapon-description">¿Deseas borrar el arma?</DialogContentText>
-              <WeaponError message={errorMessage} />
-            </DialogContent>
-            <DialogActions>
-              <Button disabled={loading} onClick={handleOpenDialog}>Cancelar</Button>
-              <Button loading={loading} onClick={DeleteWeapon} color="error">Borrar</Button>
-            </DialogActions>
-          </Dialog>
+          <ConfirmDialog title="Borrar arma" message="¿Deseas borrar el arma?" busy={loading}
+            onCancel={handleOpenDialog} onConfirm={DeleteWeapon}>
+            <WeaponError message={errorMessage} />
+          </ConfirmDialog>
         }
         <AddFloatingButton handleOpen={handleOpen} />
       </GrapLayout>

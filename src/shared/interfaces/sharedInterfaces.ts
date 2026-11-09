@@ -1,20 +1,9 @@
-import { Control, FieldValues } from "react-hook-form";
-
-
 export interface link {
     active: boolean,
     label: string,
     url: string
 
 }
-
-
-
-
-
-
-
-
 
 export interface ConfiscationFormProps {
     open: boolean;
@@ -61,29 +50,12 @@ export interface EntityListProps {
     editable?: boolean
 }
 
-
-
-export interface PhotoInputProps {
-    setValueFile: Function,
-    control: Control<FieldValues>
-}
-export interface PhotoInput2Props {
-    initFormValues: any,
-    register: any
-    PhotoRemove: any
-    setPhoto: any
-}
-
-
-
-
 export interface AlertDialogProps {
-    DeleteEntity: Function
-    handleOpen: Function
+    DeleteEntity: () => void | Promise<void>
+    handleOpen: () => void
     title: string
     dialogMessage: string
 }
-
 
 export interface SelectOptions {
     value: number,
@@ -95,58 +67,8 @@ export interface SelectResourceState {
     value: string
 }
 
-
-
-export interface MultipleSelectButtonProps {
-    optionValues: string[];
-    onSelectMultipleValues: Function;
-    rolesvalues: Object;
-    nameSelect: string;
-}
-
-
-
-
 export interface UserValidationsField {
     nombreValid: string,
     correoValid: string,
     passwordValid: string,
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-export interface FileUploadFieldProps {
-    name: string;
-    control: any;
-    label?: string;
-    accept?: string;
-    multiple?: boolean
-}
-
-
-
-
-
-
-
-

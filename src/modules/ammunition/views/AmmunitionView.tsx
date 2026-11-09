@@ -1,5 +1,6 @@
+import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import { AmmunitionError } from '../components/AmmunitionError';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+
 import { AddFloatingButton, LegacyEntityList as EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { AmmunitionFormModal } from '../components';
@@ -44,17 +45,10 @@ export const AmmunitionView = () => {
             errorMessage={errorMessage} />
         }
         {openDialog &&
-          <Dialog open onClose={() => { if (!loading) handleOpenDialog(); }} aria-labelledby="delete-ammunition-title" aria-describedby="delete-ammunition-description">
-            <DialogTitle id="delete-ammunition-title">Borrar munición</DialogTitle>
-            <DialogContent>
-              <DialogContentText id="delete-ammunition-description">¿Deseas borrar la munición?</DialogContentText>
-              <AmmunitionError message={errorMessage} />
-            </DialogContent>
-            <DialogActions>
-              <Button disabled={loading} onClick={handleOpenDialog}>Cancelar</Button>
-              <Button loading={loading} onClick={DeleteAmmunition} color="error">Borrar</Button>
-            </DialogActions>
-          </Dialog>
+          <ConfirmDialog title="Borrar munición" message="¿Deseas borrar la munición?" busy={loading}
+            onCancel={handleOpenDialog} onConfirm={DeleteAmmunition}>
+            <AmmunitionError message={errorMessage} />
+          </ConfirmDialog>
         }
         <AddFloatingButton handleOpen={handleOpen} />
       </GrapLayout>

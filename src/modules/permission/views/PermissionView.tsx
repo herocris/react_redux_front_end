@@ -1,7 +1,8 @@
+import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import type { GridColDef } from '@mui/x-data-grid';
 import type { PermissionEntity } from '../types';
 import { PermissionError } from '../components/PermissionError';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Button } from '@mui/material';
 import { AddFloatingButton, EntityList } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { PermissionFormModal } from '../components/PermissionFormModal';
@@ -49,17 +50,10 @@ export const PermissionView = () => {
             errorMessage={errorMessage} />
         }
         {openDialog &&
-          <Dialog open onClose={() => { if (!loading) handleOpenDialog(); }} aria-labelledby="delete-permission-title" aria-describedby="delete-permission-description">
-            <DialogTitle id="delete-permission-title">Borrar permiso</DialogTitle>
-            <DialogContent>
-              <DialogContentText id="delete-permission-description">¿Deseas borrar el permiso?</DialogContentText>
-              <PermissionError message={errorMessage} />
-            </DialogContent>
-            <DialogActions>
-              <Button disabled={loading} onClick={handleOpenDialog}>Cancelar</Button>
-              <Button loading={loading} onClick={DeletePermission} color="error">Borrar</Button>
-            </DialogActions>
-          </Dialog>
+          <ConfirmDialog title="Borrar permiso" message="¿Deseas borrar el permiso?" busy={loading}
+            onCancel={handleOpenDialog} onConfirm={DeletePermission}>
+            <PermissionError message={errorMessage} />
+          </ConfirmDialog>
         }
         <AddFloatingButton handleOpen={handleOpen} />
       </GrapLayout>

@@ -1,6 +1,7 @@
+import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import { PermissionOptionsStatus } from '../../permission/components/PermissionOptionsStatus';
 import { UserError } from '../components/UserError';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+
 import { AddFloatingButton, LegacyEntityList as EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { UserFormModal } from '../components/UserFormModal';
@@ -54,17 +55,10 @@ export const UserView = () => {
             errorMessage={errorMessage} />
         }
         {openDialog &&
-          <Dialog open onClose={() => { if (!loading) handleOpenDialog(); }} aria-labelledby="delete-user-title" aria-describedby="delete-user-description">
-            <DialogTitle id="delete-user-title">Borrar usuario</DialogTitle>
-            <DialogContent>
-              <DialogContentText id="delete-user-description">¿Deseas borrar el usuario?</DialogContentText>
-              <UserError message={errorMessage} />
-            </DialogContent>
-            <DialogActions>
-              <Button disabled={loading} onClick={handleOpenDialog}>Cancelar</Button>
-              <Button loading={loading} onClick={DeleteUser} color="error">Borrar</Button>
-            </DialogActions>
-          </Dialog>
+          <ConfirmDialog title="Borrar usuario" message="¿Deseas borrar el usuario?" busy={loading}
+            onCancel={handleOpenDialog} onConfirm={DeleteUser}>
+            <UserError message={errorMessage} />
+          </ConfirmDialog>
         }
         <AddFloatingButton handleOpen={handleOpen} />
       </GrapLayout>

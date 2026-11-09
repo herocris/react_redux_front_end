@@ -2,23 +2,29 @@ import { useRef, useState, useEffect } from "react";
 import { Box, Avatar, Typography, IconButton, Tooltip, Zoom } from "@mui/material";
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useController } from "react-hook-form";
+import { useController, type Control, type FieldPathByValue, type FieldValues } from "react-hook-form";
 import { getEnvVariables } from "../helpers/getEnvVariables";
-import { FileUploadFieldProps } from "../shared/interfaces/sharedInterfaces";
+interface FileUploadFieldProps<T extends FieldValues, Output extends FieldValues> {
+    name: FieldPathByValue<T, File | string | null | undefined | (File | string)[]>;
+    control: Control<T, unknown, Output>;
+    label?: string;
+    accept?: string;
+    multiple?: boolean;
+}
 
 const { VITE_LOCAL_PHOTOS_URL } = getEnvVariables();
 
-export const PhotoInput = ({
+export const PhotoInput = <T extends FieldValues, Output extends FieldValues = T>({
     name,
     control,
     label = "Subir archivo",
     accept = "image/*",
     multiple = false
-}: FileUploadFieldProps) => {
+}: FileUploadFieldProps<T, Output>) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [previews, setPreviews] = useState<string[]>([]);
 
-    const { field: { onChange, value }, fieldState: { error } } = useController({ name, control });
+    const { field: { onChange, value, onBlur, ref }, fieldState: { error } } = useController({ name, control });
 
     useEffect(() => {
         const files: unknown[] = multiple && Array.isArray(value) ? value : [value];
@@ -61,7 +67,10 @@ export const PhotoInput = ({
             {/* Input invisible */}
             <input
                 type="file"
-                ref={fileInputRef}
+                ref={element => { fileInputRef.current = element; ref(element); }}
+                name={name}
+                aria-label={label}
+                onBlur={onBlur}
                 style={{ display: "none" }}
                 accept={accept}
                 multiple={multiple}

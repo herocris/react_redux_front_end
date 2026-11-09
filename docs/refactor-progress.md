@@ -9,8 +9,8 @@ incorpora la infraestructura de TanStack Query y el paso 9 migra el CRUD de
 permisos y sus opciones en roles y usuarios.**
 
 Leer [AGENTS.md](../AGENTS.md) y [el plan con sus prompts](refactor-plan.md)
-antes de ejecutar un paso. Pasos **1, 2, 3, 4, 5, 6, 7, 8 y 9 completados**; siguiente paso pendiente:
-**10, componentes compartidos**, solo cuando se solicite.
+antes de ejecutar un paso. Pasos **1, 2, 3, 4, 5, 6, 7, 8, 9 y 10 completados**; siguiente paso pendiente:
+**11, catálogos, opciones y actividad**, solo cuando se solicite.
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 ## Decisiones acordadas
@@ -91,7 +91,7 @@ de ahorro de tokens. Los informes históricos no acreditan disponibilidad actual
 | 7. Service de permisos | Completado | Service tipado, contratos HTTP probados y thunks compatibles; pantalla y opciones siguen en Redux. |
 | 8. EntityList | Completado | Tabla genérica controlada, callbacks de fila y adaptador temporal para los diez consumidores antiguos; CRUD, solo lectura y control externo verificados. |
 | 9. Piloto de permisos | Completado | CRUD y opciones en Query; invalidación, catálogo paginado, página vacía, fallos/reintentos y sesión probados. |
-| 10. Componentes comunes | Pendiente | Hay alertas/confirmaciones repetidas y campos con tipos amplios. |
+| 10. Componentes comunes | Completado | Alertas, confirmaciones y marco modal compuestos; controles RHF tipados, selección sin copia local y errores con campos explícitos; consumidores representativos verificados. |
 | 11. Catálogos y actividad | Pendiente | Refactors previos conservados; migración de datos no iniciada. |
 | 12. Confiscaciones | Pendiente | Mantener geocodificación y completar flujos, tipos y datos. |
 | 13. Filtros Redux | Pendiente | Aún no hay slice de filtros aplicados compartidos. |
@@ -882,6 +882,120 @@ metadatos reales del endpoint. Un catálogo cambiante/incompleto requiere
 reintento; no se presume una instantánea transaccional del servidor. Cancelar
 no demuestra reversión de escrituras remotas. Continúan deuda de lint y aviso
 de bundle. Paso 9 cerrado; paso 10 pendiente y sin iniciar.
+
+### Paso 10 — Componentes compartidos (8 de noviembre de 2026)
+
+Al comenzar, HEAD `fed81d8` y workspace limpio. Se leyeron AGENTS.md, plan y
+progreso, contrastando consumidores y contratos antes de extraer piezas.
+Se ejecutó únicamente el prompt del paso 10. No se modificaron dependencias,
+services, consultas, thunks, store ni contratos HTTP. Plan sin cambios.
+
+**Cambios y decisiones.**
+
+- [ApiErrorAlert](../src/components/ApiErrorAlert.tsx) reúne las ocho alertas
+  equivalentes (siete CRUD y actividad). Los exports de dominio son alias
+  compatibles, sin otra implementación ni estado.
+- [ConfirmDialog](../src/components/ConfirmDialog.tsx) reúne las siete
+  confirmaciones CRUD: título/descripción accesibles con IDs únicos, bloqueo
+  durante envío y errores compuestos como children. El consumidor conserva
+  selección, carga, ejecución, error y cierre tras éxito. AlertDialog utiliza
+  el mismo componente con su contrato antiguo tipado para confiscaciones;
+  conserva el texto Ok y retira su transición Grow propia.
+- [FormModal](../src/components/FormModal.tsx) compone título, estado visual,
+  formulario, fieldset y transición en los siete modales. Cada dominio conserva
+  RHF, esquemas, campos y acción de guardado, incluidos bloqueos de opciones.
+  No hay formulario universal, contexto nuevo ni banderas de dominio. El marco
+  impide cerrar/reenviar durante envío, conservando controles deshabilitados
+  visibles para las herramientas de accesibilidad.
+- [setServerFormErrors](../src/helpers/setServerFormErrors.ts) usa listas
+  explícitas y tipadas de campos en esos siete formularios y el principal de
+  confiscaciones. Todos los mensajes, incluidas claves desconocidas y rutas
+  anidadas ajenas, quedan en el aviso general; solo campos admitidos llegan a
+  setError. Se retira el cast dinámico de claves del servidor. El modal muestra
+  un único aviso general, priorizando el error RHF sobre la prop remota.
+- OptionSelector, MultipleSelectButton, DatePickerField y PhotoInput enlazan
+  Control y nombres de campo mediante genéricos RHF, incluyendo entrada/salida
+  transformadas. Fechas/fotos restringen el tipo de campo; el select conserva
+  FieldPath porque las relaciones coercionadas admiten entradas unknown.
+  No se cambian esquemas, formatos ni validación permisiva de relaciones.
+- OptionSelector deriva la selección de RHF, sin índice local ni memoización
+  superflua. Gráficos usa useWatch para typeConfiscation y retira su copia visual.
+  Mapas/gráficos distinguen entrada/salida en useForm; no se migran sus datos
+  ni se añaden filtros compartidos. Roles/usuarios reutilizan el select y
+  conservan el bloqueo de permisos. El select preserva cero, texto y arrays,
+  incluidos objetos de relación antiguos. Fechas conservan Dayjs al editar,
+  texto inicial y vacío como null; fotos conectan nombre/blur/ref, manteniendo
+  creación/revocación de object URLs. Se retiraron cuatro contratos de controles
+  sin consumidores en sharedInterfaces.
+
+**Comprobaciones nuevas.**
+
+- [server-form-errors.test.mjs](../tests/server-form-errors.test.mjs): cuatro
+  conteos (grupo y tres casos) de campos admitidos/desconocidos/anidados,
+  mensajes generales, red, causa desconocida y reintento sin registrar rutas ajenas.
+- `node --test tests/server-form-errors.test.mjs tests/api-errors.test.mjs
+  tests/form-validation.test.mjs tests/image-validation.test.mjs
+  tests/confiscation-save.test.mjs tests/permission.test.mjs tests/rol.test.mjs
+  tests/user.test.mjs tests/drug.test.mjs tests/drug-presentation.test.mjs
+  tests/ammunition.test.mjs tests/weapon.test.mjs`: **75 aprobadas**, cero
+  fallos/canceladas/omitidas. Log: `%TEMP%/graphdata-step10-tests.txt`.
+- `npm.cmd run build`: correcto en la ejecución final; persiste el aviso
+  de chunks >500 kB. Se restauró tsconfig.app.tsbuildinfo a sus bytes iniciales.
+  El primer chequeo señaló children de Zoom y entradas unknown de relaciones;
+  se corrigieron sin casts ni cambios de esquemas. TypeScript final sin errores.
+- `npm.cmd run lint -- --format json --output-file ...`: **60 errores y
+  24 advertencias**, frente a 77/24 del paso 9; cero diagnósticos nuevos al
+  comparar archivo/regla/severidad/mensaje. Logs: `%TEMP%/graphdata-step10-lint.json`
+  y `%TEMP%/graphdata-step10-lint-final.json`.
+- `git diff --check`: correcto. Un intento con autocrlf desactivado interpretó
+  CRLF como espacios finales; el chequeo final usa la configuración del repo.
+
+**Navegador.** Playwright MCP operativo, página y servidor existente en 4175.
+[permission.js](../tests/browser/permission.js) y [drug.js](../tests/browser/drug.js):
+siete grupos aprobados cada uno y seis escrituras simuladas por recorrido.
+Cero excepciones JS/mensajes inesperados; tres errores HTTP/red esperados por
+recorrido. Cubren cancelación, crear/editar/borrar, bloqueo pendiente, errores
+de campo/general y reintento; drogas incluye archivo y multipart. Se inspeccionaron
+las capturas finales `.playwright-mcp/permission-form.png` y `drug-form.png`:
+títulos, mensajes, campos y acciones sin recortes en los casos representativos.
+
+[permission-query.js](../tests/browser/permission-query.js): cinco grupos
+aprobados, incluidos roles/usuarios con selectores compartidos, catálogo paginado,
+invalidación y fallo/reintento sin perder borrador; 30 GET, 18 páginas de opciones,
+dos errores esperados y cero excepciones/mensajes inesperados.
+
+[shared-form-controls.js](../tests/browser/shared-form-controls.js): cuatro
+grupos aprobados en consumidor temporal: selección inicial/eventos/reset;
+select único con cero y múltiple con IDs numéricos/texto; fecha de texto tras
+reset y cambio a Dayjs; archivo/reset/revocación de URL y eliminación de foto.
+Cero excepciones/avisos de consola. Desmonta, restaura las APIs de URL y retira
+listeners/ruta simulada en finally. El primer intento necesitó una imagen
+simulada válida; se corrigió el fixture, sin cambios de producto.
+
+Los intentos iniciales de permisos/drogas no se consideran aprobados: permisos
+agotó una espera inicial y drogas detectó que inert ocultaba controles pendientes
+al árbol accesible. Se retiró inert del marco, conservando fieldset disabled,
+y ambos recorridos completos pasaron después. Sin interceptaciones pendientes.
+No se repitieron los CRUD equivalentes de todos los catálogos.
+
+**Documentación, reutilización y límites.** Se aplicaron las skills React y
+composición: selección derivada y composición con children, sin nuevo contexto.
+Lockfile reconfirmado sin cambios: React 19.3.1, RHF 7.55.0, Material 6.4.7,
+Date Pickers 8.14.0 y Day.js 1.11.18. Context7 no ofrece RHF/Date Pickers exactos;
+se consultaron guías oficiales generales de
+[Control](https://github.com/react-hook-form/documentation/blob/master/src/content/docs/useform/control.mdx),
+[setError](https://github.com/react-hook-form/documentation/blob/master/src/content/docs/useform/seterror.mdx)
+y [slots de Pickers 8.11.0](https://github.com/mui/mui-x/blob/v8.11.0/docs/data/date-pickers/custom-field/custom-field.md),
+contrastadas con tipos instalados, build y navegador, sin atribuirlas a tags exactos.
+
+Se reutilizan las pruebas históricas de services, cancelación de listados,
+aislamiento de sesión, geocodificación y carga diferida: no cambian sus
+implementaciones/escenarios. No se repitió la suite completa. Guardado, imágenes
+y validación sí se incluyeron por compartir formularios/controles. Backend y
+autenticación simulados: no se acreditan cookies, persistencia ni servidor real.
+No se hicieron perfiles ni se atribuyen mejoras medidas de rendimiento.
+Continúan deuda de lint y aviso de bundle. Paso 10 cerrado; paso 11 pendiente,
+sin iniciarlo.
 
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,

@@ -1,80 +1,39 @@
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import { Controller, ControllerRenderProps, FieldValues } from 'react-hook-form';
-import { SelectOptions } from '../shared/interfaces/sharedInterfaces';
-import { FormHelperText } from '@mui/material';
-import { memo } from 'react';
+import { useId } from 'react';
+import { OutlinedInput, InputLabel, MenuItem, FormControl, Select, FormHelperText } from '@mui/material';
+import { useController, type Control, type FieldPath, type FieldValues } from 'react-hook-form';
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-    PaperProps: {
-        style: {
-            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-            width: 250,
-        },
-    },
-};
-
-
-
-// Componente genérico
-interface MultiSelectProps {
-    name: string;
+interface MultiSelectProps<T extends FieldValues, Output extends FieldValues> {
+    // Coercing schemas accept unknown inputs; the field path and Control stay linked.
+    name: FieldPath<T>;
     label: string;
-    options: SelectOptions[];
-    control: any; // Recibe el control de react-hook-form
-    defaultValues?: string[]; // Valores seleccionados por defecto
-    multiple: boolean
-    error?: boolean
-    errorMessage?: string
-    sizeSmall?: boolean
+    options: { value: string | number; description: string }[];
+    control: Control<T, unknown, Output>;
+    multiple: boolean;
+    disabled?: boolean;
+    error?: boolean;
+    errorMessage?: string;
+    sizeSmall?: boolean;
 }
 
-export const MultipleSelectButton = memo(({ name, label, options, control, multiple = false, error = false, errorMessage = '', sizeSmall = false }:MultiSelectProps) => {
-    //const theme = useTheme();
-    const selectValue = (field: ControllerRenderProps<FieldValues, string>) => {//formateando valor si es multiple o no
-        console.log(field);
-        
-        return multiple ? (field.value.length > 0 ? field.value : []) : (field.value != 0 ? field.value : '')
-    }
-console.log('carga componente select',options);
+const MenuProps = { PaperProps: { style: { maxHeight: 224, width: 250 } } };
 
-    return (
-        <FormControl sx={{ mb: sizeSmall ? 0 : 2, width: '100%' }} error={error}>
-            <InputLabel id={`${name}-label`}>{label}</InputLabel>
-            <Controller
-                name={name}
-                control={control}
-                //defaultValue={defaultValues} // Valores por defecto
-                render={({ field }) => {                    
-                    return<>
-                        <Select
-                            {...field}
-                            size={sizeSmall ? 'small' : 'medium'}
-                            labelId={`${name}-label`}
-                            multiple={multiple}
-                            input={<OutlinedInput label={label} />}
-                            MenuProps={MenuProps}
-                            error={error}
-                            onChange={(event) => {
-                                field.onChange(event.target.value);
-                            }}
-                            value={selectValue(field)}
-                        >
-                            {options.map((option) => (
-                                <MenuItem key={option.value} value={option.value} >
-                                    {option.description}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                        <FormHelperText>{errorMessage}</FormHelperText>
-                    </>
-                }}
-            />
-        </FormControl>
-    );
-});
+export const MultipleSelectButton = <T extends FieldValues, Output extends FieldValues = T>(
+    { name, label, options, control, multiple, disabled, error, errorMessage, sizeSmall = false }: MultiSelectProps<T, Output>,
+) => {
+    const { field, fieldState } = useController({ name, control });
+    const id = useId();
+    const invalid = error ?? fieldState.invalid;
+    const value: unknown = field.value;
+    // Preserve identifier types, including numeric zero. RHF owns selection and reset.
+    const selected = multiple ? (Array.isArray(value) ? value : [])
+        : typeof value === 'string' || typeof value === 'number' ? value : '';
+    return <FormControl sx={{ mb: sizeSmall ? 0 : 2, width: '100%' }} error={invalid} disabled={disabled}>
+        <InputLabel id={id + '-label'}>{label}</InputLabel>
+        <Select {...field} inputRef={field.ref} disabled={disabled} size={sizeSmall ? 'small' : 'medium'}
+            labelId={id + '-label'} aria-describedby={id + '-error'} multiple={multiple}
+            input={<OutlinedInput label={label} />} MenuProps={MenuProps} value={selected}>
+            {options.map(option => <MenuItem key={option.value} value={option.value}>{option.description}</MenuItem>)}
+        </Select>
+        <FormHelperText id={id + '-error'}>{errorMessage ?? fieldState.error?.message}</FormHelperText>
+    </FormControl>;
+};

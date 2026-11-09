@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { getApiErrorMessage, getApiErrorText } from '../../../api/apiErrors';
+import { setServerFormErrors } from '../../../helpers/setServerFormErrors';
 import { Alert,Typography,Box } from '@mui/material';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -37,15 +37,7 @@ export const ConfiscationForm = () => {
         try {
             await onSaveOrUptdate(data);
         } catch (error) {
-            setError('root.server', { message: getApiErrorText(error) });
-            const message = getApiErrorMessage(error);
-            if (typeof message === 'object') {
-                for (const [field, messages] of Object.entries(message)) {
-                    if (Object.prototype.hasOwnProperty.call(confiscationSchema.shape, field)) {
-                        setError(field as keyof FormFields, { message: messages.join(' ') });
-                    }
-                }
-            }
+            setServerFormErrors(error, setError, ['identificador', 'fecha', 'observacion', 'direccion', 'departamento', 'municipalidad', 'latitud', 'longitud']);
         } finally {
             submitting.current = false;
         }
