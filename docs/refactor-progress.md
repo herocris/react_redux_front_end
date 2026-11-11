@@ -17,8 +17,25 @@ antes de ejecutar un paso. Pasos **1 a 16 completados**. Migración cerrada dent
 del alcance del plan; la deuda y la validación con backend real se detallan en
 el cierre del paso 16. No hay otro paso iniciado.
 El mantenimiento posterior solicitado el 9 de noviembre elimina la deuda de
-lint y el aviso de chunks grandes; la validación con backend real sigue pendiente.
+lint y el aviso de chunks grandes. La verificación real del 10 de noviembre
+comprueba sesión, lecturas, CRUD representativo y análisis; quedan abiertos
+imágenes y metadatos de sublistas vacías, según
+[el informe de backend real](verification-backend-real-2026-11-10.md). P02 corrige
+después los tipos de ID y verifica la frontera URL, según
+[su informe](verification-identifiers-p02-2026-11-11.md).
+La comprobación posterior de roles/permisos creó el catálogo y detectó ausencia
+de restricciones. Después, el usuario informó de su implementación en los
+controladores Laravel y del cambio de nombres sin prefijo de aplicación.
+P01 repitió después la matriz: 186/186 según las asignaciones actuales, con una
+diferencia de política del operador respecto a la propuesta. Sigue pendiente
+la integración de controles en el frontend;
+ver [el informe de autorización](verification-access-control-2026-11-10.md).
 Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
+
+La preparación posterior para presentar el proyecto tiene
+[prompts por tarea](portfolio-plan.md) y [progreso propio](portfolio-progress.md).
+P01 y P02 están ejecutados; los demás prompts siguen pendientes. Su preparación no
+ejecuta por sí misma los cambios.
 
 ## Decisiones acordadas
 
@@ -1761,8 +1778,184 @@ Queda la validación contra backend real y, si se requieren más mejoras, medici
 representativas de datos/dispositivos. La deuda de lint y el chunk de 655 kB ya
 no son pendientes actuales; se conservan en los registros históricos de cada paso.
 
+### Verificación posterior — backend real (10 de noviembre de 2026)
+
+Solicitud de comprobar el backend activo, con frontend en **5174** porque
+5173 pertenece a un servicio del backend. Vite queda levantado en
+`http://localhost:5174`, contra `http://localhost/api`; CORS permite ese origen.
+No se cambian aplicación, dependencias ni configuración del backend.
+
+- Playwright MCP con HTTP real, sin interceptaciones: login, cookie HttpOnly,
+  recarga de sesión, logout y rechazo 401 posterior; login incorrecto conserva
+  campos. Contexto independiente sin cookies rechaza lecturas/escrituras.
+- Nueve listados y siete catálogos completos; página/orden/filtro de drogas;
+  CRUD JSON de padre y multipart de los tres hijos, relaciones, imágenes
+  conservadas al editar, mapa/gráficos con fixtures persistidos. Recorrido de
+  services espaciado: 24 grupos aprobados. UI de drogas: cuatro grupos aprobados,
+  fallo confirmado de visualización de imagen. Registro inválido rechazado 422.
+- Hallazgos: falta `VITE_LOCAL_PHOTOS_URL`; las tres sublistas vacías omiten
+  metadatos paginados; IDs reales numéricos frente a varios tipos `string`.
+  No se consideran corregidos. Autorización por roles y entrega pública de
+  archivos siguen pendientes de comprobación completa.
+- Límite real 60 solicitudes/minuto: un intento recibió 429, repetido con
+  peticiones espaciadas y sin reintento de escrituras. Los fixtures se eliminaron;
+  consultas finales sin temporales y totales originales conservados. Auditoría
+  real no eliminada; no se verifica limpieza física de archivos del servidor.
+- Suite automatizada al inicio: **208 aprobadas**. Lint con cero advertencias,
+  build y diff correctos. Solo se incorporan dos recorridos manuales reales y
+  documentación. Sin avance de otro paso ni certificación global del backend.
+
+Resultados, límites, incidencias y recorridos reproducibles en
+[verificación con backend real](verification-backend-real-2026-11-10.md).
+Las menciones anteriores a backend pendiente se conservan como registro
+histórico; este informe concreta lo comprobado y lo todavía abierto.
+
+### Aprovisionamiento y comprobación de roles/permisos (10 de noviembre de 2026)
+
+Solicitud explícita de verificar autorización y crear los roles/permisos para
+el frontend en el backend activo. Se conservan todos los cambios de la tarea
+anterior y el frontend en 5174. Sin modificación del código de aplicación.
+
+- Creados por API **48 permisos** (IDs 26–73) y **tres roles**:
+  `administrador` (5, 48 permisos), `operador` (6, 23) y
+  `analista` (7, 11). Relaciones confirmadas con nueva consulta.
+  Los 25 permisos/cuatro roles previos se conservan; no se asignan roles nuevos
+  a usuarios existentes. Lista y matriz en
+  [roles y permisos del frontend](frontend-roles-permissions.md), con
+  [manifest por nombre/ID](frontend-access-control.json).
+- Usuario temporal y cinco contextos independientes: sin rol, analista, operador,
+  administrador y permiso directo. Login/refresh reflejan las asignaciones
+  en los cinco casos. **Autorización no aprobada:** 22 de 35 comprobaciones
+  esperaban 403 y recibieron 200. Incluso sin roles/permisos se consultan
+  usuarios/permisos/actividad y se crean permisos y decomisos.
+- Frontend sin rol abre `/user`, muestra datos y botón de creación. No hay
+  guards por permiso en las piezas revisadas. Crear el catálogo no activa
+  autorización: quedan pendientes middleware/policies backend y su consumo
+  en rutas/menú/acciones frontend. Backend no disponible como código en este
+  workspace. No se declara implementada la política.
+- Eliminados usuario temporal, cinco permisos y cinco decomisos de prueba;
+  consultas finales con cero temporales. Quedan 73 permisos y siete roles.
+  Auditoría real conservada. Peticiones espaciadas, sin 429 en la matriz.
+- Lint, sintaxis de recorridos y diff correctos. Se reutilizan suite 208/build
+  anteriores por aplicación/dependencias sin cambios; no son ejecuciones nuevas.
+
+Método, respuestas observadas, límites y siguientes comprobaciones en el
+[informe de autorización](verification-access-control-2026-11-10.md). Se completa
+la creación y la auditoría solicitadas, sin avanzar otro paso del plan ni
+confundir registros de permisos con restricciones efectivas.
+
+### Convención de nombres de acceso y actualización de backend (10 de noviembre de 2026)
+
+Por solicitud del usuario, roles `administrador`, `operador` y `analista`, y
+permisos `<dominio>.<acción>`, sin prefijo de aplicación. Se actualizan catálogo
+Markdown/JSON, asociaciones, informes, nombres de perfiles del resultado
+histórico y los dos recorridos de aprovisionamiento/verificación. Nombres de
+archivo, IDs y relaciones se conservan. El manifest deja de declarar un namespace.
+
+El usuario informa de la misma renominación en el backend y de la autorización
+por acción implementada en controladores Laravel. Se registra como cambio
+reportado, pendiente de nueva ejecución de la matriz. Los resultados HTTP
+anteriores mantienen sus valores y se marcan como históricos; sus nombres se
+normalizan a la convención actual. Sigue pendiente la integración de permisos
+en rutas/menú/acciones del frontend.
+
+El recorrido manual deja de esperar una fila visible sin permisos: espera la
+respuesta del listado y registra su estado, permitiendo continuar la matriz
+cuando el backend devuelve 403. No se ejecutan escrituras ni nuevos recorridos
+contra el backend en esta tarea de renominación.
+
+Comprobaciones: JSON válido, 48 permisos únicos, tres roles y asociaciones por
+nombre/ID coherentes, 35 comprobaciones históricas conservadas; búsqueda sin
+nombres de acceso con el prefijo anterior; sintaxis Node de ambos recorridos,
+lint con cero advertencias, build y diff correctos. Restaurado el artefacto
+generado de TypeScript. Se conserva la suite previa de 208 pruebas, sin contarla
+como ejecución nueva. No hay cambios en aplicación ni dependencias.
+
+Documentación actualizada en [roles y permisos](frontend-roles-permissions.md)
+y [el informe de autorización](verification-access-control-2026-11-10.md).
+
+### Preparación de prompts de portafolio (10 de noviembre de 2026)
+
+Solicitud de ejecutar los pendientes en chats separados y mantener continuidad
+documental. Se crea [portfolio-plan.md](portfolio-plan.md) con 15 tareas
+principales y dos ampliaciones opcionales, cada una con prompt autocontenido,
+alcance y validación. [portfolio-progress.md](portfolio-progress.md) conserva el
+estado inicial, dependencias, contexto y reglas de actualización.
+
+Cada ejecución actualizará ese progreso, el informe del tema y una entrada
+breve aquí. Se conserva la migración de 16 pasos cerrada; no se ejecutó ninguno
+de los nuevos prompts, ni se hicieron cambios de aplicación/backend, llamadas
+de prueba o despliegues. Comprobados códigos, bloques, enlaces locales y diff.
+
+### Prioridades y acceso de demo intencional (10 de noviembre de 2026)
+
+Se explicitan las prioridades en portfolio-progress.md y se añaden los seis
+pendientes medios al informe de autorización, enlazados a sus prompts.
+El usuario confirma que el acceso precargado del login es intencional para
+la demo en producción: se excluye su retirada/sustitución de los pendientes.
+P12 pasa a datos y recorrido de demo, conservando cuenta, credenciales y
+asignaciones existentes. Se mantiene la numeración de los 17 prompts.
+Comprobación documental de códigos, enlaces y diff; sin cambios de aplicación
+ni ejecución de tareas funcionales.
+
+### P01 — Revalidación de autorización Laravel (10 de noviembre de 2026)
+
+Ejecutado únicamente P01 del plan de portafolio, conservando el workspace.
+Recorrido adaptado con preflight de permisos, IDs actuales resueltos por nombre,
+contextos aislados, objetivos propios de edición/borrado y limpieza en `finally`.
+No se modifican usuarios existentes, sus asignaciones, catálogo ni aplicación.
+
+- Matriz real en dos lotes: **92/92 + 94/94 = 186/186**, con respuestas
+  200/401/403 esperadas según los permisos actuales. Incluye seis perfiles,
+  login/refresh, lecturas/análisis y escrituras representativas JSON/multipart,
+  `_method=PUT` y relaciones. **39 fixtures eliminados**; seis comprobaciones
+  independientes finales aprobadas, con cero registros por prefijo en cinco
+  dominios y refresh anónimo 401.
+- Hallazgo: operador tiene 27 permisos frente a la propuesta de 23, con
+  altas/ediciones de catálogos y sin borrados de decomisos/hijos. Administrador
+  conserva 73 permisos y analista 11. Se documentan diferencias sin cambiar
+  asociaciones. Confirmar intención de operador antes de P04.
+- Un intento sin dividir excedió 300 s de MCP y no aporta aserciones contadas;
+  se verificó limpieza y se repitió por lotes con informe recuperable. Sin 429
+  en los lotes informados, sin reintentos de escrituras. Auditoría preservada;
+  eliminación física de medios no verificada.
+- Sintaxis Node, lint con cero advertencias y build correctos; artefacto generado
+  de TypeScript restaurado. Se reutilizan las 208 pruebas previas, sin contarlas
+  como nueva ejecución. Sin cambios React/dependencias, guards ni otra tarea.
+
+Resultados separados de la historia en el
+[informe de autorización](verification-access-control-2026-11-10.md) y su
+[JSON P01](verification-access-control-p01-results-2026-11-10.json).
+Estado central en [portfolio-progress.md](portfolio-progress.md). P02 disponible,
+sin ejecutar; las demás tareas mantienen su alcance y estado.
+
 Al terminar cada paso, actualizar su fila y añadir una entrada con:
 fecha, alcance, archivos/commits si existen, contratos conservados, decisiones,
 pruebas y resultados reales, navegador utilizado y motivo (o por qué no fue
 necesario), límites, pendientes y siguiente paso. No copiar logs completos ni
 considerar una verificación histórica equivalente a una ejecución nueva.
+
+### P02 — Contratos de identificadores (11 de noviembre de 2026)
+
+Solo P02 del portafolio: IDs numéricos confirmados en respuestas reales/OpenAPI,
+DTO/entidades/relaciones/formularios/opciones alineados, sesión por nombres y
+actividad con usuario nullable. Validación de IDs en services; conversión URL
+explícita con parseRouteId en consumidores de useParams, antes de Query/HTTP.
+Claves de detalle/padre, filtros e invalidaciones usan números; sin casts ni
+uniones especulativas. Exportaciones types.ts y transporte HTTP conservados.
+
+213/213 pruebas Node, lint sin advertencias, build y diff correctos. Playwright
+MCP real: seis grupos aprobados (selecciones, navegación detalle/edición, alias
+con una clave y ruta inválida sin HTTP); cero excepciones de página. Recorrido
+solo de lectura, sin fixtures ni cambios de asignación. Scripts históricos
+adaptados sin declarar una batería completa nueva. Artefacto TypeScript restaurado.
+
+Contratos, archivos, Context7/fallback oficial y límites en
+[el informe P02](verification-identifiers-p02-2026-11-11.md); estado central en
+[portfolio-progress.md](portfolio-progress.md). No se reabren los 16 pasos ni se
+avanza P03; imágenes, paginación y permisos visuales conservan sus pendientes.
+
+Consolidación posterior solicitada: `f0ff9f8` registra auditorías reales previas;
+`cd226a0` implementa P02 con sus pruebas. Documentación consolidada por separado,
+sin cambios adicionales de código ni repetición de las comprobaciones vigentes.
+Sin push ni despliegue.

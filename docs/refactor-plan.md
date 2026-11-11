@@ -1,5 +1,10 @@
 # Plan de refactorización
 
+Los 16 pasos de este plan están cerrados según el progreso. Las tareas posteriores
+de autorización, integración y presentación para reclutadores tienen prompts
+independientes en [el plan de portafolio](portfolio-plan.md), con su
+[progreso](portfolio-progress.md). No se reabren los pasos cerrados por leerlos.
+
 ## Cómo usar este documento
 
 La decisión acordada es usar **TanStack Query** para los datos remotos,
