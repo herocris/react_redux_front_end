@@ -1,0 +1,2710 @@
+{
+  "date": "2026-11-10",
+  "task": "P01",
+  "api": "http://localhost/api",
+  "frontend": "http://localhost:5174",
+  "status": "verified_against_live_assignments_with_policy_differences",
+  "historicalResults": "verification-access-control-results-2026-11-10.json",
+  "scope": {
+    "profiles": [
+      "sin_sesion",
+      "sin_rol",
+      "analista",
+      "operador",
+      "administrador",
+      "permiso_directo"
+    ],
+    "writeDomains": [
+      "permission",
+      "confiscation",
+      "drug",
+      "drugConfiscation"
+    ],
+    "readDomains": [
+      "user",
+      "role",
+      "permission",
+      "drug",
+      "drugPresentation",
+      "weapon",
+      "ammunition",
+      "confiscation",
+      "drugConfiscation",
+      "weaponConfiscation",
+      "ammunitionConfiscation",
+      "activity"
+    ],
+    "analysisEndpoints": [
+      "drugGraphIndex",
+      "weaponGraphIndex",
+      "ammunitionGraphIndex",
+      "confiscation/map"
+    ],
+    "expectedPermissionsSource": "Current role catalog read by name; direct drug.view; no permission bypass based on role name."
+  },
+  "summary": {
+    "matrixChecks": 186,
+    "passed": 186,
+    "failed": 0,
+    "http200": 74,
+    "http401": 29,
+    "http403": 83,
+    "fixturesCreatedInReportedBatches": 39,
+    "fixturesRemaining": 0,
+    "independentFinalChecks": 6,
+    "independentFinalChecksPassed": 6
+  },
+  "policyComparison": [
+    {
+      "role": "administrador",
+      "proposedCount": 48,
+      "actualCount": 73,
+      "added": [
+        "permission ad",
+        "permission delectus",
+        "permission deleniti",
+        "permission doloribus",
+        "permission ducimus",
+        "permission eius",
+        "permission exercitationem",
+        "permission hic",
+        "permission incidunt",
+        "permission labore",
+        "permission laudantium",
+        "permission mollitia",
+        "permission nam",
+        "permission non",
+        "permission quisquam",
+        "permission quos",
+        "permission recusandae",
+        "permission repellat",
+        "permission saepe",
+        "permission sed",
+        "permission tempora",
+        "permission temporibus",
+        "permission ullam",
+        "permission unde",
+        "permission voluptatem"
+      ],
+      "missing": []
+    },
+    {
+      "role": "operador",
+      "proposedCount": 23,
+      "actualCount": 27,
+      "added": [
+        "ammunition.create",
+        "ammunition.update",
+        "drug.create",
+        "drug.update",
+        "drugPresentation.create",
+        "drugPresentation.update",
+        "weapon.create",
+        "weapon.update"
+      ],
+      "missing": [
+        "confiscation.delete",
+        "drugConfiscation.delete",
+        "weaponConfiscation.delete",
+        "ammunitionConfiscation.delete"
+      ]
+    },
+    {
+      "role": "analista",
+      "proposedCount": 11,
+      "actualCount": 11,
+      "added": [],
+      "missing": []
+    }
+  ],
+  "priorAttempts": [
+    {
+      "status": "blocked",
+      "reason": "Initial session had no roles or permissions."
+    },
+    {
+      "status": "blocked",
+      "reason": "After role assignment, refresh returned administrador with no effective permissions. User updated Laravel associations."
+    },
+    {
+      "status": "unreported_timeout",
+      "reason": "First unsplit audit exceeded MCP 300s timeout. No assertion results retained or counted. Contexts closed, temporary user absent; final prefix reads also cover that attempt."
+    }
+  ],
+  "batches": [
+    {
+      "tag": "PORTFOLIO_RBAC_P01_1794283438528",
+      "results": [
+        {
+          "profile": "setup",
+          "action": "refresh",
+          "domain": "session",
+          "expected": 200,
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "list",
+          "domain": "user",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "list",
+          "domain": "role",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "list",
+          "domain": "permission",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "list",
+          "domain": "drug",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "list",
+          "domain": "drugPresentation",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "list",
+          "domain": "weapon",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "list",
+          "domain": "ammunition",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "list",
+          "domain": "confiscation",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "list",
+          "domain": "drugConfiscation",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "list",
+          "domain": "weaponConfiscation",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "list",
+          "domain": "ammunitionConfiscation",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "list",
+          "domain": "activity",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "detail",
+          "domain": "confiscation",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "analysis",
+          "domain": "drugGraphIndex",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "analysis",
+          "domain": "weaponGraphIndex",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "analysis",
+          "domain": "ammunitionGraphIndex",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "analysis",
+          "domain": "confiscation/map",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "create",
+          "domain": "permission",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "update",
+          "domain": "permission",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "transport": "JSON PUT",
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "delete",
+          "domain": "permission",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "create",
+          "domain": "confiscation",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "update",
+          "domain": "confiscation",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "transport": "JSON PUT",
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "delete",
+          "domain": "confiscation",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "create",
+          "domain": "drug",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "update",
+          "domain": "drug",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "transport": "multipart POST _method=PUT",
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "delete",
+          "domain": "drug",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "create",
+          "domain": "drugConfiscation",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "update",
+          "domain": "drugConfiscation",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "transport": "multipart POST _method=PUT",
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_sesion",
+          "action": "delete",
+          "domain": "drugConfiscation",
+          "expected": 401,
+          "actual": 401,
+          "pass": true,
+          "error": {
+            "code": 401,
+            "message": "No autenticado"
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "login",
+          "domain": "session",
+          "expected": 200,
+          "actual": 200,
+          "pass": true,
+          "permissionsMatch": true,
+          "rolesMatch": true
+        },
+        {
+          "profile": "sin_rol",
+          "action": "refresh",
+          "domain": "session",
+          "expected": 200,
+          "actual": 200,
+          "pass": true,
+          "permissionsMatch": true,
+          "rolesMatch": true
+        },
+        {
+          "profile": "sin_rol",
+          "action": "list",
+          "domain": "user",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "list",
+          "domain": "role",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "list",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "list",
+          "domain": "drug",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "list",
+          "domain": "drugPresentation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "list",
+          "domain": "weapon",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "list",
+          "domain": "ammunition",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "list",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "list",
+          "domain": "drugConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "list",
+          "domain": "weaponConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "list",
+          "domain": "ammunitionConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "list",
+          "domain": "activity",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "detail",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "analysis",
+          "domain": "drugGraphIndex",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "analysis",
+          "domain": "weaponGraphIndex",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "analysis",
+          "domain": "ammunitionGraphIndex",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "analysis",
+          "domain": "confiscation/map",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "create",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "update",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "transport": "JSON PUT",
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "delete",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "create",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "update",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "transport": "JSON PUT",
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "delete",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "create",
+          "domain": "drug",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "update",
+          "domain": "drug",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "transport": "multipart POST _method=PUT",
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "delete",
+          "domain": "drug",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "create",
+          "domain": "drugConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "update",
+          "domain": "drugConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "transport": "multipart POST _method=PUT",
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "sin_rol",
+          "action": "delete",
+          "domain": "drugConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "login",
+          "domain": "session",
+          "expected": 200,
+          "actual": 200,
+          "pass": true,
+          "permissionsMatch": true,
+          "rolesMatch": true
+        },
+        {
+          "profile": "analista",
+          "action": "refresh",
+          "domain": "session",
+          "expected": 200,
+          "actual": 200,
+          "pass": true,
+          "permissionsMatch": true,
+          "rolesMatch": true
+        },
+        {
+          "profile": "analista",
+          "action": "list",
+          "domain": "user",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "list",
+          "domain": "role",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "list",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "list",
+          "domain": "drug",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "analista",
+          "action": "list",
+          "domain": "drugPresentation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "analista",
+          "action": "list",
+          "domain": "weapon",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "analista",
+          "action": "list",
+          "domain": "ammunition",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "analista",
+          "action": "list",
+          "domain": "confiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "analista",
+          "action": "list",
+          "domain": "drugConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "analista",
+          "action": "list",
+          "domain": "weaponConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "analista",
+          "action": "list",
+          "domain": "ammunitionConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "analista",
+          "action": "list",
+          "domain": "activity",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "detail",
+          "domain": "confiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "analista",
+          "action": "analysis",
+          "domain": "drugGraphIndex",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "analista",
+          "action": "analysis",
+          "domain": "weaponGraphIndex",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "analista",
+          "action": "analysis",
+          "domain": "ammunitionGraphIndex",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "analista",
+          "action": "analysis",
+          "domain": "confiscation/map",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "analista",
+          "action": "create",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "update",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "transport": "JSON PUT",
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "delete",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "create",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "update",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "transport": "JSON PUT",
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "delete",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "create",
+          "domain": "drug",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "update",
+          "domain": "drug",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "transport": "multipart POST _method=PUT",
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "delete",
+          "domain": "drug",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "create",
+          "domain": "drugConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "update",
+          "domain": "drugConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "transport": "multipart POST _method=PUT",
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "analista",
+          "action": "delete",
+          "domain": "drugConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        }
+      ],
+      "cleanup": [
+        {
+          "domain": "user",
+          "id": 36,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "confiscation",
+          "id": 5010,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drug",
+          "id": 15,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drugPresentation",
+          "id": 7,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "permission",
+          "id": 81,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "confiscation",
+          "id": 5011,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drug",
+          "id": 16,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drugConfiscation",
+          "id": 1009,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "permission",
+          "id": 82,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "confiscation",
+          "id": 5012,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drug",
+          "id": 17,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drugConfiscation",
+          "id": 1010,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "permission",
+          "id": 83,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "confiscation",
+          "id": 5013,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drug",
+          "id": 18,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drugConfiscation",
+          "id": 1011,
+          "removed": true,
+          "cleanupStatus": 200
+        }
+      ],
+      "status": "passed",
+      "profiles": [
+        "sin_sesion",
+        "sin_rol",
+        "analista"
+      ],
+      "preflight": {
+        "roles": [
+          "administrador"
+        ],
+        "permissionCount": 73,
+        "missingPermissions": []
+      },
+      "roleCatalog": [
+        {
+          "name": "administrador",
+          "permissions": [
+            "activity.view",
+            "ammunition.create",
+            "ammunition.delete",
+            "ammunition.update",
+            "ammunition.view",
+            "ammunitionConfiscation.create",
+            "ammunitionConfiscation.delete",
+            "ammunitionConfiscation.update",
+            "ammunitionConfiscation.view",
+            "confiscation.create",
+            "confiscation.delete",
+            "confiscation.update",
+            "confiscation.view",
+            "dashboard.view",
+            "drug.create",
+            "drug.delete",
+            "drug.update",
+            "drug.view",
+            "drugConfiscation.create",
+            "drugConfiscation.delete",
+            "drugConfiscation.update",
+            "drugConfiscation.view",
+            "drugPresentation.create",
+            "drugPresentation.delete",
+            "drugPresentation.update",
+            "drugPresentation.view",
+            "graph.view",
+            "map.view",
+            "permission ad",
+            "permission delectus",
+            "permission deleniti",
+            "permission doloribus",
+            "permission ducimus",
+            "permission eius",
+            "permission exercitationem",
+            "permission hic",
+            "permission incidunt",
+            "permission labore",
+            "permission laudantium",
+            "permission mollitia",
+            "permission nam",
+            "permission non",
+            "permission quisquam",
+            "permission quos",
+            "permission recusandae",
+            "permission repellat",
+            "permission saepe",
+            "permission sed",
+            "permission tempora",
+            "permission temporibus",
+            "permission ullam",
+            "permission unde",
+            "permission voluptatem",
+            "permission.create",
+            "permission.delete",
+            "permission.update",
+            "permission.view",
+            "role.create",
+            "role.delete",
+            "role.update",
+            "role.view",
+            "user.create",
+            "user.delete",
+            "user.update",
+            "user.view",
+            "weapon.create",
+            "weapon.delete",
+            "weapon.update",
+            "weapon.view",
+            "weaponConfiscation.create",
+            "weaponConfiscation.delete",
+            "weaponConfiscation.update",
+            "weaponConfiscation.view"
+          ]
+        },
+        {
+          "name": "operador",
+          "permissions": [
+            "ammunition.create",
+            "ammunition.update",
+            "ammunition.view",
+            "ammunitionConfiscation.create",
+            "ammunitionConfiscation.update",
+            "ammunitionConfiscation.view",
+            "confiscation.create",
+            "confiscation.update",
+            "confiscation.view",
+            "dashboard.view",
+            "drug.create",
+            "drug.update",
+            "drug.view",
+            "drugConfiscation.create",
+            "drugConfiscation.update",
+            "drugConfiscation.view",
+            "drugPresentation.create",
+            "drugPresentation.update",
+            "drugPresentation.view",
+            "graph.view",
+            "map.view",
+            "weapon.create",
+            "weapon.update",
+            "weapon.view",
+            "weaponConfiscation.create",
+            "weaponConfiscation.update",
+            "weaponConfiscation.view"
+          ]
+        },
+        {
+          "name": "analista",
+          "permissions": [
+            "ammunition.view",
+            "ammunitionConfiscation.view",
+            "confiscation.view",
+            "dashboard.view",
+            "drug.view",
+            "drugConfiscation.view",
+            "drugPresentation.view",
+            "graph.view",
+            "map.view",
+            "weapon.view",
+            "weaponConfiscation.view"
+          ]
+        }
+      ],
+      "counts": {
+        "checks": 92,
+        "passed": 92,
+        "failed": 0,
+        "fixtures": 16,
+        "remainingFixtures": 0
+      }
+    },
+    {
+      "tag": "PORTFOLIO_RBAC_P01_1794283618788",
+      "results": [
+        {
+          "profile": "setup",
+          "action": "refresh",
+          "domain": "session",
+          "expected": 200,
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "login",
+          "domain": "session",
+          "expected": 200,
+          "actual": 200,
+          "pass": true,
+          "permissionsMatch": true,
+          "rolesMatch": true
+        },
+        {
+          "profile": "operador",
+          "action": "refresh",
+          "domain": "session",
+          "expected": 200,
+          "actual": 200,
+          "pass": true,
+          "permissionsMatch": true,
+          "rolesMatch": true
+        },
+        {
+          "profile": "operador",
+          "action": "list",
+          "domain": "user",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "operador",
+          "action": "list",
+          "domain": "role",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "operador",
+          "action": "list",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "operador",
+          "action": "list",
+          "domain": "drug",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "list",
+          "domain": "drugPresentation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "list",
+          "domain": "weapon",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "list",
+          "domain": "ammunition",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "list",
+          "domain": "confiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "list",
+          "domain": "drugConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "list",
+          "domain": "weaponConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "list",
+          "domain": "ammunitionConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "list",
+          "domain": "activity",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "operador",
+          "action": "detail",
+          "domain": "confiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "analysis",
+          "domain": "drugGraphIndex",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "analysis",
+          "domain": "weaponGraphIndex",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "analysis",
+          "domain": "ammunitionGraphIndex",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "analysis",
+          "domain": "confiscation/map",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "create",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "operador",
+          "action": "update",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "transport": "JSON PUT",
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "operador",
+          "action": "delete",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "operador",
+          "action": "create",
+          "domain": "confiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "update",
+          "domain": "confiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true,
+          "transport": "JSON PUT"
+        },
+        {
+          "profile": "operador",
+          "action": "delete",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "operador",
+          "action": "create",
+          "domain": "drug",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "update",
+          "domain": "drug",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true,
+          "transport": "multipart POST _method=PUT"
+        },
+        {
+          "profile": "operador",
+          "action": "delete",
+          "domain": "drug",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "operador",
+          "action": "create",
+          "domain": "drugConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "operador",
+          "action": "update",
+          "domain": "drugConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true,
+          "transport": "multipart POST _method=PUT",
+          "relationsMatch": true
+        },
+        {
+          "profile": "operador",
+          "action": "delete",
+          "domain": "drugConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "administrador",
+          "action": "login",
+          "domain": "session",
+          "expected": 200,
+          "actual": 200,
+          "pass": true,
+          "permissionsMatch": true,
+          "rolesMatch": true
+        },
+        {
+          "profile": "administrador",
+          "action": "refresh",
+          "domain": "session",
+          "expected": 200,
+          "actual": 200,
+          "pass": true,
+          "permissionsMatch": true,
+          "rolesMatch": true
+        },
+        {
+          "profile": "administrador",
+          "action": "list",
+          "domain": "user",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "list",
+          "domain": "role",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "list",
+          "domain": "permission",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "list",
+          "domain": "drug",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "list",
+          "domain": "drugPresentation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "list",
+          "domain": "weapon",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "list",
+          "domain": "ammunition",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "list",
+          "domain": "confiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "list",
+          "domain": "drugConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "list",
+          "domain": "weaponConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "list",
+          "domain": "ammunitionConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "list",
+          "domain": "activity",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "detail",
+          "domain": "confiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "analysis",
+          "domain": "drugGraphIndex",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "analysis",
+          "domain": "weaponGraphIndex",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "analysis",
+          "domain": "ammunitionGraphIndex",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "analysis",
+          "domain": "confiscation/map",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "create",
+          "domain": "permission",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "update",
+          "domain": "permission",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true,
+          "transport": "JSON PUT"
+        },
+        {
+          "profile": "administrador",
+          "action": "delete",
+          "domain": "permission",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "create",
+          "domain": "confiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "update",
+          "domain": "confiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true,
+          "transport": "JSON PUT"
+        },
+        {
+          "profile": "administrador",
+          "action": "delete",
+          "domain": "confiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "create",
+          "domain": "drug",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "update",
+          "domain": "drug",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true,
+          "transport": "multipart POST _method=PUT"
+        },
+        {
+          "profile": "administrador",
+          "action": "delete",
+          "domain": "drug",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "create",
+          "domain": "drugConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "administrador",
+          "action": "update",
+          "domain": "drugConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true,
+          "transport": "multipart POST _method=PUT",
+          "relationsMatch": true
+        },
+        {
+          "profile": "administrador",
+          "action": "delete",
+          "domain": "drugConfiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "login",
+          "domain": "session",
+          "expected": 200,
+          "actual": 200,
+          "pass": true,
+          "permissionsMatch": true,
+          "rolesMatch": true
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "refresh",
+          "domain": "session",
+          "expected": 200,
+          "actual": 200,
+          "pass": true,
+          "permissionsMatch": true,
+          "rolesMatch": true
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "list",
+          "domain": "user",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "list",
+          "domain": "role",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "list",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "list",
+          "domain": "drug",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "list",
+          "domain": "drugPresentation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "list",
+          "domain": "weapon",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "list",
+          "domain": "ammunition",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "list",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "list",
+          "domain": "drugConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "list",
+          "domain": "weaponConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "list",
+          "domain": "ammunitionConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "list",
+          "domain": "activity",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "detail",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "analysis",
+          "domain": "drugGraphIndex",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "analysis",
+          "domain": "weaponGraphIndex",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "analysis",
+          "domain": "ammunitionGraphIndex",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "analysis",
+          "domain": "confiscation/map",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "create",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "update",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "transport": "JSON PUT",
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "delete",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "create",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "update",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "transport": "JSON PUT",
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "delete",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "create",
+          "domain": "drug",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "update",
+          "domain": "drug",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "transport": "multipart POST _method=PUT",
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "delete",
+          "domain": "drug",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "create",
+          "domain": "drugConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "update",
+          "domain": "drugConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "transport": "multipart POST _method=PUT",
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        },
+        {
+          "profile": "permiso_directo",
+          "action": "delete",
+          "domain": "drugConfiscation",
+          "expected": 403,
+          "actual": 403,
+          "pass": true,
+          "error": {
+            "code": 403,
+            "message": "User does not have the right permissions."
+          }
+        }
+      ],
+      "cleanup": [
+        {
+          "domain": "user",
+          "id": 37,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "confiscation",
+          "id": 5014,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drug",
+          "id": 19,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drugPresentation",
+          "id": 8,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "permission",
+          "id": 84,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "confiscation",
+          "id": 5015,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "confiscation",
+          "id": 5016,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drug",
+          "id": 20,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drug",
+          "id": 21,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drugConfiscation",
+          "id": 1012,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drugConfiscation",
+          "id": 1013,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "permission",
+          "id": 85,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "permission",
+          "id": 86,
+          "removed": true
+        },
+        {
+          "domain": "confiscation",
+          "id": 5017,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "confiscation",
+          "id": 5018,
+          "removed": true
+        },
+        {
+          "domain": "drug",
+          "id": 22,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drug",
+          "id": 23,
+          "removed": true
+        },
+        {
+          "domain": "drugConfiscation",
+          "id": 1014,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drugConfiscation",
+          "id": 1015,
+          "removed": true
+        },
+        {
+          "domain": "permission",
+          "id": 87,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "confiscation",
+          "id": 5019,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drug",
+          "id": 24,
+          "removed": true,
+          "cleanupStatus": 200
+        },
+        {
+          "domain": "drugConfiscation",
+          "id": 1016,
+          "removed": true,
+          "cleanupStatus": 200
+        }
+      ],
+      "status": "passed",
+      "profiles": [
+        "operador",
+        "administrador",
+        "permiso_directo"
+      ],
+      "preflight": {
+        "roles": [
+          "administrador"
+        ],
+        "permissionCount": 73,
+        "missingPermissions": []
+      },
+      "roleCatalog": [
+        {
+          "name": "administrador",
+          "permissions": [
+            "activity.view",
+            "ammunition.create",
+            "ammunition.delete",
+            "ammunition.update",
+            "ammunition.view",
+            "ammunitionConfiscation.create",
+            "ammunitionConfiscation.delete",
+            "ammunitionConfiscation.update",
+            "ammunitionConfiscation.view",
+            "confiscation.create",
+            "confiscation.delete",
+            "confiscation.update",
+            "confiscation.view",
+            "dashboard.view",
+            "drug.create",
+            "drug.delete",
+            "drug.update",
+            "drug.view",
+            "drugConfiscation.create",
+            "drugConfiscation.delete",
+            "drugConfiscation.update",
+            "drugConfiscation.view",
+            "drugPresentation.create",
+            "drugPresentation.delete",
+            "drugPresentation.update",
+            "drugPresentation.view",
+            "graph.view",
+            "map.view",
+            "permission ad",
+            "permission delectus",
+            "permission deleniti",
+            "permission doloribus",
+            "permission ducimus",
+            "permission eius",
+            "permission exercitationem",
+            "permission hic",
+            "permission incidunt",
+            "permission labore",
+            "permission laudantium",
+            "permission mollitia",
+            "permission nam",
+            "permission non",
+            "permission quisquam",
+            "permission quos",
+            "permission recusandae",
+            "permission repellat",
+            "permission saepe",
+            "permission sed",
+            "permission tempora",
+            "permission temporibus",
+            "permission ullam",
+            "permission unde",
+            "permission voluptatem",
+            "permission.create",
+            "permission.delete",
+            "permission.update",
+            "permission.view",
+            "role.create",
+            "role.delete",
+            "role.update",
+            "role.view",
+            "user.create",
+            "user.delete",
+            "user.update",
+            "user.view",
+            "weapon.create",
+            "weapon.delete",
+            "weapon.update",
+            "weapon.view",
+            "weaponConfiscation.create",
+            "weaponConfiscation.delete",
+            "weaponConfiscation.update",
+            "weaponConfiscation.view"
+          ]
+        },
+        {
+          "name": "operador",
+          "permissions": [
+            "ammunition.create",
+            "ammunition.update",
+            "ammunition.view",
+            "ammunitionConfiscation.create",
+            "ammunitionConfiscation.update",
+            "ammunitionConfiscation.view",
+            "confiscation.create",
+            "confiscation.update",
+            "confiscation.view",
+            "dashboard.view",
+            "drug.create",
+            "drug.update",
+            "drug.view",
+            "drugConfiscation.create",
+            "drugConfiscation.update",
+            "drugConfiscation.view",
+            "drugPresentation.create",
+            "drugPresentation.update",
+            "drugPresentation.view",
+            "graph.view",
+            "map.view",
+            "weapon.create",
+            "weapon.update",
+            "weapon.view",
+            "weaponConfiscation.create",
+            "weaponConfiscation.update",
+            "weaponConfiscation.view"
+          ]
+        },
+        {
+          "name": "analista",
+          "permissions": [
+            "ammunition.view",
+            "ammunitionConfiscation.view",
+            "confiscation.view",
+            "dashboard.view",
+            "drug.view",
+            "drugConfiscation.view",
+            "drugPresentation.view",
+            "graph.view",
+            "map.view",
+            "weapon.view",
+            "weaponConfiscation.view"
+          ]
+        }
+      ],
+      "counts": {
+        "checks": 94,
+        "passed": 94,
+        "failed": 0,
+        "fixtures": 23,
+        "remainingFixtures": 0
+      }
+    }
+  ],
+  "independentFinalChecks": [
+    {
+      "domain": "user",
+      "status": 200,
+      "total": 0,
+      "matchingRows": 0,
+      "pass": true
+    },
+    {
+      "domain": "permission",
+      "status": 200,
+      "total": 0,
+      "matchingRows": 0,
+      "pass": true
+    },
+    {
+      "domain": "drug",
+      "status": 200,
+      "total": 0,
+      "matchingRows": 0,
+      "pass": true
+    },
+    {
+      "domain": "drugPresentation",
+      "status": 200,
+      "total": 0,
+      "matchingRows": 0,
+      "pass": true
+    },
+    {
+      "domain": "confiscation",
+      "status": 200,
+      "total": 0,
+      "matchingRows": 0,
+      "pass": true
+    },
+    {
+      "domain": "session",
+      "action": "refresh_without_session",
+      "expected": 401,
+      "status": 401,
+      "code": 401,
+      "pass": true
+    }
+  ],
+  "limits": [
+    "Representative writes only: no exhaustive CRUD of all controllers.",
+    "dashboard.view has no standalone HTTP endpoint.",
+    "No frontend permission guards, live revocation, production or comprehensive security verification.",
+    "Uploaded fixture records removed by API; physical media deletion not verifiable from this workspace.",
+    "Existing users and role/permission assignments were not modified by this audit."
+  ]
+}

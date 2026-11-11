@@ -1,0 +1,391 @@
+{
+  "date": "2026-11-10",
+  "api": "http://localhost/api",
+  "frontend": "http://localhost:5174",
+  "backendEnforcement": "P01: 186/186 representative checks passed against live assignments; see verification-access-control-p01-results-2026-11-10.json",
+  "snapshotScope": "Original proposed role associations and historical IDs; P01 observed administrator 73, operator 27, analyst 11 permissions. Resolve current IDs by name; see P01 results for policy differences.",
+  "permissions": [
+    {
+      "id": 26,
+      "nombre": "user.view"
+    },
+    {
+      "id": 27,
+      "nombre": "user.create"
+    },
+    {
+      "id": 28,
+      "nombre": "user.update"
+    },
+    {
+      "id": 29,
+      "nombre": "user.delete"
+    },
+    {
+      "id": 30,
+      "nombre": "role.view"
+    },
+    {
+      "id": 31,
+      "nombre": "role.create"
+    },
+    {
+      "id": 32,
+      "nombre": "role.update"
+    },
+    {
+      "id": 33,
+      "nombre": "role.delete"
+    },
+    {
+      "id": 34,
+      "nombre": "permission.view"
+    },
+    {
+      "id": 35,
+      "nombre": "permission.create"
+    },
+    {
+      "id": 36,
+      "nombre": "permission.update"
+    },
+    {
+      "id": 37,
+      "nombre": "permission.delete"
+    },
+    {
+      "id": 38,
+      "nombre": "drug.view"
+    },
+    {
+      "id": 39,
+      "nombre": "drug.create"
+    },
+    {
+      "id": 40,
+      "nombre": "drug.update"
+    },
+    {
+      "id": 41,
+      "nombre": "drug.delete"
+    },
+    {
+      "id": 42,
+      "nombre": "drugPresentation.view"
+    },
+    {
+      "id": 43,
+      "nombre": "drugPresentation.create"
+    },
+    {
+      "id": 44,
+      "nombre": "drugPresentation.update"
+    },
+    {
+      "id": 45,
+      "nombre": "drugPresentation.delete"
+    },
+    {
+      "id": 46,
+      "nombre": "weapon.view"
+    },
+    {
+      "id": 47,
+      "nombre": "weapon.create"
+    },
+    {
+      "id": 48,
+      "nombre": "weapon.update"
+    },
+    {
+      "id": 49,
+      "nombre": "weapon.delete"
+    },
+    {
+      "id": 50,
+      "nombre": "ammunition.view"
+    },
+    {
+      "id": 51,
+      "nombre": "ammunition.create"
+    },
+    {
+      "id": 52,
+      "nombre": "ammunition.update"
+    },
+    {
+      "id": 53,
+      "nombre": "ammunition.delete"
+    },
+    {
+      "id": 54,
+      "nombre": "confiscation.view"
+    },
+    {
+      "id": 55,
+      "nombre": "confiscation.create"
+    },
+    {
+      "id": 56,
+      "nombre": "confiscation.update"
+    },
+    {
+      "id": 57,
+      "nombre": "confiscation.delete"
+    },
+    {
+      "id": 58,
+      "nombre": "drugConfiscation.view"
+    },
+    {
+      "id": 59,
+      "nombre": "drugConfiscation.create"
+    },
+    {
+      "id": 60,
+      "nombre": "drugConfiscation.update"
+    },
+    {
+      "id": 61,
+      "nombre": "drugConfiscation.delete"
+    },
+    {
+      "id": 62,
+      "nombre": "weaponConfiscation.view"
+    },
+    {
+      "id": 63,
+      "nombre": "weaponConfiscation.create"
+    },
+    {
+      "id": 64,
+      "nombre": "weaponConfiscation.update"
+    },
+    {
+      "id": 65,
+      "nombre": "weaponConfiscation.delete"
+    },
+    {
+      "id": 66,
+      "nombre": "ammunitionConfiscation.view"
+    },
+    {
+      "id": 67,
+      "nombre": "ammunitionConfiscation.create"
+    },
+    {
+      "id": 68,
+      "nombre": "ammunitionConfiscation.update"
+    },
+    {
+      "id": 69,
+      "nombre": "ammunitionConfiscation.delete"
+    },
+    {
+      "id": 70,
+      "nombre": "dashboard.view"
+    },
+    {
+      "id": 71,
+      "nombre": "graph.view"
+    },
+    {
+      "id": 72,
+      "nombre": "map.view"
+    },
+    {
+      "id": 73,
+      "nombre": "activity.view"
+    }
+  ],
+  "roles": [
+    {
+      "id": 5,
+      "nombre": "administrador",
+      "permissionIds": [
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73
+      ],
+      "permissions": [
+        "user.view",
+        "user.create",
+        "user.update",
+        "user.delete",
+        "role.view",
+        "role.create",
+        "role.update",
+        "role.delete",
+        "permission.view",
+        "permission.create",
+        "permission.update",
+        "permission.delete",
+        "drug.view",
+        "drug.create",
+        "drug.update",
+        "drug.delete",
+        "drugPresentation.view",
+        "drugPresentation.create",
+        "drugPresentation.update",
+        "drugPresentation.delete",
+        "weapon.view",
+        "weapon.create",
+        "weapon.update",
+        "weapon.delete",
+        "ammunition.view",
+        "ammunition.create",
+        "ammunition.update",
+        "ammunition.delete",
+        "confiscation.view",
+        "confiscation.create",
+        "confiscation.update",
+        "confiscation.delete",
+        "drugConfiscation.view",
+        "drugConfiscation.create",
+        "drugConfiscation.update",
+        "drugConfiscation.delete",
+        "weaponConfiscation.view",
+        "weaponConfiscation.create",
+        "weaponConfiscation.update",
+        "weaponConfiscation.delete",
+        "ammunitionConfiscation.view",
+        "ammunitionConfiscation.create",
+        "ammunitionConfiscation.update",
+        "ammunitionConfiscation.delete",
+        "dashboard.view",
+        "graph.view",
+        "map.view",
+        "activity.view"
+      ]
+    },
+    {
+      "id": 6,
+      "nombre": "operador",
+      "permissionIds": [
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        38,
+        42,
+        46,
+        50,
+        70,
+        71,
+        72
+      ],
+      "permissions": [
+        "confiscation.view",
+        "confiscation.create",
+        "confiscation.update",
+        "confiscation.delete",
+        "drugConfiscation.view",
+        "drugConfiscation.create",
+        "drugConfiscation.update",
+        "drugConfiscation.delete",
+        "weaponConfiscation.view",
+        "weaponConfiscation.create",
+        "weaponConfiscation.update",
+        "weaponConfiscation.delete",
+        "ammunitionConfiscation.view",
+        "ammunitionConfiscation.create",
+        "ammunitionConfiscation.update",
+        "ammunitionConfiscation.delete",
+        "drug.view",
+        "drugPresentation.view",
+        "weapon.view",
+        "ammunition.view",
+        "dashboard.view",
+        "graph.view",
+        "map.view"
+      ]
+    },
+    {
+      "id": 7,
+      "nombre": "analista",
+      "permissionIds": [
+        38,
+        42,
+        46,
+        50,
+        54,
+        58,
+        62,
+        66,
+        70,
+        71,
+        72
+      ],
+      "permissions": [
+        "drug.view",
+        "drugPresentation.view",
+        "weapon.view",
+        "ammunition.view",
+        "confiscation.view",
+        "drugConfiscation.view",
+        "weaponConfiscation.view",
+        "ammunitionConfiscation.view",
+        "dashboard.view",
+        "graph.view",
+        "map.view"
+      ]
+    }
+  ]
+}

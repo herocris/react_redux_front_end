@@ -1,0 +1,362 @@
+{
+  "historical": true,
+  "note": "Role names normalized to current convention. HTTP results predate the Laravel authorization changes reported by the user and have not been rerun.",
+  "tag": "PORTFOLIO_RBAC_1794272914380",
+  "results": [
+    {
+      "profile": "sin_rol",
+      "roles": [],
+      "sessionPermissionCount": 0,
+      "sessionMatchesAssignedPermissions": true,
+      "checks": [
+        {
+          "method": "GET",
+          "domain": "drug",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "GET",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "GET",
+          "domain": "user",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "GET",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "GET",
+          "domain": "activity",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "POST",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "POST",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        }
+      ],
+      "refreshMatchesAssignedPermissions": true,
+      "frontendWithoutPermissions": {
+        "path": "/user",
+        "visibleDataRows": 7,
+        "createButtonVisible": true
+      }
+    },
+    {
+      "profile": "analista",
+      "roles": [
+        "analista"
+      ],
+      "sessionPermissionCount": 11,
+      "sessionMatchesAssignedPermissions": true,
+      "checks": [
+        {
+          "method": "GET",
+          "domain": "drug",
+          "expected": 200,
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "method": "GET",
+          "domain": "confiscation",
+          "expected": 200,
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "method": "GET",
+          "domain": "user",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "GET",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "GET",
+          "domain": "activity",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "POST",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "POST",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        }
+      ],
+      "refreshMatchesAssignedPermissions": true
+    },
+    {
+      "profile": "operador",
+      "roles": [
+        "operador"
+      ],
+      "sessionPermissionCount": 23,
+      "sessionMatchesAssignedPermissions": true,
+      "checks": [
+        {
+          "method": "GET",
+          "domain": "drug",
+          "expected": 200,
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "method": "GET",
+          "domain": "confiscation",
+          "expected": 200,
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "method": "GET",
+          "domain": "user",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "GET",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "GET",
+          "domain": "activity",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "POST",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "POST",
+          "domain": "confiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        }
+      ],
+      "refreshMatchesAssignedPermissions": true
+    },
+    {
+      "profile": "administrador",
+      "roles": [
+        "administrador"
+      ],
+      "sessionPermissionCount": 48,
+      "sessionMatchesAssignedPermissions": true,
+      "checks": [
+        {
+          "method": "GET",
+          "domain": "drug",
+          "expected": 200,
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "method": "GET",
+          "domain": "confiscation",
+          "expected": 200,
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "method": "GET",
+          "domain": "user",
+          "expected": 200,
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "method": "GET",
+          "domain": "permission",
+          "expected": 200,
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "method": "GET",
+          "domain": "activity",
+          "expected": 200,
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "method": "POST",
+          "domain": "permission",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "method": "POST",
+          "domain": "confiscation",
+          "expected": "2xx",
+          "actual": 200,
+          "pass": true
+        }
+      ],
+      "refreshMatchesAssignedPermissions": true
+    },
+    {
+      "profile": "permiso_directo",
+      "roles": [],
+      "sessionPermissionCount": 1,
+      "sessionMatchesAssignedPermissions": true,
+      "checks": [
+        {
+          "method": "GET",
+          "domain": "drug",
+          "expected": 200,
+          "actual": 200,
+          "pass": true
+        },
+        {
+          "method": "GET",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "GET",
+          "domain": "user",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "GET",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "GET",
+          "domain": "activity",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "POST",
+          "domain": "permission",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        },
+        {
+          "method": "POST",
+          "domain": "confiscation",
+          "expected": 403,
+          "actual": 200,
+          "pass": false
+        }
+      ],
+      "refreshMatchesAssignedPermissions": true
+    },
+    {
+      "cleanup": "confiscation",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "cleanup": "permission",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "cleanup": "confiscation",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "cleanup": "permission",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "cleanup": "confiscation",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "cleanup": "permission",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "cleanup": "confiscation",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "cleanup": "permission",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "cleanup": "confiscation",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "cleanup": "permission",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "cleanup": "temporary user",
+      "pass": true
+    }
+  ]
+}
