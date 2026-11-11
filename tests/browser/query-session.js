@@ -43,7 +43,7 @@ async (page) => {
             }
             // A cancelled HTTP request can no longer be fulfilled by the browser.
             await route.fulfill({ json: {
-                data: [{ identificador: requestUser, nombre: `Permiso ${requestUser}` }],
+                data: [{ identificador: requestUser === 'A' ? 1 : 2, nombre: `Permiso ${requestUser}` }],
                 current_page: Number(url.searchParams.get('page') || 1), per_page: 10,
                 total: 11, last_page: 2, orderBy: 'id', order: 'asc',
             } }).catch(error => {
@@ -104,7 +104,7 @@ async (page) => {
             const { store } = await import(url);
             const clientURL = performance.getEntriesByType('resource').find(entry => new URL(entry.name).pathname === '/src/queries/queryClient.ts').name;
             const { queryClient } = await import(clientURL);
-            return queryClient.getQueryCache().findAll({ queryKey: ['permission', 'list'] }).some(query => query.state.data?.permissions[0]?.id === 'B') && !('permission' in store.getState());
+            return queryClient.getQueryCache().findAll({ queryKey: ['permission', 'list'] }).some(query => query.state.data?.permissions[0]?.id === 2) && !('permission' in store.getState());
         });
         check(await page.getByText('Permiso A', { exact: true }).count() === 0, 'No reaparecen filas de A');
         check(errors.length === 0, JSON.stringify(errors));

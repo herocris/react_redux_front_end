@@ -23,7 +23,7 @@ export const DrugConfiscationForm = memo(({ busy = false, optionsStatus, activeD
         formState: { errors, isSubmitting: formSubmitting },
         control
     } = useForm<FormInput, unknown, FormFields>({
-        defaultValues: { ...activeDrugConfiscation, droga: activeDrugConfiscation.droga || '', presentacion: activeDrugConfiscation.presentacion || '',  identificador: activeDrugConfiscation.identificador?.toString() },
+        defaultValues: { ...activeDrugConfiscation, droga: activeDrugConfiscation.droga || '', presentacion: activeDrugConfiscation.presentacion || '',  identificador: activeDrugConfiscation.identificador },
         resolver: zodResolver(drugConfiscationSchema)
     });
 

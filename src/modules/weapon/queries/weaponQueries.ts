@@ -24,8 +24,8 @@ export const weaponOptionsOptions = () => queryOptions({
 
 type WeaponWrite =
     | { type: 'create'; values: Weapon }
-    | { type: 'update'; values: Weapon & { id: string } }
-    | { type: 'delete'; id: string };
+    | { type: 'update'; values: Weapon & { id: number } }
+    | { type: 'delete'; id: number };
 
 // Construct in the authenticated consumer; all effects belong to guarded callbacks.
 export const weaponMutationOptions = (client: QueryClient, onSuccess: () => void) => {

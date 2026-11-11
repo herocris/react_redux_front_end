@@ -24,8 +24,8 @@ export const drugPresentationOptionsOptions = () => queryOptions({
 
 type DrugPresentationWrite =
     | { type: 'create'; values: DrugPresentation }
-    | { type: 'update'; values: DrugPresentation & { id: string } }
-    | { type: 'delete'; id: string };
+    | { type: 'update'; values: DrugPresentation & { id: number } }
+    | { type: 'delete'; id: number };
 
 // Construct in the authenticated consumer; all effects belong to guarded callbacks.
 export const drugPresentationMutationOptions = (client: QueryClient, onSuccess: () => void) => {

@@ -1,3 +1,4 @@
+import { parseRouteId } from '../../../api/identifiers';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -9,7 +10,8 @@ import { weaponConfiscationListOptions, weaponConfiscationMutationOptions } from
 import type { WeaponConfiscation } from '../types';
 
 export const useWeaponConfiscation = () => {
-    const { confiscationId = '' } = useParams();
+    const params = useParams();
+    const confiscationId = parseRouteId(params.confiscationId);
     const client = useQueryClient();
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
@@ -31,7 +33,7 @@ export const useWeaponConfiscation = () => {
         if (page > last) setPage(last);
     }, [query.data, query.isFetching, query.isError, page, pageSize]);
     const empty: WeaponConfiscation = {
-        cantidad: 0, decomiso: Number(confiscationId), arma: 0, foto: '',
+        cantidad: 0, decomiso: confiscationId, arma: 0, foto: '',
 
     };
     const handleOpen = (value: boolean) => {
@@ -40,7 +42,7 @@ export const useWeaponConfiscation = () => {
         setOpen(value);
         if (!value) { setActive(undefined); setDialog(false); }
     };
-    const setId = (id: string | number) => {
+    const setId = (id: number | number) => {
         if (mutation.isPending || query.isError || !query.data) return;
         mutation.reset();
         setActive(id === 0 ? empty : query.data.rows.find(row => row.identificador === id));

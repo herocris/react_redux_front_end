@@ -3,7 +3,7 @@ async (page) => {
     const errors = [];
     const passed = [];
     const writes = [];
-    let items = [{ identificador: '7', nombre: 'Original', permisos: [2], roles: ['admin'], correo: 'fixture@example.test' }];
+    let items = [{ identificador: 7, nombre: 'Original', permisos: [2], roles: [1], correo: 'fixture@example.test' }];
     const unexpectedConsole = [];
     let expectedNetworkErrors = 0;
     let createAttempts = 0;
@@ -33,7 +33,7 @@ async (page) => {
         }
         if (!['fetch', 'xhr'].includes(request.resourceType())) return route.fallback();
         const url = new URL(request.url());
-        if (url.pathname.endsWith('/role')) return route.fulfill({ json: { data: [{ identificador: 'admin', nombre: 'Administrador' }, { identificador: 3, nombre: 'Operador' }], current_page: 1, per_page: 100, total: 2, last_page: 1 } });
+        if (url.pathname.endsWith('/role')) return route.fulfill({ json: { data: [{ identificador: 1, nombre: 'Administrador' }, { identificador: 3, nombre: 'Operador' }], current_page: 1, per_page: 100, total: 2, last_page: 1 } });
         if (url.pathname.endsWith('/permission')) return route.fulfill({ json: { data: [{ identificador: 1, nombre: 'Leer' }, { identificador: 2, nombre: 'Editar' }], current_page: 1, per_page: 100, total: 2, last_page: 1 } });
         if (url.pathname.endsWith('/refresh')) return route.fulfill({ json: {
             user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: [],
@@ -58,14 +58,14 @@ async (page) => {
                 await createGate;
                 return route.fulfill({ status: 422, json: { error: { nombre: ['Ya existe ese usuario.'], permisos: ['Revisa los permisos.'], campoAjeno: ['Error general.'] } } });
             }
-            const created = { identificador: '8', nombre: 'Nueva', permisos: [1], roles: [3], correo: 'fixture@example.test' };
+            const created = { identificador: 8, nombre: 'Nueva', permisos: [1], roles: [3], correo: 'fixture@example.test' };
             items.push(created);
             return route.fulfill({ json: created });
         }
         if (url.pathname.endsWith('/user/7') && request.method() === 'PUT') {
             editAttempts++;
             if (editAttempts === 1) return route.abort('failed');
-            const updated = { identificador: '7', nombre: 'Editada', permisos: [2, 1], roles: ['admin', 3], correo: 'fixture@example.test' };
+            const updated = { identificador: 7, nombre: 'Editada', permisos: [2, 1], roles: [1, 3], correo: 'fixture@example.test' };
             items = items.map(item => item.identificador === updated.identificador ? updated : item);
             return route.fulfill({ json: updated });
         }
@@ -75,7 +75,7 @@ async (page) => {
                 await deleteGate;
                 return route.fulfill({ status: 500, json: { error: 'No se pudo borrar.' } });
             }
-            items = items.filter(item => item.identificador !== '7');
+            items = items.filter(item => item.identificador !== 7);
             return route.fulfill({ json: {} });
         }
         return route.fulfill({ json: { data: [] } });
@@ -154,7 +154,7 @@ async (page) => {
         await editedRow.waitFor();
         check(editAttempts === 2, 'Unexpected update requests');
         const update = writes.filter(write => write.path.endsWith('/7') && write.method === 'PUT');
-        check(update.every(write => { const body = JSON.parse(write.body); return JSON.stringify(body.roles) === '["admin",3]' && body.id === '7' && body.nombre === 'Editada' && JSON.stringify(body.permisos) === '[2,1]'; }), 'Update JSON contract changed');
+        check(update.every(write => { const body = JSON.parse(write.body); return JSON.stringify(body.roles) === '[1,3]' && body.id === 7 && body.nombre === 'Editada' && JSON.stringify(body.permisos) === '[2,1]'; }), 'Update JSON contract changed');
         passed.push('Editar: éxito actualiza fila y conserva PUT JSON y permisos');
         await editedRow.getByRole('menuitem', { name: 'Delete', exact: true }).click();
         const dialog = page.getByRole('dialog', { name: 'Borrar usuario' });

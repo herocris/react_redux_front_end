@@ -5,7 +5,7 @@ async (page) => {
     let removed = false, mainRemoved = false, failMain = false, failList = false, failDelete = true, holdDetail = false, release;
     const mainReads = [];
     let expectedErrors = 0;
-    const main = id => ({ identificador: id, fecha: '2026-11-08', observacion: 'Padre ' + id,
+    const main = id => ({ identificador: Number(id), fecha: '2026-11-08', observacion: 'Padre ' + id,
         direccion: 'Dirección', departamento: 'Depto', municipalidad: 'Municipio', latitud: 1, longitud: 2 });
     const sub = (id, parent = 7) => ({ identificador: id, cantidad: 3, peso: 1.5, foto: 'existente.png',
         decomiso: { identificador: parent }, droga: { identificador: 1, descripcion: 'Droga ' + parent },
@@ -41,8 +41,8 @@ async (page) => {
             reads.push({ parent: nested[1], page: p });
             if (failList) return route.fulfill({ status: 503, json: { error: 'Sublistado no disponible' } });
             const total = nested[1] === '9' ? 1 : removed ? 10 : 11;
-            const rows = nested[1] === '9' ? [sub('b', 9)] : p === 2 ? removed ? [] : [sub('last')] :
-                Array.from({ length: 10 }, (_, i) => sub(String(i + 1)));
+            const rows = nested[1] === '9' ? [sub(12, 9)] : p === 2 ? removed ? [] : [sub(11)] :
+                Array.from({ length: 10 }, (_, i) => sub(i + 1));
             return route.fulfill({ json: { data: rows, total, current_page: p, per_page: 10, last_page: Math.ceil(total / 10) } });
         }
         const domain = url.pathname.split('/').at(-1);
@@ -51,7 +51,7 @@ async (page) => {
             mainReads.push({ page: p, sort: url.searchParams.get('sort_by'), order: url.searchParams.get('type') });
             if (failMain) return route.fulfill({ status: 503, json: { error: 'Listado principal no disponible' } });
             const total = mainRemoved ? 10 : 11;
-            const rows = Array.from({ length: total }, (_, i) => main(String(i + 1)));
+            const rows = Array.from({ length: total }, (_, i) => main(i + 1));
             return route.fulfill({ json: { data: rows.slice((p - 1) * 10, p * 10), total,
                 current_page: p, per_page: 10, last_page: Math.ceil(total / 10) } });
         }
@@ -106,7 +106,7 @@ async (page) => {
         await panel.getByLabel('Cantidad', { exact: true }).fill('6');
         await page.evaluate(async url => {
             const { queryClient } = await import(url);
-            await queryClient.invalidateQueries({ queryKey: ['confiscation', 'detail', '7'] });
+            await queryClient.invalidateQueries({ queryKey: ['confiscation', 'detail', 7] });
             await queryClient.invalidateQueries({ queryKey: ['drugConfiscation', '7'] });
         }, clientURL);
         check(await page.getByLabel('Observacion', { exact: true }).inputValue() === 'Borrador sin guardar', 'Recarga perdió borrador principal');
@@ -117,7 +117,7 @@ async (page) => {
         holdDetail = true;
         const old = page.evaluate(async url => {
             const { queryClient } = await import(url);
-            await queryClient.invalidateQueries({ queryKey: ['confiscation', 'detail', '7'] });
+            await queryClient.invalidateQueries({ queryKey: ['confiscation', 'detail', 7] });
         }, clientURL);
         await page.waitForFunction(() => document.querySelector('[aria-label="Cargando decomiso"]'));
         // Client navigation keeps the same QueryClient, exercising the parent key.

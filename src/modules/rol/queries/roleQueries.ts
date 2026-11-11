@@ -24,8 +24,8 @@ export const roleOptionsOptions = () => queryOptions({
 
 type RoleWrite =
     | { type: 'create'; values: Role }
-    | { type: 'update'; values: Role & { id: string } }
-    | { type: 'delete'; id: string };
+    | { type: 'update'; values: Role & { id: number } }
+    | { type: 'delete'; id: number };
 
 // Construct in the authenticated consumer; all effects belong to guarded callbacks.
 export const roleMutationOptions = (client: QueryClient, onSuccess: () => void) => {

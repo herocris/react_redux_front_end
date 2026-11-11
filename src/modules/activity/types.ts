@@ -1,10 +1,10 @@
 import type { TableOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface Activity {
-    id: string,
+    id: number,
     tipo_de_evento: string,
     descripcion?: string,
-    id_usuario: number,
+    id_usuario: number | null,
     usuario: string,
     cambios: string | undefined,
     fecha: string
@@ -12,7 +12,7 @@ export interface Activity {
 
 // The API supplies changes before JSON serialization and dates before display formatting.
 export type ActivityResponse = Omit<Activity, 'id' | 'cambios'> & {
-    identificador: string;
+    identificador: number;
     cambios: unknown;
 };
 export type ActivityListResponse = TableOptions & { data: ActivityResponse[] };

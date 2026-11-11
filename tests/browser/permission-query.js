@@ -2,7 +2,7 @@ async (page) => {
     const check = (value, message) => { if (!value) throw new Error(message); };
     const passed = [], errors = [], consoleErrors = [], reads = [];
     let expectedNetworkErrors = 0;
-    let items = Array.from({ length: 11 }, (_, i) => ({ identificador: String(i + 1), nombre: 'Keep ' + String(i + 1).padStart(2, '0') }));
+    let items = Array.from({ length: 11 }, (_, i) => ({ identificador: i + 1, nombre: 'Keep ' + String(i + 1).padStart(2, '0') }));
     let failList = false, failOptions = false;
     const onError = error => errors.push(error.message);
     const onConsole = message => {
@@ -30,15 +30,15 @@ async (page) => {
                 per_page: size, total: rows.length, last_page: Math.max(1, Math.ceil(rows.length / size)) } });
         }
         if (url.pathname.endsWith('/permission') && method === 'POST') {
-            const row = { identificador: '12', nombre: req.postDataJSON().nombre };
+            const row = { identificador: 12, nombre: req.postDataJSON().nombre };
             items.push(row); return route.fulfill({ json: row });
         }
         if (/\/permission\/[^/]+$/.test(url.pathname) && method === 'DELETE') {
-            items = items.filter(row => row.identificador !== url.pathname.split('/').at(-1));
+            items = items.filter(row => row.identificador !== Number(url.pathname.split('/').at(-1)));
             return route.fulfill({ json: {} });
         }
         if (/\/permission\/[^/]+$/.test(url.pathname) && method === 'PUT') {
-            const row = { identificador: url.pathname.split('/').at(-1), nombre: req.postDataJSON().nombre };
+            const row = { identificador: Number(url.pathname.split('/').at(-1)), nombre: req.postDataJSON().nombre };
             items = items.map(item => item.identificador === row.identificador ? row : item);
             return route.fulfill({ json: row });
         }

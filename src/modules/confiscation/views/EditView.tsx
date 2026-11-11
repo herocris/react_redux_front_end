@@ -1,3 +1,4 @@
+import { parseRouteId } from '../../../api/identifiers';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
 import { Alert, Button, CircularProgress } from '@mui/material';
@@ -10,6 +11,13 @@ import { confiscationDetailOptions } from '../queries/confiscationQueries';
 
 export const EditView = () => {
     const { confiscationId = '' } = useParams();
+    let id: number;
+    try { id = parseRouteId(confiscationId); }
+    catch { return <GrapLayout><Alert severity="error">Identificador de ruta no válido.</Alert><BackFloatingButton /></GrapLayout>; }
+    return <EditConfiscation id={id} />;
+};
+
+const EditConfiscation = ({ id: confiscationId }: { id: number }) => {
     const query = useQuery(confiscationDetailOptions(confiscationId));
     return <GrapLayout>
         <Grid container spacing={3}>

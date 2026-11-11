@@ -1,12 +1,10 @@
 import type { PermissionOptionsStatusProps } from '../permission/components/PermissionOptionsStatus';
 import type { ApiErrorMessage } from '../../api/apiErrors';
 import { TableOptions } from "../../shared/interfaces/sharedInterfaces";
-import { Permission } from "../permission";
-import { Role } from "../rol";
 
 export interface User {
-    id?: string,
-    identificador?: string,
+    id?: number,
+    identificador?: number,
     correo: string,
     nombre: string,
     password?: string,
@@ -18,8 +16,8 @@ export interface UserFormModalProps {
     roleOptionsStatus: PermissionOptionsStatusProps;
     permissionOptionsStatus: PermissionOptionsStatusProps;
     handleOpen: (open: boolean) => void;
-    permisos: { value: string | number; description: string }[]
-    roles: { value: string | number; description: string }[]
+    permisos: { value: number; description: string }[]
+    roles: { value: number; description: string }[]
     loading: boolean
     activeUser: User
     onSaveOrUptdate: (values: User) => Promise<void>
@@ -27,10 +25,10 @@ export interface UserFormModalProps {
 }
 
 
-// Select identifiers and unchanged relation objects returned by the server.
-export type UserPermission = string | number | Permission;
-export type UserRole = string | number | Role;
-export type UserResponse = Omit<User, 'id' | 'identificador'> & { identificador: string };
+// Public aliases retained; administrative relations are numeric IDs.
+export type UserPermission = number;
+export type UserRole = number;
+export type UserResponse = Omit<User, 'id' | 'identificador'> & { identificador: number };
 export type UserListResponse = TableOptions & { data: UserResponse[] };
 
-export type UserEntity = Omit<UserResponse, 'identificador'> & { id: string };
+export type UserEntity = Omit<UserResponse, 'identificador'> & { id: number };

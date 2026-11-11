@@ -6,8 +6,8 @@ async (page) => {
     const onConsole = message => {
         if (['warning', 'error'].includes(message.type()) && !message.text().startsWith('Failed to load resource:')) consoleMessages.push(message.text().slice(0, 250));
     };
-    const main = { identificador: '7', fecha: '2026-11-08', observacion: 'Original', direccion: 'Dirección', departamento: 'Departamento', municipalidad: 'Municipio', latitud: 1, longitud: 2 };
-    const sub = { identificador: '8', cantidad: 3, peso: 1.5, foto: 'existente.png', decomiso: { identificador: 7 }, droga: { identificador: 1, descripcion: 'Droga original' }, presentacion: { identificador: 2, descripcion: 'Presentación original' }, arma: { identificador: 3, descripcion: 'Arma original' }, municion: { identificador: 4, descripcion: 'Munición original' } };
+    const main = { identificador: 7, fecha: '2026-11-08', observacion: 'Original', direccion: 'Dirección', departamento: 'Departamento', municipalidad: 'Municipio', latitud: 1, longitud: 2 };
+    const sub = { identificador: 8, cantidad: 3, peso: 1.5, foto: 'existente.png', decomiso: { identificador: 7 }, droga: { identificador: 1, descripcion: 'Droga original' }, presentacion: { identificador: 2, descripcion: 'Presentación original' }, arma: { identificador: 3, descripcion: 'Arma original' }, municion: { identificador: 4, descripcion: 'Munición original' } };
     let release;
     let mode = 'fail';
     let detailFails = true;

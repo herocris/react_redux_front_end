@@ -20,7 +20,7 @@ test('análisis: contratos, argumentos y concurrencia', async t => {
     client.setDefaultOptions({ queries: { ...client.getDefaultOptions().queries, gcTime: Infinity }, mutations: { gcTime: Infinity } });
     const original = api.defaults.adapter;
     t.after(() => { api.defaults.adapter = original; client.clear(); });
-    const filters = { start_date: '2026-01-02', end_date: '2026-11-09', drugs: ['7', 2], weapons: [3], ammunitions: ['4'] };
+    const filters = { start_date: '2026-01-02', end_date: '2026-11-09', drugs: [7, 2], weapons: [3], ammunitions: [4] };
     const args = { filters, period: 1, typeConfiscation: 'Drogas', typeGraph: 'bar' };
     const reply = (config, data) => ({ config, data, status: 200, statusText: 'OK', headers: {} });
     const tick = () => new Promise(resolve => setImmediate(resolve));
@@ -107,7 +107,7 @@ test('análisis: contratos, argumentos y concurrencia', async t => {
         factories.push(() => confiscationMutationOptions(client, () => {}));
         for (const domain of ['drugConfiscation', 'weaponConfiscation', 'ammunitionConfiscation']) {
             const module = await load(`/src/modules/${domain}/queries/${domain}Queries.ts`);
-            factories.push(() => module[`${domain}MutationOptions`](client, 'parent', () => {}));
+            factories.push(() => module[`${domain}MutationOptions`](client, 7, () => {}));
         }
         const mapKey = mapQueryOptions(filters).queryKey, graphKey = graphQueryOptions(args).queryKey;
         for (const factory of factories) {
@@ -115,12 +115,12 @@ test('análisis: contratos, argumentos y concurrencia', async t => {
             client.setQueryData(graphKey, { lineBarData: [], pieData: [] });
             api.defaults.adapter = async () => { throw { error: 'Falló escritura' }; };
             const failed = client.getMutationCache().build(client, factory());
-            await assert.rejects(failed.execute({ type: 'delete', id: 'child' }));
+            await assert.rejects(failed.execute({ type: 'delete', id: 8 }));
             assert.equal(client.getQueryState(mapKey).isInvalidated, false);
             assert.equal(client.getQueryState(graphKey).isInvalidated, false);
             api.defaults.adapter = async config => reply(config, {});
             const successful = client.getMutationCache().build(client, factory());
-            await successful.execute({ type: 'delete', id: 'child' });
+            await successful.execute({ type: 'delete', id: 8 });
             assert.equal(client.getQueryState(mapKey).isInvalidated, true);
             assert.equal(client.getQueryState(graphKey).isInvalidated, true);
         }

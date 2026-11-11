@@ -2,7 +2,7 @@ import { z } from "zod";
 import { imageSchema } from "../../../shared/validators/imageValidation";
 
 export const drugPresentationSchema = z.object({
-    identificador: z.string().optional(),
+    identificador: z.number().int().positive().optional(),
     descripcion: z.string().min(1, "La descripcion es requerido"),
     logo: imageSchema,
 });

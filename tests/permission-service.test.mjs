@@ -25,7 +25,7 @@ test('permissionService: contratos HTTP sin Redux', async t => {
         for (const sortBy of ['id', 'nombre']) {
             const input = { ...params, sortBy };
             const before = { ...input };
-            const response = { ...metadata, data: [{ identificador: '007', nombre: 'Leer', extra: 'preservado' }] };
+            const response = { ...metadata, data: [{ identificador: 7, nombre: 'Leer', extra: 'preservado' }] };
             api.defaults.adapter = async config => {
                 assert.equal(config.method, 'get');
                 assert.equal(config.url, `/permission?page=3&sort_by=${sortBy === 'id' ? 'identificador' : 'nombre'}&type=desc&per_page=25&nombre=Leer`);
@@ -33,10 +33,10 @@ test('permissionService: contratos HTTP sin Redux', async t => {
                 return success(config, response);
             };
             assert.deepEqual(await service.list(input), {
-                permissions: [{ id: '007', nombre: 'Leer', extra: 'preservado' }], tableOptions: metadata,
+                permissions: [{ id: 7, nombre: 'Leer', extra: 'preservado' }], tableOptions: metadata,
             });
             assert.deepEqual(input, before);
-            assert.equal(response.data[0].identificador, '007');
+            assert.equal(response.data[0].identificador, 7);
         }
         api.defaults.adapter = async config => {
             assert.equal(config.url, '/permission?page=1&sort_by=identificador&type=asc&per_page=10&=');
@@ -50,17 +50,17 @@ test('permissionService: contratos HTTP sin Redux', async t => {
     await t.test('crear y actualizar conservan JSON, cookies y ambos campos de identificador', async () => {
         for (const update of [false, true]) {
             for (const includeIdentifier of [false, true]) {
-                const values = { nombre: 'Nuevo', ...(includeIdentifier ? { identificador: 'read' } : {}), ...(update ? { id: '007' } : {}) };
+                const values = { nombre: 'Nuevo', ...(includeIdentifier ? { identificador: 'read' } : {}), ...(update ? { id: 7 } : {}) };
                 const before = { ...values };
                 api.defaults.adapter = async config => {
-                    assert.equal(config.url, update ? '/permission/007' : '/permission');
+                    assert.equal(config.url, update ? '/permission/7' : '/permission');
                     assert.equal(config.method, update ? 'put' : 'post');
                     assert.equal(config.withCredentials, true);
                     assert.match(config.headers.get('Content-Type'), /application\/json/);
                     assert.deepEqual(JSON.parse(config.data), values);
-                    return success(config, { identificador: '007', nombre: 'Nuevo' });
+                    return success(config, { identificador: 7, nombre: 'Nuevo' });
                 };
-                assert.deepEqual(await (update ? service.update(values) : service.create(values)), { id: '007', nombre: 'Nuevo' });
+                assert.deepEqual(await (update ? service.update(values) : service.create(values)), { id: 7, nombre: 'Nuevo' });
                 assert.deepEqual(values, before);
             }
         }
@@ -69,19 +69,19 @@ test('permissionService: contratos HTTP sin Redux', async t => {
     await t.test('borrar conserva ruta e id y no necesita cuerpo de respuesta', async () => {
         api.defaults.adapter = async config => {
             assert.equal(config.method, 'delete');
-            assert.equal(config.url, '/permission/007');
+            assert.equal(config.url, '/permission/7');
             assert.equal(config.withCredentials, true);
             assert.equal(config.data, undefined);
             return success(config, undefined);
         };
-        assert.equal(await service.remove('007'), undefined);
+        assert.equal(await service.remove(7), undefined);
     });
 
     const operations = [
         signal => service.list(params, signal),
         signal => service.create({ nombre: 'Leer' }, signal),
-        signal => service.update({ id: '007', nombre: 'Leer' }, signal),
-        signal => service.remove('007', signal),
+        signal => service.update({ id: 7, nombre: 'Leer' }, signal),
+        signal => service.remove(7, signal),
     ];
     await t.test('propaga la causa HTTP, de red y desconocida sin reinterpretarla', async () => {
         for (const operation of operations) {
@@ -104,7 +104,7 @@ test('permissionService: contratos HTTP sin Redux', async t => {
             let transportSignal;
             api.defaults.adapter = config => new Promise(resolve => {
                 transportSignal = config.signal;
-                finish = () => resolve(success(config, { identificador: '007', nombre: 'Leer', data: [] }));
+                finish = () => resolve(success(config, { identificador: 7, nombre: 'Leer', data: [] }));
             });
             const pending = operation(controller.signal);
             assert.equal(transportSignal.aborted, false);
@@ -120,12 +120,12 @@ test('permissionService: contratos HTTP sin Redux', async t => {
         api.defaults.adapter = async config => {
             const page = Number(new URL(config.url, 'http://test').searchParams.get('page'));
             pages.push(page);
-            return success(config, { data: [{ identificador: page === 1 ? '007' : '008', nombre: 'P' + page }],
+            return success(config, { data: [{ identificador: page === 1 ? 7 : 8, nombre: 'P' + page }],
                 current_page: page, per_page: 1, total: 2, last_page: 2 });
         };
         const catalog = await service.catalog();
         assert.deepEqual(pages, [1, 2]);
-        assert.deepEqual(catalog.map(row => row.id), ['007', '008']);
+        assert.deepEqual(catalog.map(row => row.id), [7, 8]);
         api.defaults.adapter = async config => success(config, { data: [], current_page: 1, per_page: 100, total: 0, last_page: 1 });
         assert.deepEqual(await service.catalog(), []);
     });
@@ -134,7 +134,7 @@ test('permissionService: contratos HTTP sin Redux', async t => {
         for (const mode of ['missing', 'incomplete', 'repeated', 'changed', 'empty', 'wrongpage']) {
             api.defaults.adapter = async config => {
                 const page = Number(new URL(config.url, 'http://test').searchParams.get('page'));
-                return success(config, { data: mode === 'empty' ? [] : [{ identificador: mode === 'repeated' ? '7' : String(page), nombre: 'P' }],
+                return success(config, { data: mode === 'empty' ? [] : [{ identificador: mode === 'repeated' ? 7 : page, nombre: 'P' }],
                     current_page: mode === 'wrongpage' ? 1 : page, per_page: 1,
                     ...(mode === 'missing' ? {} : { total: mode === 'changed' && page === 2 ? 3 : 2,
                         last_page: mode === 'incomplete' ? 1 : 2 }) });
@@ -154,7 +154,7 @@ test('permissionService: contratos HTTP sin Redux', async t => {
                     if (cancel) controller.abort();
                     else throw reason;
                 }
-                return success(config, { data: [{ identificador: String(calls), nombre: 'P' }],
+                return success(config, { data: [{ identificador: calls, nombre: 'P' }],
                     current_page: calls, total: 3, last_page: 3 });
             };
             await assert.rejects(service.catalog(controller.signal), error => cancel ? axios.isCancel(error) : error === reason);

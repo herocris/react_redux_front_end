@@ -15,7 +15,7 @@ async (page) => {
         if (message.text().startsWith('Failed to load resource:') && message.location().url.includes('/activity')) expectedNetworkErrors++;
         else unexpectedConsole.push(message.type());
     };
-    const rowData = { identificador: '7', tipo_de_evento: 'update', descripcion: 'Fixture', id_usuario: 4, usuario: 'Fixture', cambios: { antes: 1 }, fecha: '2026-11-08T12:13:14' };
+    const rowData = { identificador: 7, tipo_de_evento: 'update', descripcion: 'Fixture', id_usuario: 4, usuario: 'Fixture', cambios: { antes: 1 }, fecha: '2026-11-08T12:13:14' };
     const response = (empty = false) => ({ data: empty ? [] : [rowData], current_page: 1, per_page: 10, total: empty ? 0 : 1, last_page: 1, orderBy: 'id', order: 'asc' });
     try {
         page.on('pageerror', onError);

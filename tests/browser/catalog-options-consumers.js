@@ -10,7 +10,7 @@ async (page) => {
         else if (message.text().startsWith('MUI: You have provided an out-of-range value `0`')) legacySelectWarnings++;
         else if (!message.text().startsWith('Canvas2D: Multiple readback operations')) consoleErrors.push(message.text());
     };
-    const main = { identificador: '7', fecha: '2026-11-08', observacion: 'Original', direccion: 'Dirección', departamento: 'Departamento', municipalidad: 'Municipio', latitud: 1, longitud: 2 };
+    const main = { identificador: 7, fecha: '2026-11-08', observacion: 'Original', direccion: 'Dirección', departamento: 'Departamento', municipalidad: 'Municipio', latitud: 1, longitud: 2 };
     const routeHandler = async route => {
         const req = route.request(), url = new URL(req.url());
         if (req.resourceType() === 'image') return route.fulfill({ contentType: 'image/png', body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=', 'base64') });
@@ -20,7 +20,7 @@ async (page) => {
         if (['drug', 'weapon', 'ammunition', 'drugPresentation'].includes(domain)) {
             const p = Number(url.searchParams.get('page')); reads.push({ domain, page: p });
             if (fail === domain) return route.fulfill({ status: 503, json: { error: 'Catálogo no disponible' } });
-            const rows = [1, 2, 3].map(i => ({ identificador: String(i), descripcion: domain + ' ' + i, logo: '' }));
+            const rows = [1, 2, 3].map(i => ({ identificador: i, descripcion: domain + ' ' + i, logo: '' }));
             return route.fulfill({ json: { data: rows.slice((p - 1) * 2, p * 2), current_page: p, per_page: 2, total: 3, last_page: 2 } });
         }
         if (url.pathname.endsWith('/confiscation/7')) return route.fulfill({ json: main });

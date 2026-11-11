@@ -2,7 +2,7 @@ import { z } from "zod";
 import dayjs from "dayjs";
 
 export const confiscationSchema = z.object({
-    identificador: z.string().optional(),
+    identificador: z.number().int().positive().optional(),
     fecha: z
         .any()
         .refine((val) => val && dayjs(val).isValid(), "La fecha es requerida")

@@ -1,8 +1,8 @@
 import type { TableOptions } from '../shared/interfaces/sharedInterfaces';
 export interface ListParams { page: number; per_page: number; sortBy: string; orderType: string; search_by: string; valueSearch: string }
-export async function readCatalog<T extends { id: string }>(list: (params: ListParams, signal?: AbortSignal) => Promise<{ rows: T[]; tableOptions: TableOptions }>, signal?: AbortSignal): Promise<T[]> {
+export async function readCatalog<T extends { id: number }>(list: (params: ListParams, signal?: AbortSignal) => Promise<{ rows: T[]; tableOptions: TableOptions }>, signal?: AbortSignal): Promise<T[]> {
     const rows: T[] = [];
-    const ids = new Set<string>();
+    const ids = new Set<number>();
     let expectedTotal: number | undefined;
     let lastPage: number | undefined;
     let page = 1;

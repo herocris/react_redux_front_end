@@ -2,7 +2,7 @@ import { z } from "zod";
 import { imageSchema } from "../../../shared/validators/imageValidation";
 
 export const weaponConfiscationSchema = z.object({
-    identificador: z.string().optional(),
+    identificador: z.number().int().positive().optional(),
     cantidad: z.coerce.number().min(1, "Debe haber al menos uno"),
     decomiso: z.number().positive("Debe haber un decomiso"),
     arma: z.coerce.number().positive("Debe haber una arma"),

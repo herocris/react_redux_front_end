@@ -5,7 +5,7 @@ async (page) => {
     const writes = [];
     const unexpectedConsole = [];
     let expectedNetworkErrors = 0;
-    let items = [{ identificador: '7', nombre: 'Original' }];
+    let items = [{ identificador: 7, nombre: 'Original' }];
     let createAttempts = 0;
     let editAttempts = 0;
     let deleteAttempts = 0;
@@ -49,13 +49,13 @@ async (page) => {
                 await createGate;
                 return route.fulfill({ status: 422, json: { error: { nombre: ['Ya existe ese permiso.'], campoAjeno: ['Error general.'] } } });
             }
-            items.push({ identificador: '8', nombre: 'Nueva' });
+            items.push({ identificador: 8, nombre: 'Nueva' });
             return route.fulfill({ json: items.at(-1) });
         }
         if (url.pathname.endsWith('/permission/7') && request.method() === 'PUT') {
             editAttempts++;
             if (editAttempts === 1) return route.abort('failed');
-            items[0] = { identificador: '7', nombre: 'Editada' };
+            items[0] = { identificador: 7, nombre: 'Editada' };
             return route.fulfill({ json: items[0] });
         }
         if (url.pathname.endsWith('/permission/7') && request.method() === 'DELETE') {
@@ -64,7 +64,7 @@ async (page) => {
                 await deleteGate;
                 return route.fulfill({ status: 500, json: { error: 'No se pudo borrar.' } });
             }
-            items = items.filter(item => item.identificador !== '7');
+            items = items.filter(item => item.identificador !== 7);
             return route.fulfill({ json: {} });
         }
         return route.fulfill({ json: { data: [] } });
@@ -111,7 +111,7 @@ async (page) => {
         await editedRow.waitFor();
         check(editAttempts === 2, 'Unexpected update requests');
         const update = writes.filter(write => write.path.endsWith('/7') && write.method === 'PUT');
-        check(update.every(write => { const body = JSON.parse(write.body); return body.id === '7' && body.nombre === 'Editada'; }), 'Update JSON contract changed');
+        check(update.every(write => { const body = JSON.parse(write.body); return body.id === 7 && body.nombre === 'Editada'; }), 'Update JSON contract changed');
         passed.push('Editar: éxito actualiza fila y conserva PUT JSON');
         await editedRow.getByRole('menuitem', { name: 'Delete', exact: true }).click();
         const dialog = page.getByRole('dialog', { name: 'Borrar permiso' });

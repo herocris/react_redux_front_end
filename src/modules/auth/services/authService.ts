@@ -1,5 +1,11 @@
+import { z } from 'zod';
 import api from '../../../api/graphdataApi';
 import type { LoginData, RegisterData, RegisterResponse, SessionResponse, SessionUser } from '../types';
+
+const sessionSchema = z.object({
+    user: z.object({ name: z.string(), email: z.string() }),
+    roles: z.array(z.string()), permissions: z.array(z.string()),
+});
 
 const toSessionUser = ({ user, roles, permissions }: SessionResponse): SessionUser => ({
     nombre: user.name,
@@ -11,15 +17,15 @@ const toSessionUser = ({ user, roles, permissions }: SessionResponse): SessionUs
 export const authService = {
     async login({ email, password }: LoginData, signal?: AbortSignal): Promise<SessionUser> {
         const { data } = await api.post<SessionResponse>('/login', { email, password }, { signal });
-        return toSessionUser(data);
+        return toSessionUser(sessionSchema.parse(data));
     },
     async register({ name, email, password }: RegisterData, signal?: AbortSignal): Promise<SessionUser> {
         const { data } = await api.post<RegisterResponse>('/register', { name, email, password }, { signal });
-        return 'roles' in data ? toSessionUser(data) : data.user;
+        return 'roles' in data ? toSessionUser(sessionSchema.parse(data)) : data.user;
     },
     async checkSession(signal?: AbortSignal): Promise<SessionUser> {
         const { data } = await api.post<SessionResponse>('/refresh', undefined, { signal });
-        return toSessionUser(data);
+        return toSessionUser(sessionSchema.parse(data));
     },
     async logout(signal?: AbortSignal): Promise<void> {
         await api.post('/logout', undefined, { signal });

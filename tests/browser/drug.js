@@ -3,7 +3,7 @@ async (page) => {
     const errors = [];
     const passed = [];
     const writes = [];
-    let items = [{ identificador: '7', descripcion: 'Original', logo: 'logo.png' }];
+    let items = [{ identificador: 7, descripcion: 'Original', logo: 'logo.png' }];
     const unexpectedConsole = [];
     let expectedNetworkErrors = 0;
     let createAttempts = 0;
@@ -49,14 +49,14 @@ async (page) => {
                 await createGate;
                 return route.fulfill({ status: 422, json: { error: { descripcion: ['Ya existe esa droga.'] } } });
             }
-            const created = { identificador: '8', descripcion: 'Nueva', logo: 'nueva.png' };
+            const created = { identificador: 8, descripcion: 'Nueva', logo: 'nueva.png' };
             items.push(created);
             return route.fulfill({ json: created });
         }
         if (url.pathname.endsWith('/drug/7') && request.method() === 'POST') {
             editAttempts++;
             if (editAttempts === 1) return route.abort('failed');
-            const updated = { identificador: '7', descripcion: 'Editada', logo: 'logo.png' };
+            const updated = { identificador: 7, descripcion: 'Editada', logo: 'logo.png' };
             items = items.map(item => item.identificador === updated.identificador ? updated : item);
             return route.fulfill({ json: updated });
         }
@@ -66,7 +66,7 @@ async (page) => {
                 await deleteGate;
                 return route.fulfill({ status: 500, json: { error: 'No se pudo borrar.' } });
             }
-            items = items.filter(item => item.identificador !== '7');
+            items = items.filter(item => item.identificador !== 7);
             return route.fulfill({ json: {} });
         }
         return route.fulfill({ json: { data: [] } });

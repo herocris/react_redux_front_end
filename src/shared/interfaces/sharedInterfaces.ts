@@ -30,6 +30,6 @@ export interface AlertDialogProps {
 }
 
 export interface SelectOptions {
-    value: string | number,
+    value: number,
     description: string,
 }

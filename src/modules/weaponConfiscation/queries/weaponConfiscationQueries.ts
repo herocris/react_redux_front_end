@@ -1,3 +1,4 @@
+import { readId } from '../../../api/identifiers';
 import { queryOptions, type QueryClient } from '@tanstack/react-query';
 import type { ListParams } from '../../../api/catalog';
 import { getSessionSignal } from '../../../api/sessionScope';
@@ -9,17 +10,17 @@ import { invalidateAnalysis } from '../../analysisFilters/invalidateAnalysis';
 
 export const weaponConfiscationKeys = {
     all: ['weaponConfiscation'] as const,
-    parent: (parent: string) => ['weaponConfiscation', parent] as const,
-    list: (parent: string, params: ListParams) => [...weaponConfiscationKeys.parent(parent), 'list', params] as const,
+    parent: (parent: number) => ['weaponConfiscation', readId(parent)] as const,
+    list: (parent: number, params: ListParams) => [...weaponConfiscationKeys.parent(parent), 'list', params] as const,
 };
-export const weaponConfiscationListOptions = (parent: string, params: ListParams) => queryOptions({
+export const weaponConfiscationListOptions = (parent: number, params: ListParams) => queryOptions({
     queryKey: weaponConfiscationKeys.list(parent, params),
     queryFn: ({ signal }) => weaponConfiscationService.list(parent, params, signal),
     enabled: !!parent,
 });
 type Write = { type: 'create'; values: WeaponConfiscation } |
-    { type: 'update'; values: WeaponConfiscation & { identificador: string } } | { type: 'delete'; id: string };
-export const weaponConfiscationMutationOptions = (client: QueryClient, parent: string, onSuccess: () => void) => {
+    { type: 'update'; values: WeaponConfiscation & { identificador: number } } | { type: 'delete'; id: number };
+export const weaponConfiscationMutationOptions = (client: QueryClient, parent: number, onSuccess: () => void) => {
     const signal = getSessionSignal();
     return sessionMutationOptions({
         mutationFn: async (write: Write) => {

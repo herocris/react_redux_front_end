@@ -168,6 +168,10 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
   existe. Usar `src/api/apiErrors.ts` para mensajes de UI; los thunks que rechazan
   conservan la causa y sus consumidores manejan el rechazo sin cerrar por éxito.
 - Tipar props, formularios y respuestas; preferir `unknown` y narrowing a `any`.
+- IDs del backend y relaciones administrativas: números enteros positivos
+  seguros, validados en services; opciones y claves Query usan números. Convertir
+  parámetros de `useParams` con `parseRouteId` antes de consultar. Los roles y
+  permisos de sesión son nombres string, separados de los IDs administrativos.
 - Si un esquema transforma valores, distinguir `z.input` de `z.output` en los
   genéricos de `useForm`; el submit recibe los valores ya validados y convertidos.
 - Mantener carga, éxito, error y vacío coherentes, también ante fallos. Evitar

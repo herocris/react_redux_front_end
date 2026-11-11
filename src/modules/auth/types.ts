@@ -27,17 +27,8 @@ export interface AuthLayoutProps {
 export type AuthStatus = 'checking' | 'authenticated' | 'not-authenticated';
 
 // Session contracts are independent of the administrative user and its form.
-export type SessionPermission = string | number | {
-    id?: string;
-    identificador?: string;
-    nombre: string;
-};
-export type SessionRole = string | number | {
-    id?: string;
-    identificador?: string;
-    nombre: string;
-    permisos?: SessionPermission[];
-};
+export type SessionPermission = string;
+export type SessionRole = string;
 export interface SessionUser {
     nombre: string;
     correo: string;

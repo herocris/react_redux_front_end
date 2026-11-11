@@ -2,8 +2,8 @@ import type { ApiErrorMessage } from '../../api/apiErrors';
 import { TableOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface DrugPresentation {
-    id?: string,
-    identificador?: string,
+    id?: number,
+    identificador?: number,
     descripcion: string,
     logo: string | File
 }
@@ -17,10 +17,10 @@ export interface DrugPresentationFormModalProps {
     errorMessage: ApiErrorMessage
 }
 export type DrugPresentationResponse = Omit<DrugPresentation, 'id' | 'identificador' | 'logo'> & {
-    identificador: string;
+    identificador: number;
     logo: string;
 };
 
 export type DrugPresentationListResponse = TableOptions & { data: DrugPresentationResponse[] };
 
-export type DrugPresentationEntity = Omit<DrugPresentationResponse, 'identificador'> & { id: string };
+export type DrugPresentationEntity = Omit<DrugPresentationResponse, 'identificador'> & { id: number };

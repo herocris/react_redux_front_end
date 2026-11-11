@@ -47,7 +47,7 @@ test('los formularios convierten errores de Zod en errores de campo', async t =>
         const cases = [
             [authLoginSchema, { email: 'test@example.test', password: 'Password123!' }],
             [authRegisterSchema, { name: 'Prueba', email: 'test@example.test', password: 'Password123!', passwordConfirmation: 'Password123!' }],
-            [userSchema, { identificador: '7', nombre: 'Prueba', correo: 'test@example.test', password: 'Password123!', roles: [], permisos: [] }],
+            [userSchema, { identificador: 7, nombre: 'Prueba', correo: 'test@example.test', password: 'Password123!', roles: [], permisos: [] }],
         ];
         for (const [schema, values] of cases) {
             const result = await resolve(schema, values);

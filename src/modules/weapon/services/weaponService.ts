@@ -1,7 +1,8 @@
+import { readId } from '../../../api/identifiers';
 import api from '../../../api/graphdataApi';
 import { readCatalog, type ListParams } from '../../../api/catalog';
 import type { Weapon, WeaponEntity, WeaponResponse, WeaponListResponse } from '../types';
-const toEntity = ({ identificador: id, ...rest }: WeaponResponse): WeaponEntity => ({ id, ...rest });
+const toEntity = ({ identificador: id, ...rest }: WeaponResponse): WeaponEntity => ({ ...rest, id: readId(id) });
 export const weaponService = {
     async list({ page, sortBy, orderType, per_page, search_by, valueSearch }: ListParams, signal?: AbortSignal) {
         const sort = sortBy === 'id' ? 'identificador' : sortBy;
@@ -14,13 +15,13 @@ export const weaponService = {
         const { data } = await api.post<WeaponResponse>('/weapon', values, { signal, headers: { 'Content-Type': 'multipart/form-data' } });
         return toEntity(data);
     },
-    async update(values: Weapon & { id: string }, signal?: AbortSignal): Promise<WeaponEntity> {
+    async update(values: Weapon & { id: number }, signal?: AbortSignal): Promise<WeaponEntity> {
         const payload = new FormData();
         payload.append('descripcion', values.descripcion);
         if (values.logo instanceof File) payload.append('logo', values.logo);
         payload.append('_method', 'PUT');
-        const { data } = await api.post<WeaponResponse>(`/weapon/${values.id}`, payload, { signal, headers: { 'Content-Type': 'multipart/form-data' } });
+        const { data } = await api.post<WeaponResponse>(`/weapon/${readId(values.id)}`, payload, { signal, headers: { 'Content-Type': 'multipart/form-data' } });
         return toEntity(data);
     },
-    async remove(id: string, signal?: AbortSignal): Promise<void> { await api.delete(`/weapon/${id}`, { signal }); },
+    async remove(id: number, signal?: AbortSignal): Promise<void> { await api.delete(`/weapon/${readId(id)}`, { signal }); },
 };

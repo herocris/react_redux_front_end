@@ -23,8 +23,8 @@ export const permissionOptionsOptions = () => queryOptions({
 
 type PermissionWrite =
     | { type: 'create'; values: Permission }
-    | { type: 'update'; values: Permission & { id: string } }
-    | { type: 'delete'; id: string };
+    | { type: 'update'; values: Permission & { id: number } }
+    | { type: 'delete'; id: number };
 
 // Construct in the authenticated consumer; all effects belong to guarded callbacks.
 export const permissionMutationOptions = (client: QueryClient, onSuccess: () => void) => {

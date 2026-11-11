@@ -22,7 +22,7 @@ export const AmmunitionConfiscationForm = ({ busy = false, optionsStatus, active
         formState: { errors, isSubmitting: formSubmitting },
         control
     } = useForm<FormInput, unknown, FormFields>({
-        defaultValues: { ...activeAmmunitionConfiscation, municion: activeAmmunitionConfiscation.municion || '',  identificador: activeAmmunitionConfiscation.identificador?.toString() },
+        defaultValues: { ...activeAmmunitionConfiscation, municion: activeAmmunitionConfiscation.municion || '',  identificador: activeAmmunitionConfiscation.identificador },
         resolver: zodResolver(ammunitionConfiscationSchema)
     });
 

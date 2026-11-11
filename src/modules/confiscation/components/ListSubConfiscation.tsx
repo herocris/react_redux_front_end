@@ -10,14 +10,14 @@ import { DrugConfiscation } from '../../drugConfiscation';
 interface ListSubConfiscationProps {
     setOpen: (open: boolean) => void
     list: DrugConfiscation[] | WeaponConfiscation[] | AmmunitionConfiscation[]
-    setActiveSubConfiscation: (id: string | number) => void
+    setActiveSubConfiscation: (id: number | number) => void
     disabled?: boolean
 }
 
 const { VITE_LOCAL_PHOTOS_URL } = getEnvVariables();
 
 export const ListSubConfiscation = memo(({ setOpen, list, setActiveSubConfiscation, disabled }: ListSubConfiscationProps) => {
-    const clickItemList = (id: string) => {
+    const clickItemList = (id: number) => {
         setActiveSubConfiscation(id)
         setOpen(true)
     }
@@ -35,7 +35,7 @@ export const ListSubConfiscation = memo(({ setOpen, list, setActiveSubConfiscati
                     {list.length > 0
                         ?
                         list.map((itemList: DrugConfiscation | WeaponConfiscation | AmmunitionConfiscation, index) => (
-                            <ListItemButton disabled={disabled} key={itemList.identificador ?? index} onClick={() => clickItemList(itemList?.identificador as string)}>
+                            <ListItemButton disabled={disabled} key={itemList.identificador ?? index} onClick={() => { if (itemList.identificador !== undefined) clickItemList(itemList.identificador); }}>
                                 <ListItemAvatar>
                                     <Badge badgeContent={itemList.cantidad} color="primary" sx={{ margin: 0 }}>
                                         <Avatar alt={"Remy Sharp"} src={`${VITE_LOCAL_PHOTOS_URL}/${itemList?.foto}` as string} />

@@ -17,7 +17,7 @@ test('filtros aplicados: transiciones, contrato y fronteras de sesión', async t
     const { onLogin, onLogout, onChecking } = await load('/src/modules/auth/slices/authSlice.ts');
     const empty = { start_date: '', end_date: '', drugs: [], weapons: [], ammunitions: [] };
     const filters = { start_date: '2026-01-02', end_date: '2026-11-09',
-        drugs: ['007', 3], weapons: [8], ammunitions: ['12'] };
+        drugs: [7, 3], weapons: [8], ammunitions: [12] };
     const initial = () => rootReducer(undefined, { type: '@@init' });
 
     await t.test('defaults vacíos y selector estable; ninguna fecha ni selección implícita', () => {
@@ -29,14 +29,14 @@ test('filtros aplicados: transiciones, contrato y fronteras de sesión', async t
     await t.test('editar borrador no aplica; aplicar reemplaza atómicamente sin convertir IDs ni fechas', () => {
         const before = initial();
         const draft = structuredClone(filters);
-        draft.drugs.push('99');
+        draft.drugs.push(99);
         assert.deepEqual(selectAppliedAnalysisFilters(before), empty);
         const next = rootReducer(before, applyAnalysisFilters(draft));
         assert.deepEqual(selectAppliedAnalysisFilters(next), draft);
         assert.deepEqual(selectAppliedAnalysisFilters(before), empty);
         // The applied snapshot must not retain mutable form arrays.
-        draft.drugs.push('later');
-        assert.deepEqual(next.analysisFilters.drugs, ['007', 3, '99']);
+        draft.drugs.push(100);
+        assert.deepEqual(next.analysisFilters.drugs, [7, 3, 99]);
         const replaced = rootReducer(next, applyAnalysisFilters({ ...filters, weapons: [] }));
         assert.deepEqual(replaced.analysisFilters, { ...filters, weapons: [] });
         assert.equal(replaced.auth, next.auth);

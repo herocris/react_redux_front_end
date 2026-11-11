@@ -21,7 +21,7 @@ export const WeaponConfiscationForm = ({ busy = false, optionsStatus, activeWeap
         formState: { errors, isSubmitting: formSubmitting },
         control
     } = useForm<FormInput, unknown, FormFields>({
-        defaultValues: { ...activeWeaponConfiscation, arma: activeWeaponConfiscation.arma || '',  identificador: activeWeaponConfiscation.identificador?.toString() },
+        defaultValues: { ...activeWeaponConfiscation, arma: activeWeaponConfiscation.arma || '',  identificador: activeWeaponConfiscation.identificador },
         resolver: zodResolver(weaponConfiscationSchema)
     });
 

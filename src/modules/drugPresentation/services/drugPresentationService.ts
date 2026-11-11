@@ -1,7 +1,8 @@
+import { readId } from '../../../api/identifiers';
 import api from '../../../api/graphdataApi';
 import { readCatalog, type ListParams } from '../../../api/catalog';
 import type { DrugPresentation, DrugPresentationEntity, DrugPresentationResponse, DrugPresentationListResponse } from '../types';
-const toEntity = ({ identificador: id, ...rest }: DrugPresentationResponse): DrugPresentationEntity => ({ id, ...rest });
+const toEntity = ({ identificador: id, ...rest }: DrugPresentationResponse): DrugPresentationEntity => ({ ...rest, id: readId(id) });
 export const drugPresentationService = {
     async list({ page, sortBy, orderType, per_page, search_by, valueSearch }: ListParams, signal?: AbortSignal) {
         const sort = sortBy === 'id' ? 'identificador' : sortBy;
@@ -14,13 +15,13 @@ export const drugPresentationService = {
         const { data } = await api.post<DrugPresentationResponse>('/drugPresentation', values, { signal, headers: { 'Content-Type': 'multipart/form-data' } });
         return toEntity(data);
     },
-    async update(values: DrugPresentation & { id: string }, signal?: AbortSignal): Promise<DrugPresentationEntity> {
+    async update(values: DrugPresentation & { id: number }, signal?: AbortSignal): Promise<DrugPresentationEntity> {
         const payload = new FormData();
         payload.append('descripcion', values.descripcion);
         if (values.logo instanceof File) payload.append('logo', values.logo);
         payload.append('_method', 'PUT');
-        const { data } = await api.post<DrugPresentationResponse>(`/drugPresentation/${values.id}`, payload, { signal, headers: { 'Content-Type': 'multipart/form-data' } });
+        const { data } = await api.post<DrugPresentationResponse>(`/drugPresentation/${readId(values.id)}`, payload, { signal, headers: { 'Content-Type': 'multipart/form-data' } });
         return toEntity(data);
     },
-    async remove(id: string, signal?: AbortSignal): Promise<void> { await api.delete(`/drugPresentation/${id}`, { signal }); },
+    async remove(id: number, signal?: AbortSignal): Promise<void> { await api.delete(`/drugPresentation/${readId(id)}`, { signal }); },
 };

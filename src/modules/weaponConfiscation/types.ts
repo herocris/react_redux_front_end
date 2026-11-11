@@ -2,7 +2,7 @@ import type { OptionsStatus } from '../resouce/queries/optionsStatus';
 import { SelectOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface WeaponConfiscation {
-    identificador?: string,
+    identificador?: number,
     cantidad: number,
     decomiso: number,
     arma: number,

@@ -24,8 +24,8 @@ export const userOptionsOptions = () => queryOptions({
 
 type UserWrite =
     | { type: 'create'; values: User }
-    | { type: 'update'; values: User & { id: string } }
-    | { type: 'delete'; id: string };
+    | { type: 'update'; values: User & { id: number } }
+    | { type: 'delete'; id: number };
 
 // Construct in the authenticated consumer; all effects belong to guarded callbacks.
 export const userMutationOptions = (client: QueryClient, onSuccess: () => void) => {

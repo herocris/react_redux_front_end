@@ -1,3 +1,4 @@
+import { readId } from '../../../api/identifiers';
 import api from '../../../api/graphdataApi';
 import dayjs from 'dayjs';
 import type { ListParams } from '../../../api/catalog';
@@ -8,7 +9,7 @@ export const activityService = {
         const { data: { data, ...tableOptions } } = await api.get<ActivityListResponse>(
             `/activity?page=${page}&sort_by=${sort}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal });
         return { rows: data.map(({ identificador: id, cambios, fecha, ...rest }) => ({
-            id, cambios: JSON.stringify(cambios), fecha: dayjs(fecha).format('DD-MM-YYYY HH:mm:ss'), ...rest,
+            id: readId(id), cambios: JSON.stringify(cambios), fecha: dayjs(fecha).format('DD-MM-YYYY HH:mm:ss'), ...rest, id_usuario: rest.id_usuario === null ? null : readId(rest.id_usuario),
         })), tableOptions };
     },
 };

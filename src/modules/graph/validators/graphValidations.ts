@@ -13,9 +13,9 @@ export const graphSchema = z.object({
                 .any()
                 .refine((val) => val && dayjs(val).isValid(), "La fecha final es requerida")
                 .transform((val) => dayjs(val).format("YYYY-MM-DD")),
-        drugs: z.array(z.any()),
-        weapons: z.array(z.any()).optional(),
-        ammunitions: z.array(z.any()).optional(),
+        drugs: z.array(z.number().int().positive()),
+        weapons: z.array(z.number().int().positive()).optional(),
+        ammunitions: z.array(z.number().int().positive()).optional(),
 })//validacion condicional en base a type
         .superRefine((data, ctx) => {
                 // Según el tipo seleccionado, validar el array correspondiente

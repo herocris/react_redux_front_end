@@ -2,7 +2,7 @@ import type { OptionsStatus } from '../resouce/queries/optionsStatus';
 import { SelectOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface DrugConfiscation {
-    identificador?: string,
+    identificador?: number,
     cantidad: number,
     peso: number,
     decomiso: number,

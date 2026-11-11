@@ -2,17 +2,17 @@ import type { ApiErrorMessage } from '../../api/apiErrors';
 import { TableOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface PermissionFormValues {
-    identificador?: string,
+    identificador?: number,
     nombre: string,
 }
 
 // Contrato heredado para selección, formularios y consumidores de resouce.
 export interface Permission extends PermissionFormValues {
-    id?: string,
+    id?: number,
 }
 
 export interface PermissionEntity {
-    id: string,
+    id: number,
     nombre: string,
 }
 
@@ -37,7 +37,7 @@ export interface PermissionFormModalProps {
     errorMessage: ApiErrorMessage
 }
 export interface PermissionResponse {
-    identificador: string,
+    identificador: number,
     nombre: string,
 }
 export type PermissionListResponse = TableOptions & { data: PermissionResponse[] };

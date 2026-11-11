@@ -21,7 +21,7 @@ test('errores HTTP y thunks con el cliente real y un transporte simulado', async
     const { authSlice } = await server.ssrLoadModule('/src/modules/auth/slices/authSlice.ts');
     const originalAdapter = api.defaults.adapter;
     t.after(() => { api.defaults.adapter = originalAdapter; });
-    const user = { id: '7', nombre: 'Prueba', correo: 'prueba@example.test' };
+    const user = { id: 7, nombre: 'Prueba', correo: 'prueba@example.test' };
     const networkError = new axios.AxiosError('Network Error', 'ERR_NETWORK');
     const validation = { error: { correo: ['El correo ya existe.'] } };
 

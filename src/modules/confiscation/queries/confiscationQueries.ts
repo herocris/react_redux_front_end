@@ -1,3 +1,4 @@
+import { readId } from '../../../api/identifiers';
 import { queryOptions, type QueryClient } from '@tanstack/react-query';
 import type { ListParams } from '../../../api/catalog';
 import { getSessionSignal } from '../../../api/sessionScope';
@@ -10,19 +11,19 @@ export const confiscationKeys = {
     all: ['confiscation'] as const,
     lists: () => ['confiscation', 'list'] as const,
     list: (params: ListParams) => [...confiscationKeys.lists(), params] as const,
-    detail: (id: string) => ['confiscation', 'detail', id] as const,
+    detail: (id: number) => ['confiscation', 'detail', readId(id)] as const,
 };
 export const confiscationListOptions = (params: ListParams) => queryOptions({
     queryKey: confiscationKeys.list(params),
     queryFn: ({ signal }) => confiscationService.list(params, signal),
 });
-export const confiscationDetailOptions = (id: string) => queryOptions({
+export const confiscationDetailOptions = (id: number) => queryOptions({
     queryKey: confiscationKeys.detail(id),
     queryFn: ({ signal }) => confiscationService.detail(id, signal),
     enabled: !!id,
 });
 type Write = { type: 'create'; values: Confiscation } |
-    { type: 'update'; values: ConfiscationEntity } | { type: 'delete'; id: string };
+    { type: 'update'; values: ConfiscationEntity } | { type: 'delete'; id: number };
 export const confiscationMutationOptions = (client: QueryClient,
     onSuccess: (data: ConfiscationEntity | void, write: Write) => void) => {
     const signal = getSessionSignal();

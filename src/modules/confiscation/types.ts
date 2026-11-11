@@ -3,8 +3,8 @@ import type { z } from 'zod';
 import type { confiscationSchema } from './validators';
 
 export interface Confiscation {
-    id?: string,
-    identificador?: string,
+    id?: number,
+    identificador?: number,
     fecha: string,
     observacion: string,
     direccion: string,

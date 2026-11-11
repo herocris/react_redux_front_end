@@ -26,8 +26,8 @@ test('autenticación: contratos del service y transiciones de sesión', async t 
     const registration = { ...credentials, name: 'Sesión', passwordConfirmation: credentials.password };
     const response = {
         user: { name: registration.name, email: credentials.email },
-        roles: ['admin', 2, { identificador: '3', nombre: 'Operador' }],
-        permissions: [1, 'read', { identificador: '4', nombre: 'Leer' }],
+        roles: ['administrador', 'operador'],
+        permissions: ['drug.view'],
     };
     const session = { nombre: registration.name, correo: credentials.email,
         roles: response.roles, permisos: response.permissions };

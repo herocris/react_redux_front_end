@@ -45,7 +45,7 @@ test('piloto de permisos: caché, concurrencia, invalidación y sesión', async 
         assert.equal(hashes.size, 7);
         assert.notDeepEqual(keys.options(), keys.list(params));
         let calls = 0;
-        api.defaults.adapter = async config => { calls++; return reply(config, data('7')); };
+        api.defaults.adapter = async config => { calls++; return reply(config, data(7)); };
         const [a, b] = await Promise.all([client.fetchQuery(list(params)), client.fetchQuery(list(params))]);
         assert.deepEqual(a, b);
         await client.fetchQuery(list(params));
@@ -59,16 +59,16 @@ test('piloto de permisos: caché, concurrencia, invalidación y sesión', async 
         const unsubscribe = observer.subscribe(() => {});
         observer.setOptions(list({ ...params, page: 2, valueSearch: 'B' }));
         assert.equal(pending[0].config.signal.aborted, true);
-        pending[1].finish(data('B', 2));
+        pending[1].finish(data(102, 2));
         await tick();
-        pending[0].finish(data('A'));
+        pending[0].finish(data(101));
         await tick();
-        assert.equal(observer.getCurrentResult().data.permissions[0].id, 'B');
+        assert.equal(observer.getCurrentResult().data.permissions[0].id, 102);
         assert.equal(client.getQueryData(keys.list(params)), undefined);
         observer.setOptions(list({ ...params, page: 3 }));
         unsubscribe();
         assert.equal(pending[2].config.signal.aborted, true);
-        pending[2].finish(data('late', 3));
+        pending[2].finish(data(105, 3));
         await tick();
         assert.equal(client.getQueryData(keys.list({ ...params, page: 3 })), undefined);
     });
@@ -79,21 +79,21 @@ test('piloto de permisos: caché, concurrencia, invalidación y sesión', async 
         const a = client.fetchQuery(list(params));
         const b = client.fetchQuery(list({ ...params, page: 2 }));
         assert.equal(pending[0].config.signal.aborted, false);
-        pending[1].finish(data('B', 2));
-        pending[0].finish(data('A'));
+        pending[1].finish(data(102, 2));
+        pending[0].finish(data(101));
         await Promise.all([a, b]);
-        assert.equal(client.getQueryData(keys.list(params)).permissions[0].id, 'A');
-        assert.equal(client.getQueryData(keys.list({ ...params, page: 2 })).permissions[0].id, 'B');
+        assert.equal(client.getQueryData(keys.list(params)).permissions[0].id, 101);
+        assert.equal(client.getQueryData(keys.list({ ...params, page: 2 })).permissions[0].id, 102);
     });
 
     await t.test('errores conservan causa y caché, sin invalidación ni éxito; reintento de las tres escrituras', async () => {
         const reason = { error: { nombre: ['Duplicado'], desconocido: ['General'] } };
         const writes = [{ type: 'create', values: { nombre: 'Nueva' } },
-            { type: 'update', values: { id: '7', nombre: 'Editada' } }, { type: 'delete', id: '7' }];
+            { type: 'update', values: { id: 7, nombre: 'Editada' } }, { type: 'delete', id: 7 }];
         for (const value of writes) {
             client.clear();
-            client.setQueryData(keys.list(params), { permissions: [{ id: '7', nombre: 'Original' }] });
-            client.setQueryData(keys.options(), [{ id: '7', nombre: 'Original' }]);
+            client.setQueryData(keys.list(params), { permissions: [{ id: 7, nombre: 'Original' }] });
+            client.setQueryData(keys.options(), [{ id: 7, nombre: 'Original' }]);
             client.setQueryData(keys.list({ ...params, page: 2 }), 'page2');
             client.setQueryData(['other'], 'unchanged');
             let effects = 0;
@@ -104,7 +104,7 @@ test('piloto de permisos: caché, concurrencia, invalidación y sesión', async 
             assert.equal(client.getQueryState(keys.list(params)).isInvalidated, false);
             assert.equal(client.getQueryState(keys.options()).isInvalidated, false);
             assert.equal(client.getQueryData(keys.list(params)).permissions[0].nombre, 'Original');
-            api.defaults.adapter = async config => reply(config, { identificador: '7', nombre: 'Nueva' });
+            api.defaults.adapter = async config => reply(config, { identificador: 7, nombre: 'Nueva' });
             await mutation.execute(value);
             assert.equal(effects, 1);
             for (const key of [keys.list(params), keys.list({ ...params, page: 2 }), keys.options()]) {
@@ -121,7 +121,7 @@ test('piloto de permisos: caché, concurrencia, invalidación y sesión', async 
         api.defaults.adapter = async config => {
             if (config.method === 'delete') { removed = true; return reply(config, {}); }
             reads.push(config.url);
-            return reply(config, { data: removed ? [] : [{ identificador: '7', nombre: 'Original' }],
+            return reply(config, { data: removed ? [] : [{ identificador: 7, nombre: 'Original' }],
                 current_page: 1, per_page: 10, total: removed ? 0 : 1, last_page: 1 });
         };
         const listObserver = new QueryObserver(client, list(params));
@@ -135,7 +135,7 @@ test('piloto de permisos: caché, concurrencia, invalidación y sesión', async 
                 effects++;
                 assert.equal(listObserver.getCurrentResult().data.tableOptions.total, 0);
                 assert.deepEqual(optionObserver.getCurrentResult().data, []);
-            })).execute({ type: 'delete', id: '7' });
+            })).execute({ type: 'delete', id: 7 });
             assert.equal(effects, 1);
             assert.equal(reads.length, 4);
         } finally { unlist(); unoption(); }
@@ -153,28 +153,28 @@ test('piloto de permisos: caché, concurrencia, invalidación y sesión', async 
         await tick();
         resetSessionScope();
         await client.cancelQueries(); client.clear();
-        client.setQueryData(keys.options(), [{ id: 'B', nombre: 'B' }]);
-        pending[0].finish(data('A'));
-        pending[1].finish({ identificador: 'A', nombre: 'A' });
+        client.setQueryData(keys.options(), [{ id: 102, nombre: 'B' }]);
+        pending[0].finish(data(101));
+        pending[1].finish({ identificador: 101, nombre: 'A' });
         await Promise.all([rejectedRead, rejectedWrite]);
         assert.equal(effects, 0);
         assert.equal(client.getQueryState(keys.options()).isInvalidated, false);
-        assert.equal(client.getQueryData(keys.options())[0].id, 'B');
+        assert.equal(client.getQueryData(keys.options())[0].id, 102);
     });
 
     await t.test('cambio de sesión durante la invalidación impide efectos posteriores al await', async () => {
         client.clear(); resetSessionScope();
         const pending = intercept();
-        client.setQueryData(keys.list(params), { permissions: [{ id: 'A', nombre: 'A' }], tableOptions: { total: 1 } });
+        client.setQueryData(keys.list(params), { permissions: [{ id: 101, nombre: 'A' }], tableOptions: { total: 1 } });
         const observer = new QueryObserver(client, list(params));
         const unsubscribe = observer.subscribe(() => {});
         let effects = 0;
         const old = client.getMutationCache().build(client, write(client, () => { effects++; }))
-            .execute({ type: 'delete', id: 'A' });
+            .execute({ type: 'delete', id: 101 });
         await tick(); pending[0].finish({}); await tick();
         assert.equal(pending.length, 2);
         resetSessionScope(); await client.cancelQueries(); client.clear();
-        pending[1].finish(data('A'));
+        pending[1].finish(data(101));
         await old;
         assert.equal(effects, 0);
         unsubscribe();
@@ -182,7 +182,7 @@ test('piloto de permisos: caché, concurrencia, invalidación y sesión', async 
 
     await t.test('esquema de formulario conserva los campos y rechaza nombre vacío', async () => {
         const { permissionSchema } = await load('/src/modules/permission/validators/permissionValidations.ts');
-        const values = { nombre: 'Leer', identificador: 'read' };
+        const values = { nombre: 'Leer', identificador: 7 };
         assert.deepEqual(permissionSchema.parse(values), values);
         assert.equal(permissionSchema.safeParse({ nombre: '' }).success, false);
     });

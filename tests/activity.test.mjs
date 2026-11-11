@@ -20,7 +20,7 @@ test('actividad: service y consulta de solo lectura', async t => {
     t.after(() => { api.defaults.adapter = original; client.clear(); });
     const params = { page: 2, per_page: 5, sortBy: 'id', orderType: 'desc', search_by: 'tipo_de_evento', valueSearch: 'update' };
     const reply = (config, data) => ({ config, data, status: 200, statusText: 'OK', headers: {} });
-    const item = { identificador: '007', tipo_de_evento: 'update', descripcion: 'Fixture', id_usuario: 4, usuario: 'Fixture' };
+    const item = { identificador: 7, tipo_de_evento: 'update', descripcion: 'Fixture', id_usuario: 4, usuario: 'Fixture' };
     await t.test('GET preserva parámetros, cookies, campos, JSON de cambios y fechas locales', async () => {
         for (const fecha of ['2026-11-08T12:13:14', '2026-11-08T12:13:14Z', 'sin-fecha']) {
             const changes = [{ antes: 1 }, ['a', 1], 'texto', null, undefined];
@@ -58,11 +58,11 @@ test('actividad: service y consulta de solo lectura', async t => {
         const observer = new QueryObserver(client, list(params)); const off = observer.subscribe(() => {});
         observer.setOptions(list({ ...params, page: 3 }));
         assert.equal(pending[0].config.signal.aborted, true);
-        pending[1].finish('new'); await new Promise(resolve => setImmediate(resolve));
-        pending[0].finish('old'); await new Promise(resolve => setImmediate(resolve));
-        assert.equal(observer.getCurrentResult().data.rows[0].id, 'new');
+        pending[1].finish(104); await new Promise(resolve => setImmediate(resolve));
+        pending[0].finish(103); await new Promise(resolve => setImmediate(resolve));
+        assert.equal(observer.getCurrentResult().data.rows[0].id, 104);
         observer.setOptions(list({ ...params, page: 4 })); off();
-        assert.equal(pending[2].config.signal.aborted, true); pending[2].finish('late');
+        assert.equal(pending[2].config.signal.aborted, true); pending[2].finish(105);
         await new Promise(resolve => setImmediate(resolve));
         assert.equal(client.getQueryData(keys.list({ ...params, page: 4 })), undefined);
     });

@@ -28,7 +28,7 @@ async (page) => {
                 drug_confiscations: [], weapon_confiscations: [], ammunition_confiscations: [],
             }] } });
         }
-        return route.fulfill({ json: { data: [{ identificador: '7', descripcion: 'Opción 7', logo: '' }],
+        return route.fulfill({ json: { data: [{ identificador: 7, descripcion: 'Opción 7', logo: '' }],
             current_page: 1, per_page: 100, total: 1, last_page: 1 } });
     };
     const applied = () => page.evaluate(async () => {

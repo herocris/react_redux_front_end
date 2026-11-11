@@ -1,7 +1,8 @@
+import { readId } from '../../../api/identifiers';
 import api from '../../../api/graphdataApi';
 import { readCatalog, type ListParams } from '../../../api/catalog';
 import type { User, UserEntity, UserResponse, UserListResponse } from '../types';
-const toEntity = ({ identificador: id, ...rest }: UserResponse): UserEntity => ({ id, ...rest });
+const toEntity = ({ identificador: id, ...rest }: UserResponse): UserEntity => ({ ...rest, id: readId(id), roles: rest.roles?.map(readId), permisos: rest.permisos?.map(readId) });
 export const userService = {
     async list({ page, sortBy, orderType, per_page, search_by, valueSearch }: ListParams, signal?: AbortSignal) {
         const sort = sortBy === 'id' ? 'identificador' : sortBy;
@@ -14,9 +15,9 @@ export const userService = {
         const { data } = await api.post<UserResponse>('/user', values, { signal });
         return toEntity(data);
     },
-    async update(values: User & { id: string }, signal?: AbortSignal): Promise<UserEntity> {
-        const { data } = await api.put<UserResponse>(`/user/${values.id}`, values, { signal });
+    async update(values: User & { id: number }, signal?: AbortSignal): Promise<UserEntity> {
+        const { data } = await api.put<UserResponse>(`/user/${readId(values.id)}`, values, { signal });
         return toEntity(data);
     },
-    async remove(id: string, signal?: AbortSignal): Promise<void> { await api.delete(`/user/${id}`, { signal }); },
+    async remove(id: number, signal?: AbortSignal): Promise<void> { await api.delete(`/user/${readId(id)}`, { signal }); },
 };

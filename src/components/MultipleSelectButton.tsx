@@ -6,7 +6,7 @@ interface MultiSelectProps<T extends FieldValues, Output extends FieldValues> {
     // Coercing schemas accept unknown inputs; the field path and Control stay linked.
     name: FieldPath<T>;
     label: string;
-    options: { value: string | number; description: string }[];
+    options: { value: number; description: string }[];
     control: Control<T, unknown, Output>;
     multiple: boolean;
     disabled?: boolean;

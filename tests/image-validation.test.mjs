@@ -65,7 +65,7 @@ test('imágenes: límites efectivos y referencias existentes', async t => {
             const { [domain + 'Schema']: schema } = await server.ssrLoadModule(`/src/modules/${domain}/validators/${domain}Validations.ts`);
             const { [domain + 'Service']: service } = await server.ssrLoadModule(`/src/modules/${domain}/services/${domain}Service.ts`);
             for (const image of ['existente.png', new File([new Uint8Array(5_000_000)], 'reemplazo.png')]) {
-                const input = schema.parse({ ...fields, identificador: '8', [field]: image });
+                const input = schema.parse({ ...fields, identificador: 8, [field]: image });
                 let requests = 0;
                 api.defaults.adapter = async config => {
                     requests++;
@@ -82,7 +82,7 @@ test('imágenes: límites efectivos y referencias existentes', async t => {
                         assert.equal(sent.size, image.size);
                     }
                     return { config, status: 200, statusText: 'OK', headers: {}, data: {
-                        identificador: '8', foto: image instanceof File ? 'reemplazo.png' : image,
+                        identificador: 8, foto: image instanceof File ? 'reemplazo.png' : image,
                         decomiso: { identificador: 7 }, droga: { identificador: 3, descripcion: 'Droga' },
                         presentacion: { identificador: 4, descripcion: 'Presentación' },
                         arma: { identificador: 3, descripcion: 'Arma' }, municion: { identificador: 3, descripcion: 'Munición' },

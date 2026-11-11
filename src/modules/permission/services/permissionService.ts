@@ -1,10 +1,11 @@
+import { readId } from '../../../api/identifiers';
 import api from '../../../api/graphdataApi';
 import type {
     Permission, PermissionEntity, PermissionListParams, PermissionListResponse,
     PermissionListResult, PermissionResponse,
 } from '../types';
 
-const toPermission = ({ identificador: id, ...rest }: PermissionResponse): PermissionEntity => ({ id, ...rest });
+const toPermission = ({ identificador: id, ...rest }: PermissionResponse): PermissionEntity => ({ ...rest, id: readId(id) });
 
 const listUrl = ({ page, sortBy, orderType, per_page, search_by, valueSearch }: PermissionListParams): string => {
     const sort = sortBy === 'id' ? 'identificador' : sortBy;
@@ -22,7 +23,7 @@ export const permissionService = {
         let page = 1;
         let expectedTotal: number | undefined;
         let lastPage: number | undefined;
-        const ids = new Set<string>();
+        const ids = new Set<number>();
         do {
             const result = await permissionService.list({ page, sortBy: 'id', orderType: 'asc',
                 per_page: 100, search_by: '', valueSearch: '' }, signal);
@@ -53,11 +54,11 @@ export const permissionService = {
         const { data } = await api.post<PermissionResponse>('/permission', permission, { signal });
         return toPermission(data);
     },
-    async update(permission: Permission & { id: string }, signal?: AbortSignal): Promise<PermissionEntity> {
-        const { data } = await api.put<PermissionResponse>(`/permission/${permission.id}`, permission, { signal });
+    async update(permission: Permission & { id: number }, signal?: AbortSignal): Promise<PermissionEntity> {
+        const { data } = await api.put<PermissionResponse>(`/permission/${readId(permission.id)}`, permission, { signal });
         return toPermission(data);
     },
-    async remove(id: string, signal?: AbortSignal): Promise<void> {
-        await api.delete(`/permission/${id}`, { signal });
+    async remove(id: number, signal?: AbortSignal): Promise<void> {
+        await api.delete(`/permission/${readId(id)}`, { signal });
     },
 };

@@ -2,8 +2,8 @@ import type { ApiErrorMessage } from '../../api/apiErrors';
 import { TableOptions } from "../../shared/interfaces/sharedInterfaces"
 
 export interface Ammunition {
-    id?: string,
-    identificador?: string,
+    id?: number,
+    identificador?: number,
     descripcion: string,
     logo: string | File
 }
@@ -17,10 +17,10 @@ export interface AmmunitionFormModalProps {
     errorMessage: ApiErrorMessage
 }
 export type AmmunitionResponse = Omit<Ammunition, 'id' | 'identificador' | 'logo'> & {
-    identificador: string;
+    identificador: number;
     logo: string;
 };
 
 export type AmmunitionListResponse = TableOptions & { data: AmmunitionResponse[] };
 
-export type AmmunitionEntity = Omit<AmmunitionResponse, 'identificador'> & { id: string };
+export type AmmunitionEntity = Omit<AmmunitionResponse, 'identificador'> & { id: number };

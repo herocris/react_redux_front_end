@@ -1,28 +1,27 @@
 import type { PermissionOptionsStatusProps } from '../permission/components/PermissionOptionsStatus';
 import type { ApiErrorMessage } from '../../api/apiErrors';
 import { TableOptions } from "../../shared/interfaces/sharedInterfaces";
-import type { Permission } from "../permission";
 
-// Identifier values emitted by the select, or unchanged legacy relation objects.
-export type RolePermission = string | number | Permission;
+// Administrative relations and select values are numeric backend IDs.
+export type RolePermission = number;
 
 export interface Role {
-    id?: string,
-    identificador?: string,
+    id?: number,
+    identificador?: number,
     nombre: string,
     permisos?: RolePermission[]
 }
 export interface RoleFormModalProps {
     permissionOptionsStatus: PermissionOptionsStatusProps;
     handleOpen: (open: boolean) => void;
-    permisos: { value: string | number; description: string }[]
+    permisos: { value: number; description: string }[]
     loading: boolean
     activeRole: Role
     onSaveOrUptdate: (values: Role) => Promise<void>
     errorMessage: ApiErrorMessage
 }
 
-export type RoleResponse = Omit<Role, "id" | "identificador"> & { identificador: string };
+export type RoleResponse = Omit<Role, "id" | "identificador"> & { identificador: number };
 export type RoleListResponse = TableOptions & { data: RoleResponse[] };
 
-export type RoleEntity = Omit<RoleResponse, 'identificador'> & { id: string };
+export type RoleEntity = Omit<RoleResponse, 'identificador'> & { id: number };
