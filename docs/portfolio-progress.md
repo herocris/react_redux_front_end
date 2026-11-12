@@ -2,7 +2,7 @@
 
 ## Estado al 12 de noviembre de 2026
 
-**P01–P13 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 verifica navegación desconocida y P10 identidad/panel con simulación local. P11 audita y corrige flujos representativos de accesibilidad/móvil con simulación; no acredita conformidad WCAG completa. P12 prepara doce registros ficticios persistentes y verifica el recorrido con API local. P13 configura CI y verifica sus comandos y estructura localmente; ejecución en GitHub pendiente. P14 tiene revisión local y guía de despliegue. La verificación pública queda pendiente porque el propietario confirmó que aún carece de producción. P15 sigue pendiente.** La preparación del
+**P01–P13 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 verifica navegación desconocida y P10 identidad/panel con simulación local. P11 audita y corrige flujos representativos de accesibilidad/móvil con simulación; no acredita conformidad WCAG completa. P12 prepara doce registros ficticios persistentes y verifica el recorrido con API local. P13 configura CI y verifica sus comandos y estructura localmente; ejecución en GitHub pendiente. P14 tiene revisión local y guía de despliegue. La verificación pública queda pendiente porque el propietario confirmó que aún carece de producción. P15 completa la presentación documental del producto con esa limitación explícita.** La preparación del
 plan no ejecutó por sí misma ninguna tarea.
 Fuente: [portfolio-plan.md](portfolio-plan.md). Se conserva la refactorización
 cerrada en [refactor-progress.md](refactor-progress.md).
@@ -23,7 +23,7 @@ cerrada en [refactor-progress.md](refactor-progress.md).
 | P12 | Alta | Datos y recorrido de demo | Completado en local con límites documentados | Acceso y asignaciones conservados; 12 registros persistentes, inventario y guía; preparación pública y limpieza física pendientes |
 | P13 | Media | Tests/lint/build en CI | Implementado con validación local | Instalación sin legacy, 261 pruebas, lint, build y actionlint aprobados; ejecución GitHub pendiente |
 | P14 | Media | Comprobar despliegue público | Parcial, revisión local realizada; producción pendiente | Propietario confirma que aún carece de producción; guía de despliegue y matriz pendientes |
-| P15 | Alta | README de portafolio | Pendiente | Reflejar resultados de las tareas anteriores |
+| P15 | Alta | README de portafolio | Completado, alcance documental | Producto, capturas ficticias verificadas, recorrido local, arquitectura, arranque y límites; demo pública pendiente en P14 |
 | O01 | Opcional | E2E repetible | Sin iniciar | Solicitud explícita del usuario |
 | O02 | Opcional | Flujos reales adicionales | Sin iniciar | Solicitud explícita del usuario |
 
@@ -812,3 +812,58 @@ Diff, enlaces locales y alcance documental revisados. Sin cambios de código de
 aplicación, infraestructura, escrituras de datos, publicaciones o commits.
 Siguiente acción de P14, recibir URL y retomar su matriz pública. P15/O01/O02
 y límites anteriores conservan su estado.
+
+## P15 — Presentación del producto (12 de noviembre de 2026)
+
+Ejecutado exclusivamente P15 sobre workspace inicialmente limpio. Se sustituye
+el README de Vite por la presentación de **Decomisos**: problema, destinatarios,
+funciones existentes, recorrido de consulta, stack resuelto en lockfile,
+arquitectura, arranque, variables públicas, verificación y límites. Se enlazan
+guías e informes técnicos, sin trasladar la cronología de los planes a la portada.
+Archivos afectados: [README](../README.md) y ambos progresos. Planes sin cambio
+de alcance; no se añaden funciones, dependencias, cuentas ni datos.
+
+Las decisiones se contrastan con store, QueryClient, services/queries,
+middleware de sesión, mutaciones protegidas, acceso centralizado, formularios,
+router y geocodificación. Se explica Query frente a Redux, límites HTTP,
+permisos efectivos y decisión backend, conservación de edición ante errores,
+cancelación frente a escrituras aceptadas y carga diferida con recuperación.
+La aportación se presenta como evolución técnica documentada de un frontend
+existente, con decisiones del propietario y asistencia de agentes; no se
+atribuye autoría exclusiva, métricas de impacto, cobertura porcentual ni
+experiencia de producción. Los cambios Laravel informados por el usuario se
+distinguen del código frontend y de las comprobaciones HTTP.
+
+Se reutilizan tres PNG versionados de P10/P11: panel de escritorio, gráfico
+oscuro con tabla y formulario móvil tras error. Inspeccionados visualmente en
+esta tarea, con sesión/datos ficticios y procedencia simulada explícita;
+1440×1000, 1440×1000 y 320×568. No se usa el mapa blanco de teselas simuladas
+como presentación cartográfica. No se crean capturas ni se copian credenciales.
+El recorrido usa el conjunto ficticio P12 y remite a su preparación/inventario
+por entorno; sus resultados se identifican como evidencia local previa.
+
+Verificación documental: enlaces nuevos de README y entradas de progreso
+resueltos, PNG válidos, bloques de código equilibrados, versiones contrastadas
+con `package-lock.json`, scripts con `package.json`, CI con el workflow y bases
+locales con `.env.template`/guías. Context7 consultado para **Vite 8.3.5 exacto**:
+variables públicas sustituidas al compilar, reinicio de desarrollo, opciones
+CLI y preview local, con fuentes oficiales de esa versión enlazadas. No se
+introducen APIs ni cambios React que requieran skills de implementación.
+
+El barrido de los tres documentos detectó dos referencias históricas rotas a
+`LegacyEntityList.tsx` y `useEntityList.tsx` dentro del registro de refactorización;
+ya constaban antes de P15 y describen piezas retiradas. Se conservan sin
+reintroducirlas ni ampliar la tarea. Los enlaces añadidos no dependen de ellas.
+`git diff --check` correcto; revisión de alcance y contenido completada.
+Las 261 pruebas, lint sin advertencias y builds P14 se reutilizan porque no
+cambia el código funcional ni su configuración; no son ejecuciones nuevas.
+No se repiten instalación, tests, lint, build ni navegador por este cambio
+documental. La inspección de PNG existentes no implica ejecutar Playwright MCP.
+
+**P15 completado dentro del alcance documental.** P14 sigue parcial: producción
+y demo públicas, HTTPS, cookies/CORS, medios y chunks pendientes de URL accesible
+y comprobación. CI real, contrato de sublistas, limpieza física de imágenes,
+restablecimiento completo y límites de autorización/accesibilidad se mantienen
+explícitos. Siguiente acción pendiente: recibir la URL para retomar P14.
+O01/O02 siguen sin iniciar y requieren solicitud expresa. Sin commits, push,
+despliegues, publicaciones ni escrituras backend.

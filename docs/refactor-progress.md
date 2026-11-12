@@ -41,7 +41,8 @@ no acredita conformidad WCAG completa. P12 prepara doce registros ficticios
 persistentes y verifica el recorrido con API local. P13 configura checks y la
 dependencia del despliegue, con validación local; ejecución GitHub pendiente.
 P14 tiene revisión local y guía de despliegue, con verificación pública pendiente
-porque el propietario confirmó que aún carece de producción. P15 sigue pendiente.
+porque el propietario confirmó que aún carece de producción. P15 completa el
+README de producto con capturas ficticias, recorrido local y límites explícitos.
 P06 incorpora adaptación limitada del vacío inicial,
 con contrato backend todavía pendiente. P07 configura y verifica medios locales,
 sin acreditar limpieza física ni producción. El estado actualizado y sus límites
@@ -2325,3 +2326,27 @@ y consola/red queda pendiente de URL accesible. Cuenta demo pública sin usar.
 Detalles, logs y matriz en la guía y en [progreso de portafolio](portfolio-progress.md).
 Diff y enlaces revisados. Sin cambios de aplicación, infraestructura, datos,
 publicaciones o commits. P14 permanece parcial; P15/O01/O02 conservan su estado.
+
+## Portafolio P15 — README de producto (12 de noviembre de 2026)
+
+Solo P15: [README](../README.md) sustituye la plantilla Vite por problema,
+usuarios, funciones, tres capturas ficticias verificadas visualmente, recorrido
+local, stack, arquitectura, arranque/variables públicas, comandos y límites.
+Explica Query/Redux, services, permisos, formularios ante fallos, aislamiento
+de sesión/cancelación y carga diferida, contrastados con código e informes.
+La aportación se delimita al trabajo documentado sobre el frontend existente,
+con decisiones del propietario y asistencia de agentes; sin autoría exclusiva,
+métricas inventadas ni experiencia de producción afirmada.
+
+Enlaces añadidos y PNG comprobados, bloques equilibrados y diff correcto.
+Context7 verificó configuración/CLI de Vite 8.3.5 exacto; stack contrastado con
+lockfile. Dos enlaces históricos a piezas retiradas dentro de este registro
+siguen identificados como previos, sin ampliar el alcance. Se reutilizan las
+261 pruebas, lint y builds P14 del mismo código; no se ejecutan de nuevo por
+editar documentación. Solo cambian README y ambos progresos; sin funciones,
+datos, dependencias, commits o despliegues.
+
+P15 documental completado; demo/producción sin acreditar y P14 parcial.
+Siguiente acción: recibir URL accesible para su matriz pública. O01/O02 sin
+iniciar; límites anteriores conservados. Detalle en el
+[progreso de portafolio](portfolio-progress.md#p15--presentación-del-producto-12-de-noviembre-de-2026).
