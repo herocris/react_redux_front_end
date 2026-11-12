@@ -11,7 +11,7 @@ async (page) => {
     page.setDefaultTimeout(15000);
     try {
         await page.goto('http://localhost:5174/drug');
-        await page.getByRole('button', { name: 'add', exact: true }).click();
+        await page.getByRole('button', { name: 'Añadir', exact: true }).click();
         const dialog = page.getByRole('dialog', { name: 'Crear droga' });
         await dialog.getByLabel('Descripción', { exact: true }).fill(tag);
         await dialog.locator('input[type=file]').setInputFiles({
@@ -35,7 +35,7 @@ async (page) => {
         const imageInfo = await image.count() ? await image.evaluate(img => ({ loaded: img.complete && img.naturalWidth > 0 })) : { loaded: false };
         imageInfo.invalidBase = await page.evaluate(() => performance.getEntriesByType('resource').some(entry => entry.name.includes('/undefined/')));
         results.push({ name: 'Stored image displayed in table', status: imageInfo.loaded ? 'PASS' : 'FAIL', ...imageInfo });
-        await row.getByRole('menuitem', { name: 'Edit', exact: true }).click();
+        await row.getByRole('menuitem', { name: 'Editar', exact: true }).click();
         const edit = page.getByRole('dialog', { name: 'Editar droga' });
         check(await edit.getByLabel('Descripción', { exact: true }).inputValue() === tag, 'Edit initial values lost');
         await edit.getByLabel('Descripción', { exact: true }).fill(tag + '_UPDATED');
@@ -50,7 +50,7 @@ async (page) => {
         }, tag);
         check(stored?.descripcion === tag + '_UPDATED' && stored.logo === created.logo, 'Edit did not preserve stored image');
         results.push({ name: 'UI update with existing image preserved', status: 'PASS' });
-        await updated.getByRole('menuitem', { name: 'Delete', exact: true }).click();
+        await updated.getByRole('menuitem', { name: 'Borrar', exact: true }).click();
         await page.getByRole('dialog', { name: 'Borrar droga' }).getByRole('button', { name: 'Borrar', exact: true }).click();
         await updated.waitFor({ state: 'hidden' });
         const absent = await page.evaluate(async tag => {

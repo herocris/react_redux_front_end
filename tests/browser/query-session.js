@@ -92,7 +92,7 @@ async (page) => {
         user = 'B';
         await page.getByRole('textbox', { name: 'Correo', exact: true }).fill('B@example.test');
         await page.locator('input[name="password"]').fill('Password123!');
-        await page.getByRole('button', { name: 'Login', exact: true }).click();
+        await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
         await page.waitForURL('**/dashboard');
         await page.getByText('Usuario B', { exact: true }).first().waitFor();
         await page.getByRole('button', { name: 'Permission', exact: true }).click();

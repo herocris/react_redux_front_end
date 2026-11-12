@@ -1,5 +1,5 @@
 import { canAccess, accessDestinations } from '../../modules/auth/access';
-import { IconButton, styled, AppBar, Box, CssBaseline, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Link } from '@mui/material';
+import { IconButton, styled, AppBar, Box, CssBaseline, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { ReactNode, useState } from 'react';
 import { AccountCircle, Logout, Person, RecentActors, Map, ContactEmergency, SignalCellularAlt, Inventory2, FormatListBulleted, HomeRepairServiceOutlined, Vaccines, AllInbox, Category } from '@mui/icons-material';
@@ -64,23 +64,23 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
 
     const navigate = useNavigate();
     const authMenuOptions = [
-        { name: 'Users', url: '/user', icon: <Person /> },
+        { name: 'Usuarios', url: '/user', icon: <Person /> },
         { name: 'Roles', url: '/rol', icon: <RecentActors /> },
-        { name: 'Permission', url: '/permiso', icon: <ContactEmergency /> },
-        { name: 'Event logs', url: '/actividad', icon: <FormatListBulleted /> }
+        { name: 'Permisos', url: '/permiso', icon: <ContactEmergency /> },
+        { name: 'Actividad', url: '/actividad', icon: <FormatListBulleted /> }
     ]
     const menuOptions = [
-        { name: 'Ammunitions', url: '/ammunition', icon: <HomeRepairServiceOutlined /> },
-        { name: 'Drug', url: '/drug', icon: <Vaccines /> },
-        { name: 'Weapon', url: '/weapon', icon: <AllInbox /> },
-        { name: 'Drug presentations', url: '/drugPresentation', icon: <Category /> },
-        { name: 'Confiscations', url: '/confiscation', icon: <Inventory2 /> },
+        { name: 'Municiones', url: '/ammunition', icon: <HomeRepairServiceOutlined /> },
+        { name: 'Drogas', url: '/drug', icon: <Vaccines /> },
+        { name: 'Armas', url: '/weapon', icon: <AllInbox /> },
+        { name: 'Presentaciones de droga', url: '/drugPresentation', icon: <Category /> },
+        { name: 'Decomisos', url: '/confiscation', icon: <Inventory2 /> },
 
     ]
     const displayMenuOptions = [
-        { name: 'Dashboard', url: '/dashboard', icon: <AccountCircle /> },
-        { name: 'Graphs', url: '/graph', icon: <SignalCellularAlt /> },
-        { name: 'Map', url: '/map', icon: <Map /> },
+        { name: 'Panel de inicio', url: '/dashboard', icon: <AccountCircle /> },
+        { name: 'Gráficos', url: '/graph', icon: <SignalCellularAlt /> },
+        { name: 'Mapa', url: '/map', icon: <Map /> },
     ]
 
     const visible = (item: { url: string }) => {
@@ -96,7 +96,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
             <List>
                 {displayMenuOptions.filter(visible).map((opt, index) => (
                     <ListItem key={index} disablePadding >
-                        <ListItemButton onClick={() => navigate(opt.url)} selected={pathname == opt.url}>
+                        <ListItemButton onClick={() => { navigate(opt.url); setMobileOpen(false); }} selected={pathname == opt.url}>
                             <ListItemIcon>
                                 {opt.icon}
                             </ListItemIcon>
@@ -109,7 +109,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
             <List>
                 {authMenuOptions.filter(visible).map((opt, index) => (
                     <ListItem key={index} disablePadding >
-                        <ListItemButton onClick={() => navigate(opt.url)} selected={pathname == opt.url}>
+                        <ListItemButton onClick={() => { navigate(opt.url); setMobileOpen(false); }} selected={pathname == opt.url}>
                             <ListItemIcon>
                                 {opt.icon}
                             </ListItemIcon>
@@ -122,7 +122,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
             <List>
                 {menuOptions.filter(visible).map((opt, index) => (
                     <ListItem key={index} disablePadding >
-                        <ListItemButton onClick={() => navigate(opt.url)} selected={pathname == opt.url}>
+                        <ListItemButton onClick={() => { navigate(opt.url); setMobileOpen(false); }} selected={pathname == opt.url}>
                             <ListItemIcon>
                                 {opt.icon}
                             </ListItemIcon>
@@ -152,7 +152,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                 <Toolbar>
                     <IconButton
                         color="inherit"
-                        aria-label="open drawer"
+                        aria-label="Abrir menú"
                         edge="start"
                         onClick={handleDrawerToggle}
                         sx={{ mr: 2, display: { md: 'none' } }}
@@ -160,19 +160,10 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                         <MenuIcon />
                     </IconButton>
 
-                    <Link
-                        href="https://github.com/herocris/react_redux_front_end"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        underline="hover"
-                        variant="h6"
-                        color="inherit"
-                        sx={{ flexGrow: 1 }}
-                    >
-                        Repo: https://github.com/herocris/react_redux_front_end
-                    </Link>
+                    <Typography variant="h6" component="span" sx={{ flexGrow: 1, minWidth: 0 }}>Decomisos</Typography>
                     <IconButton
                         sx={{ ml: 1 }}
+                        aria-label={mode === 'dark' ? 'Activar tema claro' : 'Activar tema oscuro'}
                         onClick={toggleMode}
                         color="inherit"
                     >
@@ -193,7 +184,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
             <Box
                 component="nav"
                 sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-                aria-label="mailbox folders"
+                aria-label="Navegación principal"
             >
                 {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
                 <Drawer
@@ -228,7 +219,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
             <Box
                 component="main"
                 //sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
-                sx={{ flexGrow: 1, p: 3, width: '100%' }}
+                sx={{ flexGrow: 1, minWidth: 0, p: { xs: 2, sm: 3 }, width: '100%' }}
             >
                 <DrawerHeader />
                 {children}

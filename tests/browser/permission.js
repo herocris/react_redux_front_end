@@ -73,9 +73,9 @@ async (page) => {
     const row = () => page.getByRole('row').filter({ hasText: 'Original' });
         await page.goto(baseURL + '/permiso');
         await row().waitFor();
-        await row().getByRole('menuitem', { name: 'Delete', exact: true }).click();
+        await row().getByRole('menuitem', { name: 'Borrar', exact: true }).click();
         await page.getByRole('dialog', { name: 'Borrar permiso' }).getByRole('button', { name: 'Cancelar' }).click();
-        await page.getByRole('button', { name: 'add', exact: true }).click();
+        await page.getByRole('button', { name: 'Añadir', exact: true }).click();
         await page.getByText('Crear permiso', { exact: true }).waitFor();
         check(await form.getByLabel('Nombre', { exact: true }).inputValue() === '', 'Cancel left an active entity in the create form');
         passed.push('Cancelar borrado limpia la selección antes de crear');
@@ -99,7 +99,7 @@ async (page) => {
         await page.getByRole('row').filter({ hasText: 'Nueva' }).waitFor();
         check(createAttempts === 2, 'Unexpected create requests');
         passed.push('Crear: reintento cierra solo tras éxito y añade la fila');
-        await row().getByRole('menuitem', { name: 'Edit', exact: true }).click();
+        await row().getByRole('menuitem', { name: 'Editar', exact: true }).click();
         await form.getByLabel('Nombre', { exact: true }).fill('Editada');
         await form.getByRole('button', { name: 'Guardar permiso' }).click();
         await page.getByRole('alert').filter({ hasText: 'No se pudo conectar' }).waitFor();
@@ -113,7 +113,7 @@ async (page) => {
         const update = writes.filter(write => write.path.endsWith('/7') && write.method === 'PUT');
         check(update.every(write => { const body = JSON.parse(write.body); return body.id === 7 && body.nombre === 'Editada'; }), 'Update JSON contract changed');
         passed.push('Editar: éxito actualiza fila y conserva PUT JSON');
-        await editedRow.getByRole('menuitem', { name: 'Delete', exact: true }).click();
+        await editedRow.getByRole('menuitem', { name: 'Borrar', exact: true }).click();
         const dialog = page.getByRole('dialog', { name: 'Borrar permiso' });
         await dialog.getByRole('button', { name: 'Borrar', exact: true }).click();
         await page.waitForFunction(() => document.querySelector('[role="dialog"] button')?.disabled === true);

@@ -53,7 +53,7 @@ const graphIconList = [
     },
     {
         value: 'line',
-        label: 'Linea',
+        label: 'Línea',
         icono: <Timeline />
     },
     {

@@ -136,7 +136,7 @@ async (page) => {
         await page.locator('[data-field="observacion"][role="columnheader"]').click();
         await page.getByRole('button', { name: 'Go to next page' }).click();
         await page.getByText('11–11 of 11', { exact: true }).waitFor();
-        await page.getByRole('row').filter({ hasText: 'Padre 11' }).getByRole('menuitem', { name: 'Delete' }).click();
+        await page.getByRole('row').filter({ hasText: 'Padre 11' }).getByRole('menuitem', { name: 'Borrar' }).click();
         failDelete = true;
         await dialog.getByRole('button', { name: 'Ok', exact: true }).click();
         await dialog.getByText('Borrado rechazado').waitFor();

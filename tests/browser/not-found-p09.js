@@ -63,7 +63,7 @@ async (page) => {
         await view.goto(base + '/auth/register');
         await view.getByRole('textbox', { name: 'Nombre' }).waitFor();
         await view.goto(base + '/auth/login');
-        await view.getByRole('button', { name: 'Login', exact: true }).click();
+        await view.getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
         await view.getByRole('grid').waitFor();
         check(new URL(view.url()).pathname === '/drug', 'Login did not land on allowed view');
         passed.push('Deliberate visitor root/auth/private login and registration entries preserved; simulated login reaches permitted drug list');

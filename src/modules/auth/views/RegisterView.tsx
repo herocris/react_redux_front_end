@@ -32,7 +32,7 @@ export const RegisterView = () => {
         await onRegister(data);
     }
     return (
-        <AuthLayout title="Register">
+        <AuthLayout title="Crear cuenta en Decomisos">
             <form onSubmit={handleSubmit(onSubmit)} aria-busy={isSubmitting}>
                 <fieldset disabled={isSubmitting} aria-label="Registro" style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
                 <Grid container>
@@ -68,7 +68,7 @@ export const RegisterView = () => {
                     </Typography>
                     <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 2, mt: 2 }}>
                         <Button variant='contained' fullWidth type="submit" loading={isSubmitting}>
-                            Login
+                            Crear cuenta
                         </Button>
                     </Grid>
                     <Grid container direction='row' justifyContent='end'>

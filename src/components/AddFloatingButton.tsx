@@ -15,7 +15,7 @@ export const AddFloatingButton = memo(({ handleOpen }: AddFloatingButtonProps) =
                 width: '100%'
             }}
         >
-            <Fab color="primary" aria-label="add" onClick={()=>handleOpen(true)}>
+            <Fab color="primary" aria-label="Añadir" onClick={()=>handleOpen(true)}>
                 <AddIcon />
             </Fab>
         </Box>

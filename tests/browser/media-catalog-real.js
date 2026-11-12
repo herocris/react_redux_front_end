@@ -55,7 +55,7 @@ async (page) => {
             return body;
         };
         await trackUrls();
-        await page.getByRole('button', { name: 'add', exact: true }).click();
+        await page.getByRole('button', { name: 'Añadir', exact: true }).click();
         let dialog = page.getByRole('dialog', { name: 'Crear droga' });
         await dialog.getByLabel('Descripción', { exact: true }).fill(tag);
         await dialog.locator('input[type=file]').setInputFiles({ name: 'p07-blue.png', mimeType: 'image/png', buffer: blue });
@@ -69,7 +69,7 @@ async (page) => {
         await page.reload(); await loaded(row.locator('img'));
         await row.screenshot({ path: '.playwright-mcp/p07-catalog.png' });
         report.passed.push('saved logo renders after full reload');
-        await row.getByRole('menuitem', { name: 'Edit', exact: true }).click();
+        await row.getByRole('menuitem', { name: 'Editar', exact: true }).click();
         dialog = page.getByRole('dialog', { name: 'Editar droga' });
         await loaded(dialog.locator('img'));
         await dialog.getByLabel('Descripción', { exact: true }).fill(tag + '_UPDATED');
@@ -77,7 +77,7 @@ async (page) => {
         check(kept.logo === created.logo, 'Existing reference changed without replacement');
         report.passed.push('existing PhotoInput preview and edit without replacement preserve exact reference');
         await trackUrls();
-        await row.getByRole('menuitem', { name: 'Edit', exact: true }).click();
+        await row.getByRole('menuitem', { name: 'Editar', exact: true }).click();
         dialog = page.getByRole('dialog', { name: 'Editar droga' });
         await dialog.locator('input[type=file]').setInputFiles({ name: 'p07-red.png', mimeType: 'image/png', buffer: red });
         await loaded(dialog.locator('img[src^="blob:"]'));
@@ -96,7 +96,7 @@ async (page) => {
                     const row = [...document.querySelectorAll('[role="row"]')].find(el => el.textContent.includes(tag));
                     return row && !row.querySelector('img') && row.querySelector('.MuiAvatar-root')?.textContent === 'P';
                 }, tag);
-                await row.getByRole('menuitem', { name: 'Edit', exact: true }).click();
+                await row.getByRole('menuitem', { name: 'Editar', exact: true }).click();
                 dialog = page.getByRole('dialog', { name: 'Editar droga' });
                 await dialog.getByRole('img', { name: 'Imagen no disponible', exact: true }).waitFor();
                 check(await dialog.getByRole('button', { name: 'Eliminar imagen 1' }).isVisible(), 'Existing image value lost on load error');

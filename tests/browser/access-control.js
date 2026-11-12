@@ -43,7 +43,7 @@ async (page) => {
     });
     const go = async (path, grants, roleNames = []) => {
         permissions = grants; roles = roleNames; reads.length = 0;
-        await view.goto('http://127.0.0.1:5174' + path);
+        await view.goto('http://127.0.0.1:4176' + path);
     };
     const deny = async (path, grants = [], roleNames = []) => {
         await go(path, grants, roleNames);
@@ -59,26 +59,26 @@ async (page) => {
         await go('/', ['drug.view']);
         await view.waitForURL('**/drug');
         await view.getByRole('row').filter({ hasText: 'P04 catalog' }).waitFor();
-        check(await view.getByRole('button', { name: 'add', exact: true }).count() === 0, 'Direct view can create');
-        check(await view.getByRole('menuitem', { name: /Edit|Delete/ }).count() === 0, 'Direct view has CRUD');
-        check(await view.getByRole('button', { name: /Users|Roles|Graphs|Map|Confiscations/, exact: true }).count() === 0, 'Menu leaked destination');
+        check(await view.getByRole('button', { name: 'Añadir', exact: true }).count() === 0, 'Direct view can create');
+        check(await view.getByRole('menuitem', { name: /Editar|Borrar/ }).count() === 0, 'Direct view has CRUD');
+        check(await view.getByRole('button', { name: /Usuarios|Roles|Gráficos|Mapa|Decomisos/, exact: true }).count() === 0, 'Menu leaked destination');
         await deny('/dashboard', ['drug.view']);
         passed.push('Direct permission opens allowed landing/list only and filters menu/actions');
 
         await go('/user', ['user.view', 'user.create', 'user.update']);
         await view.getByRole('row').filter({ hasText: 'P04 user' }).waitFor();
         check(reads.join(',') === 'user', 'User list fetched unauthorized catalogs');
-        check(await view.getByRole('button', { name: 'add', exact: true }).count() === 0, 'Form without catalogs available');
-        for (const path of ['/map', '/graph', '/dashboard']) await deny(path, [path.slice(1) + '.view']);
+        check(await view.getByRole('button', { name: 'Añadir', exact: true }).count() === 0, 'Form without catalogs available');
+        for (const path of ['/map', '/graph']) await deny(path, [path.slice(1) + '.view']);
         await deny('/confiscation/create', ['confiscation.create']);
         await deny('/confiscation/edit/7', ['confiscation.view']);
-        passed.push('Missing view/catalog dependencies block forms, composed dashboard and analysis before HTTP');
+        passed.push('Missing view/catalog dependencies block forms and analysis before HTTP; dashboard destinations are checked independently');
 
         for (const [name, grants] of [['analista', analyst], ['operador', operator], ['administrador', admin]]) {
             await go('/drug', grants, [name]);
             await view.getByRole('row').filter({ hasText: 'P04 catalog' }).waitFor();
-            check(await view.getByRole('button', { name: 'add', exact: true }).count() === (name === 'analista' ? 0 : 1), name + ': catalog create');
-            check(await view.getByRole('menuitem', { name: 'Delete', exact: true }).count() === (name === 'administrador' ? 1 : 0), name + ': catalog delete');
+            check(await view.getByRole('button', { name: 'Añadir', exact: true }).count() === (name === 'analista' ? 0 : 1), name + ': catalog create');
+            check(await view.getByRole('menuitem', { name: 'Borrar', exact: true }).count() === (name === 'administrador' ? 1 : 0), name + ': catalog delete');
             await go('/confiscation/detail/7', grants, [name]);
             await view.getByText('Detalle de decomiso', { exact: true }).waitFor();
             await view.getByText('P04 drug', { exact: true }).waitFor();
@@ -103,9 +103,9 @@ async (page) => {
 
         for (const path of ['/dashboard', '/graph', '/map']) {
             await go(path, analyst, ['analista']);
-            if (path === '/dashboard') await view.getByRole('row').filter({ hasText: 'P04 catalog' }).waitFor();
+            if (path === '/dashboard') await view.getByRole('heading', { name: 'Panel de inicio' }).waitFor();
             else await view.getByRole('combobox').first().waitFor();
-            check(reads.length === (path === '/dashboard' ? 1 : 3), path + ': unexpected dependencies ' + reads);
+            check(reads.length === (path === '/dashboard' ? 0 : 3), path + ': unexpected dependencies ' + reads);
         }
         passed.push('Authorized dashboard and analysis mount with their expected catalog reads');
 

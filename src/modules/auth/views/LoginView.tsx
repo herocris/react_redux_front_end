@@ -32,7 +32,9 @@ export const LoginView = () => {
     }
     
     return (
-        <AuthLayout title="React Redux App">
+        <AuthLayout title="Decomisos">
+            <Typography color="text.secondary">Gestión y análisis de decomisos</Typography>
+            <Typography variant="body2" sx={{ mt: 1 }}>Demostración con acceso precargado. Los registros pueden incluir datos de ejemplo.</Typography>
             <form onSubmit={handleSubmit(onSubmit)} aria-busy={isSubmitting}>
                 <fieldset disabled={isSubmitting} aria-label="Acceso" style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
                 <Grid container>
@@ -55,7 +57,7 @@ export const LoginView = () => {
                     </Typography>
                     <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 2, mt: 2 }}>
                         <Button variant='contained' fullWidth type="submit" loading={isSubmitting}>
-                            Login
+                            Iniciar sesión
                         </Button>
                     </Grid>
                     <Grid container direction='row' justifyContent='end'>
@@ -63,9 +65,8 @@ export const LoginView = () => {
                         <Typography component={Link} color='info' to="/auth/register">
                             Registrar
                         </Typography>
-                        <Typography sx={{ mr: 1 }}>Documentación de api backend:</Typography>
-                        <a href="https://crisdemo.xyz/api/documentation" target="_blank" rel="noopener noreferrer" style={{ color: '#298aebff' }}>Documentation</a>
-                        {/* <Typography component={Link} color='info' to="https://crisdemo.xyz/api/documentation">Documentation</Typography> */}
+                        <Typography sx={{ mr: 1 }}>Documentación de la API:</Typography>
+                        <a href="https://crisdemo.xyz/api/documentation" target="_blank" rel="noopener noreferrer" style={{ color: '#298aebff' }}>Consultar API</a>
                     </Grid>
                 </Grid>
                 </fieldset>

@@ -54,8 +54,8 @@ async (page) => {
         page.on('request', onRequest);
         const fixture = page.locator('#entity-list-fixture');
         await fixture.getByRole('gridcell', { name: 'Controlled', exact: true }).waitFor();
-        await fixture.getByRole('menuitem', { name: 'Edit', exact: true }).click();
-        await fixture.getByRole('menuitem', { name: 'Delete', exact: true }).click();
+        await fixture.getByRole('menuitem', { name: 'Editar', exact: true }).click();
+        await fixture.getByRole('menuitem', { name: 'Borrar', exact: true }).click();
         check(await page.evaluate(() => window.__entityListFixture.events.filter(e => ['edit', 'delete'].includes(e[0])).every(e => e[1] && e[2] === 7)), 'Actions lost row identity or numeric id');
         passed.push('explicit callbacks receive the original row and numeric identifier');
         check(await fixture.locator('[data-field="nombre"][role="columnheader"]').getAttribute('aria-sort') === 'descending', 'Initial controlled sort missing');
@@ -71,7 +71,7 @@ async (page) => {
         }, false));
         await fixture.getByText('16–20 of 30', { exact: true }).waitFor();
         check(await fixture.locator('[data-field="nombre"][role="columnheader"]').getAttribute('aria-sort') === 'ascending', 'External sort reset missing');
-        check(await fixture.getByRole('menuitem', { name: /Edit|Delete/ }).count() === 0, 'Read-only renders actions');
+        check(await fixture.getByRole('menuitem', { name: /Editar|Borrar/ }).count() === 0, 'Read-only renders actions');
         const header = fixture.locator('[data-field="nombre"][role="columnheader"]');
         await header.hover();
         await header.getByRole('button', { name: 'Show filters' }).click();

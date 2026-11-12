@@ -17,10 +17,10 @@ export const PasswordField = <T extends FieldValues,>({ name, errorMessage, hasE
     };
     return (
         <FormControl sx={{ width: '100%' }} variant="outlined">
-            <InputLabel htmlFor={name} color={hasError ? 'error' : 'info'}>Password</InputLabel>
+            <InputLabel htmlFor={name} color={hasError ? 'error' : 'info'}>{name === 'passwordConfirmation' ? 'Confirmar contraseña' : 'Contraseña'}</InputLabel>
             <OutlinedInput
                 id={name}
-                label="Password"
+                label={name === 'passwordConfirmation' ? 'Confirmar contraseña' : 'Contraseña'}
                 error={hasError}
                 type={showPassword ? 'text' : 'password'}
                 {...register(name)}
@@ -28,7 +28,7 @@ export const PasswordField = <T extends FieldValues,>({ name, errorMessage, hasE
                     <InputAdornment position="end">
                         <IconButton
                             aria-label={
-                                showPassword ? 'hide the password' : 'display the password'
+                                showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
                             }
                             onClick={handleClickShowPassword}
                             onMouseDown={handleMouseDownPassword}

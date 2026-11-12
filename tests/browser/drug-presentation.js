@@ -70,9 +70,9 @@ async (page) => {
     try {
         await page.goto(baseURL + '/drugPresentation');
         await row().waitFor();
-        await row().getByRole('menuitem', { name: 'Delete', exact: true }).click();
+        await row().getByRole('menuitem', { name: 'Borrar', exact: true }).click();
         await page.getByRole('dialog', { name: 'Borrar presentación' }).getByRole('button', { name: 'Cancelar' }).click();
-        await page.getByRole('button', { name: 'add', exact: true }).click();
+        await page.getByRole('button', { name: 'Añadir', exact: true }).click();
         await page.getByText('Crear presentación', { exact: true }).waitFor();
         check(await form.getByLabel('Descripción', { exact: true }).inputValue() === '', 'Cancel left an active entity in the create form');
         passed.push('Cancelar borrado limpia la selección antes de crear');
@@ -95,7 +95,7 @@ async (page) => {
         check(createAttempts === 2, 'Unexpected create requests');
         check(writes.filter(write => write.path.endsWith('/drugPresentation')).every(write => write.body.includes('filename="logo.png"')), 'Retry lost the selected file');
         passed.push('Crear: reintento cierra solo tras éxito y añade la fila');
-        await row().getByRole('menuitem', { name: 'Edit', exact: true }).click();
+        await row().getByRole('menuitem', { name: 'Editar', exact: true }).click();
         await form.getByLabel('Descripción', { exact: true }).fill('Editada');
         await form.getByRole('button', { name: 'Guardar presentación' }).click();
         await page.getByRole('alert').filter({ hasText: 'No se pudo conectar' }).waitFor();
@@ -109,7 +109,7 @@ async (page) => {
         const update = writes.filter(write => write.path.endsWith('/7') && write.method === 'POST');
         check(update.every(write => write.body.includes('name="_method"') && write.body.includes('PUT') && !write.body.includes('name="logo"')), 'Update contract changed');
         passed.push('Editar: éxito actualiza fila y conserva POST multipart con _method=PUT');
-        await editedRow.getByRole('menuitem', { name: 'Delete', exact: true }).click();
+        await editedRow.getByRole('menuitem', { name: 'Borrar', exact: true }).click();
         const dialog = page.getByRole('dialog', { name: 'Borrar presentación' });
         await dialog.getByRole('button', { name: 'Borrar', exact: true }).click();
         await dialog.getByRole('alert').filter({ hasText: 'No se pudo borrar.' }).waitFor();

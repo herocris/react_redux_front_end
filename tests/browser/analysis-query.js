@@ -88,7 +88,7 @@ async (page) => {
         check(requests.at(-1).params.period === 'year' && requests.at(-1).params.typeGraph === 'line', 'Aplicar no actualiza argumentos exclusivos');
         check(JSON.stringify(await applied()) === JSON.stringify(shared), 'Controles exclusivos cambian filtros comunes');
         passed.push('Aplicar cambia período y typeGraph enviados sin añadirlos al contexto compartido');
-        await page.getByRole('button', { name: 'Map', exact: true }).click();
+        await page.getByRole('button', { name: 'Mapa', exact: true }).click();
         await page.getByText('Análisis no disponible', { exact: true }).waitFor();
         check(JSON.stringify(await applied()) === JSON.stringify(shared), 'Navegación pierde contexto');
         check((await page.locator('#mui-component-select-drugs').textContent()).includes('Opción 7'), 'RHF no restaura selección aplicada');
@@ -113,10 +113,10 @@ async (page) => {
         const response = page.waitForResponse(r => r.url().includes('/confiscation/map'));
         await page.getByRole('button', { name: 'Aplicar filtros', exact: true }).click(); await response;
         check(requests.at(-1).params.weapons === '[7]', 'Aplicar mapa pierde armas');
-        await page.getByRole('button', { name: 'Graphs', exact: true }).click();
+        await page.getByRole('button', { name: 'Gráficos', exact: true }).click();
         await page.locator('#mui-component-select-drugs').waitFor();
         check((await applied()).weapons[0] === '7', 'Vuelta pierde contexto compartido');
-        await page.getByRole('button', { name: 'Map', exact: true }).click();
+        await page.getByRole('button', { name: 'Mapa', exact: true }).click();
         await page.locator('.leaflet-marker-icon').waitFor();
         passed.push('capas alternan sin acumulación ni GET; Aplicar mapa y navegación conservan contexto; remontaje sin excepciones');
         await page.locator('button').filter({ has: page.locator('[data-testid="LogoutIcon"]') }).click();

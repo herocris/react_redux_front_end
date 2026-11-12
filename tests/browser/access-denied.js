@@ -74,7 +74,7 @@ async (page) => {
         check(refreshes === 2 && logouts === 0, 'Error recovery changed session');
         passed.push('401, 500 and transport distinguished; explicit retry recovers list');
 
-        await view.getByRole('button', { name: 'add', exact: true }).click();
+        await view.getByRole('button', { name: 'Añadir', exact: true }).click();
         const dialog = view.getByRole('dialog', { name: 'Crear droga' });
         const form = dialog.locator('form');
         await form.getByLabel('Descripción', { exact: true }).fill('Nueva P03');
@@ -99,7 +99,7 @@ async (page) => {
         check(creates === 5 && writes.every(body => body.includes('filename="p03.png"')), 'Retry lost multipart file');
         passed.push('Create: 403/422/transport/500 preserve fields, file and modal; successful retry closes');
 
-        await view.getByRole('row').filter({ hasText: 'Original' }).getByRole('menuitem', { name: 'Delete', exact: true }).click();
+        await view.getByRole('row').filter({ hasText: 'Original' }).getByRole('menuitem', { name: 'Borrar', exact: true }).click();
         const confirm = view.getByRole('dialog', { name: 'Borrar droga' });
         await confirm.getByRole('button', { name: 'Borrar', exact: true }).click();
         await confirm.getByRole('alert').filter({ hasText: 'Acceso denegado.' }).waitFor();

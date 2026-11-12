@@ -68,7 +68,7 @@ async (page) => {
         passed.push('gráficos: inválido y borrador no aplican; envío válido publica solo filtros comunes y conserva contrato');
         await select('Drogas');
         check(JSON.stringify(await applied()) === JSON.stringify(graphFilters) && requests.length === 1, 'Borrador cambia filtros aplicados');
-        await page.getByRole('button', { name: 'Map', exact: true }).click();
+        await page.getByRole('button', { name: 'Mapa', exact: true }).click();
         await page.locator('.leaflet-container').waitFor();
         check(JSON.stringify(await applied()) === JSON.stringify(graphFilters), 'Navegación borra filtros');
         passed.push('edición posterior aislada y snapshot Redux conservado al navegar; consultas aún antiguas');

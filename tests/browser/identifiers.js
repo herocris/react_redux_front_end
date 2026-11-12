@@ -18,7 +18,7 @@ async (page) => {
     };
     try {
         await page.goto(base + '/user');
-        await page.getByRole('menuitem', { name: 'Edit', exact: true }).first().click();
+        await page.getByRole('menuitem', { name: 'Editar', exact: true }).first().click();
         const role = page.getByRole('dialog').getByRole('combobox', { name: /^Roles/ });
         check((await role.innerText()).trim().length > 0, 'Existing user role is not selected');
         await role.click();
@@ -28,7 +28,7 @@ async (page) => {
         passed.push('user numeric role selected');
 
         await navigate('/rol');
-        await page.getByRole('menuitem', { name: 'Edit', exact: true }).first().click();
+        await page.getByRole('menuitem', { name: 'Editar', exact: true }).first().click();
         const permissions = page.getByRole('dialog').getByRole('combobox', { name: /^Permisos/ });
         check((await permissions.innerText()).includes('user.view'), 'Existing permissions missing');
         await permissions.click();
@@ -43,7 +43,7 @@ async (page) => {
             const { queryClient } = await import('/src/queries/queryClient.ts');
             return queryClient.isFetching() === 0;
         });
-        await page.getByRole('menuitem', { name: 'Edit', exact: true }).first().click();
+        await page.getByRole('menuitem', { name: 'Editar', exact: true }).first().click();
         await page.getByText('Editar decomiso', { exact: true }).waitFor();
         check(/\/confiscation\/edit\/\d+$/.test(page.url()), 'List did not navigate to numeric detail/edit');
         passed.push('list to detail/edit navigation');

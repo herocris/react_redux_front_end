@@ -57,7 +57,7 @@ async (page) => {
         const logged = await request(context, 'POST', 'login', { email: account.correo, password });
         record('temporary login', logged); ok(logged, 'temporary login');
         await view.goto('http://localhost:5174/drug'); await view.getByRole('grid').waitFor();
-        check(await view.getByRole('button', { name: 'add', exact: true }).count() === 0, 'View role acquired create');
+        check(await view.getByRole('button', { name: 'Añadir', exact: true }).count() === 0, 'View role acquired create');
         await updateRole([]); // user is idle on /drug, with its session cookie unchanged
         const revoked = await session('role permission revoked in open session');
         check(!revoked.permissions.includes('drug.view') && revoked.roles.includes(tag), 'Refresh kept revoked role permission');
@@ -76,14 +76,14 @@ async (page) => {
 
         await view.getByRole('button', { name: 'Permission', exact: true }).click();
         await view.waitForURL('**/permiso'); await view.getByRole('grid').waitFor();
-        await view.getByRole('button', { name: 'add', exact: true }).click();
+        await view.getByRole('button', { name: 'Añadir', exact: true }).click();
         const form = view.getByRole('dialog', { name: 'Crear permiso' });
         await form.getByLabel('Nombre', { exact: true }).fill(tag + '_draft');
         await poll();
         check(await form.getByLabel('Nombre', { exact: true }).inputValue() === tag + '_draft', 'Unchanged refresh lost editing');
         await assign([roleId], [id('permission.view')]); await poll();
         await form.waitFor({ state: 'detached' }); await view.getByRole('grid').waitFor();
-        check(await view.getByRole('button', { name: 'add', exact: true }).count() === 0, 'Revoked form action remained');
+        check(await view.getByRole('button', { name: 'Añadir', exact: true }).count() === 0, 'Revoked form action remained');
         const write403 = await request(context, 'POST', 'permission', { nombre: tag + '_denied' });
         record('write after direct create revocation', write403); check(write403.status === 403, 'Direct write revocation ignored');
         report.passed.push('Unchanged refresh keeps editing; direct create/update revocation discards form and write is 403');
@@ -115,7 +115,7 @@ async (page) => {
             writeStarted(); await new Promise(resolve => { releaseWrite = resolve; });
             await route.fulfill({ response, body }).catch(() => {}); await response.dispose();
         });
-        await view.getByRole('button', { name: 'add', exact: true }).click();
+        await view.getByRole('button', { name: 'Añadir', exact: true }).click();
         const writeForm = view.getByRole('dialog', { name: 'Crear permiso' });
         await writeForm.getByLabel('Nombre', { exact: true }).fill(tag + '_accepted');
         await writeForm.getByRole('button', { name: 'Guardar permiso' }).click(); await writing;

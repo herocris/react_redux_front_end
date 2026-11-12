@@ -11,7 +11,7 @@ const catalogDependencies: Partial<Record<AccessDomain, AccessDomain[]>> = {
     weaponConfiscation: ['weapon'], ammunitionConfiscation: ['ammunition'],
 };
 const viewDependencies: Partial<Record<AccessDomain, AccessDomain[]>> = {
-    dashboard: ['drug', 'graph', 'map'],
+    // The dashboard is a navigation hub; each destination checks its own access.
     graph: ['drug', 'weapon', 'ammunition'], map: ['drug', 'weapon', 'ammunition'],
 };
 

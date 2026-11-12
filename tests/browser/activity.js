@@ -50,7 +50,7 @@ async (page) => {
         check(attempts === 1, 'Duplicate initial load');
         check(await row.getByRole('gridcell', { name: '08-11-2026 12:13:14', exact: true }).count() === 1, 'Date format changed');
         check(await row.getByRole('gridcell', { name: '{"antes":1}', exact: true }).count() === 1, 'Changes serialization changed');
-        check(await page.getByRole('menuitem', { name: /Edit|Delete/ }).count() === 0 && await page.getByRole('button', { name: 'add', exact: true }).count() === 0, 'Read-only contract changed');
+        check(await page.getByRole('menuitem', { name: /Editar|Borrar/ }).count() === 0 && await page.getByRole('button', { name: 'Añadir', exact: true }).count() === 0, 'Read-only contract changed');
         await row.getByRole('gridcell', { name: 'update', exact: true }).click();
         check(await row.getAttribute('aria-selected') === 'true', 'Row not selected');
         passed.push('one initial GET, fields, local date, serialized changes and read-only actions');

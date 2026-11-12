@@ -42,7 +42,7 @@ test('P04: permisos efectivos, dependencias y sesión', async t => {
         assert.equal(firstAllowedPath(user([])), undefined);
         assert.equal(firstAllowedPath({ nombre: '', correo: '' }), undefined);
     });
-    await t.test('catálogos requeridos para edición, lectura independiente y dashboard compuesto', () => {
+    await t.test('catálogos requeridos para edición/análisis y panel de navegación independiente', () => {
         for (const [domain, catalogs] of [['user', ['role', 'permission']], ['role', ['permission']],
             ['drugConfiscation', ['drug', 'drugPresentation']], ['weaponConfiscation', ['weapon']], ['ammunitionConfiscation', ['ammunition']]]) {
             const base = [`${domain}.view`, `${domain}.create`, `${domain}.update`, `${domain}.delete`];
@@ -57,7 +57,7 @@ test('P04: permisos efectivos, dependencias y sesión', async t => {
             assert.equal(canAccess(user([`${domain}.view`]), domain), false);
             assert.equal(canAccess(user([`${domain}.view`, 'drug.view', 'weapon.view', 'ammunition.view']), domain), true);
         }
-        assert.equal(canAccess(user(['dashboard.view']), 'dashboard'), false);
+        assert.equal(canAccess(user(['dashboard.view']), 'dashboard'), true);
         assert.equal(canAccess(user(['dashboard.view', 'drug.view', 'graph.view', 'map.view']), 'dashboard'), true);
     });
     await t.test('login, refresh y logout usan una sola sesión Redux', () => {

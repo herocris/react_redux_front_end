@@ -26,7 +26,7 @@ export const AuthLayout = ({ children, title = '' }: AuthLayoutProps) => {
                         padding: 3,
                         borderRadius: 2
                     }}>
-                    <Typography variant='h5' sx={{ mb: 1 }}>{title}</Typography>
+                    <Typography component='h1' variant='h5' sx={{ mb: 1 }}>{title}</Typography>
                     {children}
                 </Grid>
             </Grow>

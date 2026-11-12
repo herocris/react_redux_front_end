@@ -58,7 +58,7 @@ async (page) => {
             await page.locator('input[name="password"]').fill('Password123!');
             if (mode === 'register') await page.locator('input[name="passwordConfirmation"]').fill('Password123!');
             await page.locator('form').evaluate(form => { window.authTestForm = form; });
-            await page.getByRole('button', { name: 'Login', exact: true }).click();
+            await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
             await page.waitForFunction(() => document.querySelector('form')?.getAttribute('aria-busy') === 'true');
             check(await page.locator('input[name="email"]').isDisabled(), `${mode}: controles bloqueados`);
             check(await page.locator('form').evaluate(form => form === window.authTestForm), `${mode}: formulario conservado durante envío`);
@@ -71,7 +71,7 @@ async (page) => {
                 check(await page.locator('input[name="passwordConfirmation"]').inputValue() === 'Password123!', 'registro: conserva confirmación');
             }
             check(await page.locator('form').evaluate(form => form === window.authTestForm), `${mode}: formulario conservado tras fallo`);
-            await page.getByRole('button', { name: 'Login', exact: true }).click();
+            await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
             await page.waitForURL('**/drug');
             await page.getByText('Sesión de prueba', { exact: true }).first().waitFor();
             check(attempt === 2, `${mode}: una petición por intento`);

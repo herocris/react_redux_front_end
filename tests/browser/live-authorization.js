@@ -37,7 +37,7 @@ async (page) => {
     const poll = async () => { const before = refreshes; await view.clock.fastForward(61000);
         await view.waitForFunction(() => true); check(refreshes > before, 'Passive poll did not start'); };
     const open = async () => {
-        await view.getByRole('button', { name: 'add', exact: true }).click();
+        await view.getByRole('button', { name: 'Añadir', exact: true }).click();
         const form = view.getByRole('dialog', { name: 'Crear droga' }).locator('form');
         await form.getByLabel('Descripción', { exact: true }).fill('Draft P05');
         await form.locator('input[type="file"]').setInputFiles({ name: 'p05.png', mimeType: 'image/png', buffer: png });
@@ -70,7 +70,7 @@ async (page) => {
 
         permissions = ['drug.view']; await poll();
         await view.getByRole('dialog').waitFor({ state: 'detached' }); await row().waitFor();
-        check(await view.getByRole('button', { name: 'add', exact: true }).count() === 0, 'Revoked create survived');
+        check(await view.getByRole('button', { name: 'Añadir', exact: true }).count() === 0, 'Revoked create survived');
         passed.push('Action revocation tears down form/selection even when view remains allowed');
         permissions = []; await poll();
         await view.getByRole('alert', { name: 'Acceso denegado' }).waitFor();

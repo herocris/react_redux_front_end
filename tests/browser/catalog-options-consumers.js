@@ -44,7 +44,7 @@ async (page) => {
         await selectCount(form, 'Drogas', 3);
         passed.push('gráficos recupera catálogo paginado y bloquea envío durante fallo');
         const before = reads.length;
-        await page.getByRole('button', { name: 'Map', exact: true }).click();
+        await page.getByRole('button', { name: 'Mapa', exact: true }).click();
         await page.locator('.leaflet-container').waitFor();
         for (const name of ['Drogas', 'Armas', 'Municiones']) await selectCount(page.locator('form'), name, 3);
         check(reads.length === before, 'Map duplicated fresh catalog requests');

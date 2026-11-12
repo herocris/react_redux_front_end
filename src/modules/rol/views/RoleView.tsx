@@ -11,8 +11,8 @@ import { RoleFormModal } from '../components/RoleFormModal';
 import { useRoleView } from '../hooks/useRoleView';
 
 const columns: GridColDef<RoleEntity>[] = [
-  { field: 'id', headerName: 'id', flex: 1 },
-  { field: 'nombre', headerName: 'nombre', flex: 1 }
+  { field: 'id', headerName: 'ID', flex: 1 },
+  { field: 'nombre', headerName: 'Nombre', flex: 1 }
 ];
 
 export const RoleView = () => {

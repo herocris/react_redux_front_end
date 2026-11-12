@@ -11,9 +11,9 @@ import { UserFormModal } from '../components/UserFormModal';
 import { useUserView } from '../hooks/useUserView';
 
 const columns: GridColDef<UserEntity>[] = [
-  { field: 'id', headerName: 'id', flex: 1 },
-  { field: 'nombre', headerName: 'nombre', flex: 1 },
-  { field: 'correo', headerName: 'correo', flex: 1 }
+  { field: 'id', headerName: 'ID', flex: 1 },
+  { field: 'nombre', headerName: 'Nombre', flex: 1 },
+  { field: 'correo', headerName: 'Correo', flex: 1 }
 ];
 
 export const UserView = () => {

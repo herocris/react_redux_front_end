@@ -2,7 +2,7 @@ import { Avatar, Box } from '@mui/material';
 import type { GridColDef, GridValidRowModel } from '@mui/x-data-grid';
 import { getMediaUrl } from '../helpers/getMediaUrl';
 export const logoColumn = <T extends GridValidRowModel,>(): GridColDef<T> => ({
-    field: 'logo', headerName: 'logo', sortable: false, filterable: false, align: 'center', headerAlign: 'center',
+    field: 'logo', headerName: 'Imagen', sortable: false, filterable: false, align: 'center', headerAlign: 'center',
     renderCell: ({ value, row }) => {
         const name = row.descripcion || row.name || row.nombre || 'N/A';
         const imageUrl = getMediaUrl(value);

@@ -53,11 +53,11 @@ async (page) => {
         await page.getByRole('grid').waitFor();
         check([...scripts].some(path => /UserRoutes-/.test(path)), 'User chunk not loaded');
         check(![...scripts].some(path => /DashBoardRoutes-|ConfiscationRoutes-|GraphView-|TileLayer-/.test(path)), 'User route loaded unrelated chunks');
-        await page.getByRole('button', { name: 'Graphs', exact: true }).filter({ visible: true }).click();
+        await page.getByRole('button', { name: 'Gráficos', exact: true }).filter({ visible: true }).click();
         await page.waitForURL('**/graph');
         await page.locator('form').waitFor();
         check([...scripts].some(path => /GraphView-/.test(path)), 'Graph chunk not loaded');
-        await page.getByRole('button', { name: 'Map', exact: true }).filter({ visible: true }).click();
+        await page.getByRole('button', { name: 'Mapa', exact: true }).filter({ visible: true }).click();
         await page.waitForURL('**/map');
         await page.locator('.leaflet-container').waitFor();
         check(await leafletStyled(), 'Map route missing Leaflet CSS');

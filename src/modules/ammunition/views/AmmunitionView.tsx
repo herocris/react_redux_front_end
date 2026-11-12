@@ -12,8 +12,8 @@ import { AmmunitionFormModal } from '../components';
 import { useAmmunitionView } from '../hooks';
 
 const columns: GridColDef<AmmunitionEntity>[] = [
-  { field: 'id', headerName: 'id', flex: 1 },
-  { field: 'descripcion', headerName: 'descripcion', flex: 1 },
+  { field: 'id', headerName: 'ID', flex: 1 },
+  { field: 'descripcion', headerName: 'Descripción', flex: 1 },
   logoColumn(),
 ];
 
