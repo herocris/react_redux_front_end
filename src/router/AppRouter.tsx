@@ -10,6 +10,7 @@ import { ApiRequestError } from '../components/ApiRequestError';
 import { useAuthorizationRefresh } from '../modules/auth/hooks/useAuthorizationRefresh';
 import { refreshAuthorization } from '../modules/auth/thunks/refreshAuthorization';
 import { startLogout } from '../modules/auth/thunks';
+import { ViewErrorBoundary } from './ViewErrorBoundary';
 
 
 const UserRoutes = lazy(() => import('../modules/user/routes/UserRoutes').then(module => ({ default: module.UserRoutes })));
@@ -83,6 +84,7 @@ export const AppRouter = () => {
         {logoutFailure && <Alert severity="error">No se pudo cerrar la sesión.</Alert>}
     </Box>;
     return (
+        <ViewErrorBoundary>
         <Suspense key={authorizationRevision} fallback={<RouteLoading />}>
         <Routes>
             {
@@ -108,5 +110,6 @@ export const AppRouter = () => {
             <Route path='/*' element={<Navigate to="/auth/login" />} />
         </Routes>
         </Suspense>
+        </ViewErrorBoundary>
     )
 }
