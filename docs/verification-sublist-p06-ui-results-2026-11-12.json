@@ -1,0 +1,14 @@
+{
+  "passed": [
+    "real first-page empty adaptation in all three services",
+    "last page row deleted through UI: total 6→5, page 2→1, size 5 retained",
+    "final child removed: empty first page, total zero and disabled pagination"
+  ],
+  "cleanup": [
+    "own children and parent removed"
+  ],
+  "pageErrors": [],
+  "warnings": [
+    "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+  ]
+}

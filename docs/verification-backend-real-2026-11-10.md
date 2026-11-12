@@ -3,8 +3,11 @@
 Actualización P02 (11 de noviembre): la discrepancia de IDs del hallazgo 3 se
 corrigió y verificó contra respuestas actuales y OpenAPI. Contratos, frontera
 URL, pruebas y límites en [el informe P02](verification-identifiers-p02-2026-11-11.md).
-El contenido siguiente conserva la evidencia histórica; imágenes y paginación
-de sublistas vacías siguen pendientes.
+Actualización P06 (12 de noviembre): nueva comprobación de los tres endpoints,
+adaptación limitada del vacío inicial y respuesta mínima solicitada a Laravel
+al final de este informe. La omisión de metadatos del backend sigue pendiente;
+no se considera resuelto el contrato completo. Imágenes continúa en P07.
+El contenido siguiente conserva la evidencia histórica.
 
 ## Entorno y alcance
 
@@ -129,3 +132,124 @@ recorrido final.
 La integración real queda comprobada para los flujos descritos, con los tres
 hallazgos anteriores abiertos. No se marca la validación global como libre de
 pendientes ni se avanza otro paso del plan de refactorización.
+
+## P06 — Paginación vacía (12 de noviembre de 2026)
+
+Nueva ejecución real en `localhost/api`, sesión de demo existente y Vite en
+5174. No se modifica Laravel ni cuentas/asignaciones. El código backend no
+está en este workspace. Evidencia sanitizada de las 24 lecturas en
+[JSON P06](verification-sublist-p06-results-2026-11-12.json), recorrido reproducible
+en [sublist-pagination-real.js](../tests/browser/sublist-pagination-real.js).
+No hay respuestas interceptadas/simuladas en este recorrido.
+
+Los tres endpoints `GET /api/{dominio}/{padre}/confiscation`, con dominios
+`drugConfiscation`, `weaponConfiscation` y `ammunitionConfiscation`, responden
+200 con el mismo comportamiento:
+
+| Escenario, tamaño 2 y orden identificador descendente | Filas | total / current_page / last_page / per_page |
+| --- | --- | --- |
+| Padre existente sin hijos, página 1 | 0 | Omitidos: cuerpo exacto `{"data":[]}` |
+| Tres hijos, página 1 | 2 | 3 / 1 / 2 / 2 |
+| Tres hijos, última página 2 | 1 | 3 / 2 / 2 / 2 |
+| Tres hijos, página 3 fuera de rango | 0 | 3 / 3 / 2 / 2 |
+| Segundo padre vacío mientras el primero tiene tres hijos | 0 | Omitidos |
+| Borrar fila única de página 2, volver a consultar página 2 | 0 | 2 / 2 / 1 / 2 |
+| Consultar página anterior tras borrar | 2 | 2 / 1 / 1 / 2 |
+| Borrar también los dos hijos restantes, página 1 | 0 | Omitidos |
+
+Esto precisa el hallazgo histórico: **una página vacía no implica total cero**.
+En el escenario fuera de rango observado Laravel conserva los metadatos; los
+omite cuando ya no hay hijos. Se acredita el aislamiento por padre y el orden
+descendente, sin deducir el comportamiento de todos los filtros del servidor.
+Un intento inicial con tamaño 1 recibió 422 (`per_page` mínimo 2); se limpiaron
+sus dos padres y se repitió con tamaño válido, sin reintentar escrituras.
+
+### Adaptación y límites
+
+`api/sublistPagination.ts`, invocado solo desde los tres services, representa
+honestamente la respuesta HTTP como metadatos opcionales y exige los cuatro
+campos antes de publicar una respuesta paginada. Conserva los metadatos del
+servidor, incluidos un total positivo y `last_page < current_page`.
+Solo adapta `data: []` en **página solicitada 1**, con los cuatro campos ausentes:
+total 0, página 1, última 1 y tamaño solicitado. La primera página vacía acredita
+que no hay filas para esos argumentos en ese instante. No se inventan enlaces
+ni se afirma haberlos recibido; el contrato adaptado requiere solo esos cuatro
+campos. Se preservan parámetros, orden, filtros, padre, cookies y AbortSignal.
+
+Si faltan metadatos en página posterior, o llegan parcialmente/inválidos, el
+service rechaza explícitamente el listado. No sondea páginas, no inventa cero,
+no reutiliza totales de otra clave/padre y no cambia la página. Query posee
+error y resultados; los hooks conservan el único estado de página y ajustan
+una página vacía únicamente tras una lectura exitosa actual con total probado.
+La paginación muestra total desconocido (`-1` de MUI) durante ausencia de datos
+o error; selección/escrituras del listado quedan bloqueadas ante error, con
+Reintentar. La caché puede conservar la última respuesta acreditada de la misma
+clave, sin presentarla como una nueva lectura exitosa.
+
+### Respuesta mínima que debe garantizar backend
+
+Pendiente Laravel: devolver siempre el paginador, también cuando no hay hijos
+o el filtro no encuentra filas. Aplicar padre y filtros antes de contar; no
+construir un `data: []` aislado al detectar colección vacía. Ejemplos mínimos
+para tamaño 2 (el resto de enlaces puede seguir siendo opcional para este UI):
+
+```json
+{"data":[],"total":0,"current_page":1,"last_page":1,"per_page":2}
+```
+
+Página solicitada 2 tras borrar la tercera fila, quedando dos en página 1:
+
+```json
+{"data":[],"total":2,"current_page":2,"last_page":1,"per_page":2}
+```
+
+Si no quedan hijos pero se solicita página 2, conservar `current_page: 2`,
+`total: 0`, `last_page: 1`, `per_page: 2`. El cliente decidirá volver a 1.
+No sustituir el total por la longitud de `data` ni cambiar silenciosamente la
+página solicitada. Distinguir mediante rechazo HTTP un padre inexistente/no
+autorizado de una colección vacía; esa distinción no se certifica en P06.
+Este documento es la entrega para backend; no se ha enviado mensaje externo
+ni se ha aplicado/verificado ese ajuste en Laravel.
+
+### Verificación del frontend
+
+Pruebas de contrato/query en
+[sublist-pagination.test.mjs](../tests/sublist-pagination.test.mjs) y regresión
+[confiscation-save.test.mjs](../tests/confiscation-save.test.mjs). Cubren vacío
+inicial, total positivo fuera de rango, parámetros/señal, metadatos parciales,
+rechazos HTTP, borrado de última página/hijo final, recarga activa, error ambiguo
+sin sobrescribir datos probados e invalidación limitada al padre. El fixture de
+deduplicación antiguo devolvía página 1 para cualquier petición; corregido para
+reflejar la página solicitada. La señal Axios combina sesión y consulta: la
+prueba comprueba propagación de aborto, no identidad del objeto.
+
+Context7 consultado para Query **5.107.1** (lockfile); no ofrece ese patch
+versionado exacto. Se contrasta con la
+[documentación oficial v5 de invalidación](https://tanstack.com/query/v5/docs/framework/react/guides/query-invalidation):
+prefijo por padre y recarga de consultas activas. No se cambia la política
+Query, ni dependencias. React resuelto 19.3.1, Axios 1.21.0 y MUI 6.4.7.
+
+Resultado final: **256/256 pruebas Node**, lint sin advertencias y build correctos;
+diff comprobado y `tsconfig.app.tsbuildinfo` restaurado. Las 25 pruebas P06 están
+incluidas en ese total; el resto preserva la regresión existente. Transporte de
+las pruebas Node simulado, separado de los recorridos HTTP reales.
+
+[sublist-pagination-ui.js](../tests/browser/sublist-pagination-ui.js) pasó tres
+grupos reales: adaptación inicial de los tres services, borrado por UI de la
+fila única de página 2 (total 6→5, página 2→1, tamaño 5 conservado), y eliminación
+por service de los hijos restantes seguida de invalidación/lectura UI con
+total cero, estado vacío y navegación deshabilitada. No se añaden filtros/orden
+a un control que no los ofrece; su conservación se verifica en parámetros y
+claves de service/query, y el sondeo real comprueba el orden descendente.
+[Resultado UI](verification-sublist-p06-ui-results-2026-11-12.json): cero excepciones
+y errores de consola finales, un aviso de rendimiento Canvas2D, ningún aviso MUI
+de página inválida. Red relevante: DELETE 200, relectura de página 2 con total
+5 y posterior página 1; sin interceptaciones pendientes.
+
+El primer intento UI detectó módulos anteriores retenidos desde el sondeo;
+se limpió su padre, se añadió recarga inicial y el recorrido final pasó con el
+código actual. Limpiados los nueve hijos/dos padres del sondeo y seis hijos/un
+padre del recorrido UI; también dos padres del intento con tamaño 1 y uno del
+primer intento UI. Consulta final independiente por observación: cero padres
+`PORTFOLIO_P06_`. Se conserva auditoría; no se acredita eliminación física de
+imágenes. Sin commits, despliegues ni cambios fuera de P06.

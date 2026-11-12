@@ -1,0 +1,582 @@
+{
+  "cases": [
+    {
+      "domain": "drugConfiscation",
+      "label": "existing parent without children",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {},
+      "keys": [
+        "data"
+      ]
+    },
+    {
+      "domain": "drugConfiscation",
+      "label": "first page",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 2,
+      "ids": [
+        1019,
+        1018
+      ],
+      "metadata": {
+        "total": 3,
+        "current_page": 1,
+        "last_page": 2,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "drugConfiscation",
+      "label": "last page",
+      "requestedPage": 2,
+      "status": 200,
+      "rows": 1,
+      "ids": [
+        1017
+      ],
+      "metadata": {
+        "total": 3,
+        "current_page": 2,
+        "last_page": 2,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "drugConfiscation",
+      "label": "out of range with previous rows",
+      "requestedPage": 3,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {
+        "total": 3,
+        "current_page": 3,
+        "last_page": 2,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "drugConfiscation",
+      "label": "other parent remains empty",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {},
+      "keys": [
+        "data"
+      ]
+    },
+    {
+      "domain": "drugConfiscation",
+      "label": "after deleting last row of last page",
+      "requestedPage": 2,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {
+        "total": 2,
+        "current_page": 2,
+        "last_page": 1,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "drugConfiscation",
+      "label": "previous page after delete",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 2,
+      "ids": [
+        1019,
+        1018
+      ],
+      "metadata": {
+        "total": 2,
+        "current_page": 1,
+        "last_page": 1,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "drugConfiscation",
+      "label": "after deleting final child",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {},
+      "keys": [
+        "data"
+      ]
+    },
+    {
+      "domain": "weaponConfiscation",
+      "label": "existing parent without children",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {},
+      "keys": [
+        "data"
+      ]
+    },
+    {
+      "domain": "weaponConfiscation",
+      "label": "first page",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 2,
+      "ids": [
+        1003,
+        1002
+      ],
+      "metadata": {
+        "total": 3,
+        "current_page": 1,
+        "last_page": 2,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "weaponConfiscation",
+      "label": "last page",
+      "requestedPage": 2,
+      "status": 200,
+      "rows": 1,
+      "ids": [
+        1001
+      ],
+      "metadata": {
+        "total": 3,
+        "current_page": 2,
+        "last_page": 2,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "weaponConfiscation",
+      "label": "out of range with previous rows",
+      "requestedPage": 3,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {
+        "total": 3,
+        "current_page": 3,
+        "last_page": 2,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "weaponConfiscation",
+      "label": "other parent remains empty",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {},
+      "keys": [
+        "data"
+      ]
+    },
+    {
+      "domain": "weaponConfiscation",
+      "label": "after deleting last row of last page",
+      "requestedPage": 2,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {
+        "total": 2,
+        "current_page": 2,
+        "last_page": 1,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "weaponConfiscation",
+      "label": "previous page after delete",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 2,
+      "ids": [
+        1003,
+        1002
+      ],
+      "metadata": {
+        "total": 2,
+        "current_page": 1,
+        "last_page": 1,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "weaponConfiscation",
+      "label": "after deleting final child",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {},
+      "keys": [
+        "data"
+      ]
+    },
+    {
+      "domain": "ammunitionConfiscation",
+      "label": "existing parent without children",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {},
+      "keys": [
+        "data"
+      ]
+    },
+    {
+      "domain": "ammunitionConfiscation",
+      "label": "first page",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 2,
+      "ids": [
+        1003,
+        1002
+      ],
+      "metadata": {
+        "total": 3,
+        "current_page": 1,
+        "last_page": 2,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "ammunitionConfiscation",
+      "label": "last page",
+      "requestedPage": 2,
+      "status": 200,
+      "rows": 1,
+      "ids": [
+        1001
+      ],
+      "metadata": {
+        "total": 3,
+        "current_page": 2,
+        "last_page": 2,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "ammunitionConfiscation",
+      "label": "out of range with previous rows",
+      "requestedPage": 3,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {
+        "total": 3,
+        "current_page": 3,
+        "last_page": 2,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "ammunitionConfiscation",
+      "label": "other parent remains empty",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {},
+      "keys": [
+        "data"
+      ]
+    },
+    {
+      "domain": "ammunitionConfiscation",
+      "label": "after deleting last row of last page",
+      "requestedPage": 2,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {
+        "total": 2,
+        "current_page": 2,
+        "last_page": 1,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "ammunitionConfiscation",
+      "label": "previous page after delete",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 2,
+      "ids": [
+        1003,
+        1002
+      ],
+      "metadata": {
+        "total": 2,
+        "current_page": 1,
+        "last_page": 1,
+        "per_page": 2
+      },
+      "keys": [
+        "current_page",
+        "data",
+        "first_page_url",
+        "from",
+        "last_page",
+        "last_page_url",
+        "links",
+        "next_page_url",
+        "path",
+        "per_page",
+        "prev_page_url",
+        "to",
+        "total"
+      ]
+    },
+    {
+      "domain": "ammunitionConfiscation",
+      "label": "after deleting final child",
+      "requestedPage": 1,
+      "status": 200,
+      "rows": 0,
+      "ids": [],
+      "metadata": {},
+      "keys": [
+        "data"
+      ]
+    }
+  ],
+  "cleanup": [
+    {
+      "domain": "confiscation",
+      "removed": true
+    },
+    {
+      "domain": "confiscation",
+      "removed": true
+    }
+  ],
+  "failures": []
+}

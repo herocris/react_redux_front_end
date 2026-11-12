@@ -34,8 +34,9 @@ Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 La preparación posterior para presentar el proyecto tiene
 [prompts por tarea](portfolio-plan.md) y [progreso propio](portfolio-progress.md).
-P01 y P02 están ejecutados; los demás prompts siguen pendientes. Su preparación no
-ejecuta por sí misma los cambios.
+P01–P05 están ejecutados; P06 incorpora adaptación limitada del vacío inicial,
+con contrato backend todavía pendiente. El estado actualizado y sus límites
+están en el progreso de portafolio; su preparación no ejecuta por sí misma cambios.
 
 ## Decisiones acordadas
 
@@ -2058,3 +2059,35 @@ guía, informe, evidencia JSON y progresos se consolidan por separado. Se reutil
 las 231 pruebas, lint, build y recorridos del mismo código, sin nueva ejecución.
 Diff e índice revisados y JSON saneado comprobado. Sin push ni despliegue. El
 ajuste Laravel anónimo sigue pendiente; P06 y siguientes no se ejecutan.
+
+### P06 — Vacío paginado de subdecomisos (12 de noviembre de 2026)
+
+Solo P06 del plan de portafolio. Verificados los tres endpoints con padres
+temporales: 24 lecturas reales de vacío inicial, última página, fuera de rango,
+otro padre y borrado de última fila/hijo final. Laravel omite los metadatos
+cuando no hay hijos, pero conserva total positivo fuera de rango y tras borrar
+la última fila de página 2. Adaptación en frontera del service únicamente para
+primera página vacía sin metadatos. En página posterior indeterminada se rechaza
+el listado, sin inventar cero ni ajustar página; UI muestra total desconocido.
+Sin duplicar estado de página, cambiar filtros/orden ni ampliar la migración.
+
+**256/256 pruebas Node**, lint sin advertencias, build y diff correctos.
+25 pruebas P06 de service/query; regresión de contratos, invalidación, sesión
+y concurrencia conservada. Playwright real: tres grupos aprobados de services/UI,
+total 6→5 y página 2→1 con tamaño 5 tras borrar por UI, vacío final con total 0.
+Cero excepciones/errores de consola finales, un aviso Canvas2D del entorno.
+Fixtures propios limpiados; comprobación final cero padres `PORTFOLIO_P06_`.
+Artefacto TypeScript restaurado; sin dependencias nuevas, commits o despliegues.
+
+Contrato completo **pendiente en Laravel**; respuesta mínima y límites en
+[informe backend P06](verification-backend-real-2026-11-10.md#p06--paginación-vacía-12-de-noviembre-de-2026),
+[evidencia HTTP](verification-sublist-p06-results-2026-11-12.json),
+[evidencia UI](verification-sublist-p06-ui-results-2026-11-12.json) y
+[progreso de portafolio](portfolio-progress.md#p06--paginación-de-sublistas-vacías-12-de-noviembre-de-2026).
+Siguiente disponible P07, sin ejecutar; los 16 pasos originales siguen cerrados.
+
+Consolidación solicitada: `9ce885a` contiene implementación y pruebas P06;
+informe, evidencias JSON y progresos se consolidan por separado. Se reutilizan
+las 256 pruebas, lint, build y recorridos del mismo código, sin nueva ejecución.
+Diff e índice revisados. Sin push ni despliegue; contrato Laravel pendiente
+y P07 sin ejecutar.

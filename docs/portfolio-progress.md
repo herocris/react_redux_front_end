@@ -14,7 +14,7 @@ cerrada en [refactor-progress.md](refactor-progress.md).
 | P03 | Media | Acceso denegado y tipos de error | Completado | Cuerpos reales 401/403, presentación reutilizable y recuperación verificados |
 | P04 | Alta | Permisos en rutas, menú y acciones | Implementado y verificado con simulación; integración real selectiva nueva en P05 | Drogas/permisos con sesión temporal; resto de perfiles/dependencias reales sin repetir |
 | P05 | Alta | Revocación durante sesión abierta | Completado | Política viva, 231 pruebas, 11 grupos simulados, 6 reales y regresión P03; ajuste Laravel anónimo documentado |
-| P06 | Alta | Paginación de sublistas vacías | Pendiente | Contrato real del backend |
+| P06 | Alta | Paginación de sublistas vacías | Implementado con adaptación limitada; contrato backend pendiente | Vacío inicial acreditado; fuera de rango conserva total; informe P06 |
 | P07 | Alta | Configuración y renderizado de imágenes | Pendiente | URL pública real de medios |
 | P08 | Media | Recuperación de errores de render/lazy | Pendiente | Mantener carga diferida |
 | P09 | Media | Página no encontrada | Pendiente | Integrar con P03/P04 si están implementados |
@@ -348,3 +348,56 @@ lint, build y recorridos aprobados del mismo código, sin contarlos como nuevas
 ejecuciones. Diff e índice revisados; JSON saneado comprobado. Sin push ni
 despliegue. El ajuste Laravel de autenticación anónima sin Accept JSON sigue
 pendiente; P06 y posteriores no se ejecutan.
+
+### P06 — Paginación de sublistas vacías (12 de noviembre de 2026)
+
+Ejecutado únicamente P06. Los tres endpoints reales omiten los cuatro metadatos
+cuando el padre no tiene hijos, incluida la lectura tras borrar el hijo final.
+Con tres hijos y tamaño 2, última página y fuera de rango sí devuelven metadatos;
+al borrar la fila de página 2, su vacío conserva total 2 y última página 1.
+Segundo padre permanece vacío: aislamiento acreditado. 24 lecturas documentadas
+en [JSON real](verification-sublist-p06-results-2026-11-12.json).
+
+Los tres services usan `api/sublistPagination.ts`: solo página solicitada 1 con
+filas vacías y los cuatro campos ausentes se adapta a total 0/página 1/última 1/
+tamaño solicitado. Metadatos existentes se conservan, incluyendo total positivo
+fuera de rango. Una página posterior sin metadatos o metadatos parciales/inválidos
+rechaza el listado; no se deduce cero ni se cambia página ante el error. Los
+hooks mantienen un propietario de página y muestran total desconocido mientras
+no hay lectura acreditada o hay error. Orden, filtros, tamaño, señal y claves
+por padre permanecen; invalidación actual y corrección de página reutilizadas.
+
+**256/256 pruebas Node finales**, incluidas 25 de P06 (grupo/subgrupos incluidos),
+lint sin advertencias, build y diff correctos. Artefacto TypeScript restaurado.
+Pruebas de services/query: contratos, parámetros, aborto, escritura/relectura,
+total/página, error ambiguo sin sobrescribir caché e invalidación por padre.
+Fixture antiguo de deduplicación corregido: respondía página 1 también al pedir 2.
+
+Playwright MCP real, sin interceptar respuestas: tres grupos de interfaz/services,
+normalización vacía de los tres dominios, borrado por UI con total 6→5 y página
+2→1 conservando tamaño 5, eliminación de hijos restantes seguida de recarga con
+total 0/estado vacío/controles deshabilitados. Cero excepciones y errores de
+consola en el recorrido final; un aviso de rendimiento Canvas2D del entorno,
+sin avisos de paginación MUI. [Evidencia UI](verification-sublist-p06-ui-results-2026-11-12.json).
+
+Se limpiaron los nueve hijos/dos padres del sondeo y seis hijos/un padre del
+recorrido final, más los padres de dos intentos iniciales (tamaño 1 rechazado
+422 y módulo anterior retenido en la pestaña, resuelto recargando). Comprobación
+final independiente: cero padres con prefijo `PORTFOLIO_P06_`. No se modifican
+cuentas, roles ni auditoría; eliminación física de fotos no acreditada.
+
+**El contrato Laravel no se declara resuelto.** El informe entrega los cuerpos
+mínimos para vacío real y fuera de rango; faltan implementación backend y nueva
+verificación de esa garantía, incluidos filtro sin resultados y página posterior
+cuando ya no hay hijos. Ante esos casos indeterminados el cliente muestra error
+y permite reintentar. No se enviaron mensajes externos ni se modificó Laravel.
+Context7 sin patch exacto de Query 5.107.1; contraste oficial y límites en
+[informe backend P06](verification-backend-real-2026-11-10.md#p06--paginación-vacía-12-de-noviembre-de-2026).
+Sin dependencias nuevas, commits o despliegues. Siguiente disponible **P07**,
+sin ejecutar; ajuste backend P06 y resto de pendientes conservados.
+
+Consolidación solicitada: `9ce885a` registra implementación y pruebas P06;
+informe, evidencias JSON y ambos progresos se consolidan por separado. Se
+reutilizan las 256 pruebas, lint, build y recorridos del mismo código, sin nueva
+ejecución. Diff e índice revisados. Sin push ni despliegue; contrato Laravel
+pendiente y P07 sin ejecutar.
