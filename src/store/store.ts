@@ -1,6 +1,6 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { isSessionBoundary, sessionMiddleware } from './sessionMiddleware'
-import { authSlice } from '../modules/auth/slices/authSlice'
+import { authSlice, onSessionRefreshed } from '../modules/auth/slices/authSlice'
 import { analysisFiltersSlice } from '../modules/analysisFilters/slices/analysisFiltersSlice'
 
 const appReducer = combineReducers({
@@ -9,7 +9,9 @@ const appReducer = combineReducers({
 })
 
 export const rootReducer: typeof appReducer = (state, action) => {
-  if (isSessionBoundary(action)) {
+  const changedUser = onSessionRefreshed.match(action) && state?.auth?.status === 'authenticated' &&
+    state.auth.user.correo !== action.payload.correo;
+  if (isSessionBoundary(action) || changedUser) {
     // Reset applied filters at every session boundary.
     // Preserve auth until its own reducer applies the requested transition.
     const initial = appReducer(undefined, { type: '@@session/reset' })

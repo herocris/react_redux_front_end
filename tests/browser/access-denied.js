@@ -12,6 +12,8 @@ async (page) => {
         if (['error', 'warning'].includes(message.type()) && !message.text().startsWith('Failed to load resource:')) consoleErrors.push(message.text().slice(0, 200));
     });
     view.setDefaultTimeout(12000);
+    // Keep the P05 cooldown deterministic while verifying P03 form/error behavior.
+    await view.clock.install();
     await context.route('**/*', async route => {
         const req = route.request();
         if (req.resourceType() === 'image') return route.fulfill({ contentType: 'image/png', body: png });
@@ -54,7 +56,7 @@ async (page) => {
         await view.goto('http://localhost:5174/drug');
         const denial = view.getByRole('alert', { name: 'Acceso denegado' });
         await denial.waitFor();
-        check(reads === 1 && refreshes === 1 && logouts === 0, '403 retried or changed session');
+        check(reads === 1 && refreshes === 2 && logouts === 0, '403 retried or failed its bounded P05 session check');
         await denial.getByRole('button', { name: 'Reintentar listado' }).focus();
         await view.keyboard.press('Tab');
         check(await denial.getByRole('button', { name: 'Cerrar sesión' }).evaluate(el => el === document.activeElement), 'Logout not reachable by keyboard');
@@ -69,7 +71,7 @@ async (page) => {
         mode = 'success';
         await view.getByRole('button', { name: 'Reintentar listado' }).click();
         await view.getByRole('row').filter({ hasText: 'Original' }).waitFor();
-        check(refreshes === 1 && logouts === 0, 'Error recovery changed session');
+        check(refreshes === 2 && logouts === 0, 'Error recovery changed session');
         passed.push('401, 500 and transport distinguished; explicit retry recovers list');
 
         await view.getByRole('button', { name: 'add', exact: true }).click();
@@ -104,18 +106,18 @@ async (page) => {
         check(await view.getByRole('row', { includeHidden: true }).filter({ hasText: 'Original' }).count() === 1, 'Denied delete changed rows');
         await confirm.getByRole('button', { name: 'Borrar', exact: true }).click();
         await confirm.waitFor({ state: 'detached' });
-        check(await view.getByRole('row').filter({ hasText: 'Original' }).count() === 0, 'Delete recovery failed');
-        check(refreshes === 1 && logouts === 0 && errors.length === 0 && consoleErrors.length === 0, 'Unexpected session effect or browser error');
+        await view.getByRole('row').filter({ hasText: 'Original' }).waitFor({ state: 'detached' });
+        check(refreshes === 2 && logouts === 0 && errors.length === 0 && consoleErrors.length === 0, 'Unexpected session effect or browser error');
         passed.push('Delete: 403 preserves selection/dialog; explicit retry recovers; no session side effects');
         refreshDenied = true;
         const beforeBootstrap = reads;
         await view.goto('http://localhost:5174/drug');
         await view.getByRole('main').getByRole('alert', { name: 'Acceso denegado' }).waitFor();
-        check(reads === beforeBootstrap && refreshes === 2 && logouts === 0, 'Bootstrap 403 logged out, looped or mounted protected queries');
+        check(reads === beforeBootstrap && refreshes === 3 && logouts === 0, 'Bootstrap 403 logged out, looped or mounted protected queries');
         refreshDenied = false;
         await view.getByRole('button', { name: 'Reintentar', exact: true }).click();
         await view.getByRole('row').filter({ hasText: 'Nueva P03' }).waitFor();
-        check(refreshes === 3 && logouts === 0 && errors.length === 0 && consoleErrors.length === 0, 'Bootstrap recovery failed');
+        check(refreshes === 4 && logouts === 0 && errors.length === 0 && consoleErrors.length === 0, 'Bootstrap recovery failed');
         passed.push('Initial refresh 403 shows recovery without logout/loop/protected queries; explicit retry restores app');
         return { passed, creates, deletes, reads, refreshes, logouts, pageErrors: errors, consoleErrors };
     } finally {

@@ -2,6 +2,7 @@ import axios from 'axios';
 import { getEnvVariables } from '../helpers/getEnvVariables';
 import { getSessionSignal } from './sessionScope';
 import { rememberHttpFailure } from './apiErrors';
+import { notifyForbidden } from './authorizationEvents';
 
 const { VITE_API_URL } = getEnvVariables()
 
@@ -30,6 +31,11 @@ calendarApi.interceptors.response.use(
             : error;
         if (axios.isAxiosError(error) && error.response) {
             rememberHttpFailure(reason, error.response.status, error);
+            // Never react to auth endpoints or to a retired request/session.
+            if (error.response.status === 403 && error.config?.signal &&
+                !/^\/(login|register|refresh|logout)$/.test(error.config.url ?? '')) {
+                notifyForbidden(error.config.signal as AbortSignal);
+            }
         }
         return Promise.reject(reason);
     },

@@ -5,8 +5,11 @@ import { useAppDispatch, useAppSelector } from '../hooks/hooks';
 import { selectAuthStatus } from '../modules/auth/selectors';
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { checkAuthToken } from '../modules/auth/thunks';
-import { Box, CircularProgress } from '@mui/material';
+import { Alert, Box, Button, CircularProgress } from '@mui/material';
 import { ApiRequestError } from '../components/ApiRequestError';
+import { useAuthorizationRefresh } from '../modules/auth/hooks/useAuthorizationRefresh';
+import { refreshAuthorization } from '../modules/auth/thunks/refreshAuthorization';
+import { startLogout } from '../modules/auth/thunks';
 
 
 const UserRoutes = lazy(() => import('../modules/user/routes/UserRoutes').then(module => ({ default: module.UserRoutes })));
@@ -31,6 +34,17 @@ const RouteLoading = () => (
 export const AppRouter = () => {
     const status = useAppSelector(selectAuthStatus);
     const dispatch = useAppDispatch();
+    const { authorizationRevision, authorizationError } = useAppSelector(state => state.auth);
+    useAuthorizationRefresh(status === 'authenticated');
+    const [accessBusy, setAccessBusy] = useState(false);
+    const [logoutFailure, setLogoutFailure] = useState(false);
+    const recoverAccess = async (logout = false) => {
+        setAccessBusy(true);
+        setLogoutFailure(false);
+        try { await dispatch(logout ? startLogout() : refreshAuthorization()); }
+        catch { setLogoutFailure(true); }
+        finally { setAccessBusy(false); }
+    };
     const [sessionFailure, setSessionFailure] = useState<unknown>(null);
     const [checking, setChecking] = useState(false);
     const checkSession = useCallback(async () => {
@@ -62,8 +76,14 @@ export const AppRouter = () => {
             </Box>
         )
     }
+    if (status === 'authenticated' && authorizationError !== null) return <Box component="main" sx={{ p: 3 }}>
+        <Alert severity="error">No se pudieron verificar tus permisos. {authorizationError}</Alert>
+        <Button disabled={accessBusy} onClick={() => void recoverAccess()}>Actualizar permisos</Button>
+        <Button disabled={accessBusy} onClick={() => void recoverAccess(true)}>Cerrar sesión</Button>
+        {logoutFailure && <Alert severity="error">No se pudo cerrar la sesión.</Alert>}
+    </Box>;
     return (
-        <Suspense fallback={<RouteLoading />}>
+        <Suspense key={authorizationRevision} fallback={<RouteLoading />}>
         <Routes>
             {
                 status === 'not-authenticated'

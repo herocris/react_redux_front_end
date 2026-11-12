@@ -49,4 +49,6 @@ export interface AuthState {
     status: AuthStatus;
     user: SessionUser;
     errorMessage: AuthError | undefined;
+    authorizationRevision: number;
+    authorizationError: string | null;
 }

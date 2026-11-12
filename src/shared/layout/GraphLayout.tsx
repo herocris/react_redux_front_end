@@ -6,6 +6,8 @@ import { AccountCircle, Logout, Person, RecentActors, Map, ContactEmergency, Sig
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
 import { selectSessionUser } from '../../modules/auth/selectors';
 import { startLogout } from '../../modules/auth/thunks';
+import { refreshAuthorization } from '../../modules/auth/thunks/refreshAuthorization';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { useNavigate, useLocation } from 'react-router';
 import { useThemeContext } from '../../theme/themeState';
 import { Brightness4, Brightness7 } from "@mui/icons-material";
@@ -32,6 +34,12 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
     const dispatch = useAppDispatch();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
+    const refreshPermissions = async () => {
+        setRefreshing(true);
+        try { await dispatch(refreshAuthorization()); }
+        finally { setRefreshing(false); }
+    };
     const { mode, toggleMode } = useThemeContext();//para modo oscuro
 
     const onLogout = () => {
@@ -170,6 +178,8 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                     >
                         {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
                     </IconButton>
+                    <IconButton color="inherit" aria-label="Actualizar permisos" disabled={refreshing}
+                        onClick={() => void refreshPermissions()}><RefreshIcon /></IconButton>
                     <IconButton
                         color="inherit"
                         aria-label="Cerrar sesión"

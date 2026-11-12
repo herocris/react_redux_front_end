@@ -2,8 +2,9 @@ import { getApiErrorKind, getApiErrorText } from '../../../api/apiErrors';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { onChecking, onLogin, onLogout, clearErrorMessage } from '../slices/authSlice';
 import { authService } from '../services/authService';
-import type { LoginData, RegisterData } from '../types';
+import type { AuthState, LoginData, RegisterData } from '../types';
 import { getSessionSignal } from '../../../api/sessionScope';
+import { pauseAuthorizationRefresh } from './refreshAuthorization';
 
 const authRequests = new WeakMap<Dispatch, AbortController>();
 const beginAuthRequest = (dispatch: Dispatch) => {
@@ -48,10 +49,13 @@ export const startLoginWithEmailPassword = (values: LoginData) => {
 };
 
 export const startLogout = () => {
-    return async (dispatch: Dispatch): Promise<void> => {
+    return async (dispatch: Dispatch, getState: () => { auth: AuthState }): Promise<void> => {
+        const resume = pauseAuthorizationRefresh(getState);
         const request = beginAuthRequest(dispatch);
-        await authService.logout(request.signal);
-        if (request.isCurrent()) dispatch(onLogout());
+        try {
+            await authService.logout(request.signal);
+            if (request.isCurrent()) dispatch(onLogout());
+        } finally { resume(); }
     };
 };
 
