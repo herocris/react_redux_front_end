@@ -2,7 +2,7 @@
 
 ## Estado al 12 de noviembre de 2026
 
-**P01–P08 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 y posteriores siguen sin ejecutar.** La preparación del
+**P01–P09 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 verifica navegación desconocida con simulación local; P10 y posteriores siguen sin ejecutar.** La preparación del
 plan no ejecutó por sí misma ninguna tarea.
 Fuente: [portfolio-plan.md](portfolio-plan.md). Se conserva la refactorización
 cerrada en [refactor-progress.md](refactor-progress.md).
@@ -17,7 +17,7 @@ cerrada en [refactor-progress.md](refactor-progress.md).
 | P06 | Alta | Paginación de sublistas vacías | Implementado con adaptación limitada; contrato backend pendiente | Vacío inicial acreditado; fuera de rango conserva total; informe P06 |
 | P07 | Alta | Configuración y renderizado de imágenes | Completado en local con límites documentados | Base confirmada y 200; conservación/reemplazo/fallback verificados; limpieza física no acreditada |
 | P08 | Media | Recuperación de errores de render/lazy | Completado con escenarios controlados | Frontera de vistas, recuperación explícita y carga diferida verificadas; informe P08 |
-| P09 | Media | Página no encontrada | Pendiente | Integrar con P03/P04 si están implementados |
+| P09 | Media | Página no encontrada | Completado con comprobaciones locales | Comodines, permisos, recuperación e HTTP SPA documentados; hosting público pendiente de P14 |
 | P10 | Alta | Identidad y dashboard de producto | Pendiente | Considerar permisos de P04 |
 | P11 | Media | Móvil, aspecto y accesibilidad | Pendiente | Preferible después de P03–P10 |
 | P12 | Alta | Datos y recorrido de demo | Pendiente | Conservar acceso precargado intencional; permisos verificados y P04 |
@@ -486,3 +486,34 @@ Informe y ambos progresos se consolidan en un segundo commit documental.
 Se reutilizan las verificaciones del mismo código: 259 pruebas, lint, build y
 recorridos descritos; sin repetirlas por cambios exclusivamente documentales.
 Diff e índice revisados. Sin push ni despliegue; P09 sigue sin ejecutar.
+
+## P09 — Página no encontrada (12 de noviembre de 2026)
+
+Ejecutado exclusivamente P09. Página MUI con tema/foco, salida al login para
+visitantes, primera vista permitida y logout para sesiones; sin destinos
+privados cuando no hay permisos. Comodines principal y de once módulos muestran
+404 conservando URL. Guards en rutas concretas antes de consultas; entradas
+deliberadas de raíz/auth/login/registro conservadas. Recurso HTTP 404 mantiene
+la vista y Query con mensaje propio, separado de ruta inexistente y 403.
+
+**260/260 pruebas Node**, lint sin advertencias y build correctos. Playwright
+MCP: siete grupos del recorrido P09 aprobados sobre build/preview local con
+sesiones/API simuladas, más comprobación aislada de tema oscuro y Tab/Enter.
+URL directa, recarga, once comodines con/sin sesión, atrás/adelante, recuperación,
+permisos, recurso 404/403 y logout fallido/recuperado sin bucles. Cero excepciones
+JS; errores HTTP simulados esperados. Capturas móvil/escritorio/oscuro revisadas.
+Bloque adicional incorporado al script sin repetir toda la matriz por ese cambio.
+Sintaxis y diff correctos; artefacto TypeScript restaurado.
+
+Documento desconocido del preview recibe HTTP 200 aunque React muestra 404;
+la UI cliente no modifica ese código. Hosting público, fallback y HTTP real
+pendientes de P14, sin acreditarlos por el preview. No hay pruebas backend
+reales, dependencias nuevas, commits ni despliegues. Límites previos conservados.
+Informe, decisiones y reproducción: [P09](verification-not-found-p09-2026-11-12.md)
+y `tests/browser/not-found-p09.js`. Siguiente disponible: **P10**, sin ejecutar.
+
+Consolidación solicitada: `5c07f94` registra implementación y pruebas de P09.
+Informe y ambos progresos se consolidan en un segundo commit documental.
+Se reutilizan las 260 pruebas, lint, build y recorridos del mismo código; no se
+repiten por esta consolidación. Diff e índice revisados. Sin push ni despliegue;
+hosting público pendiente de P14 y P10 sin ejecutar.

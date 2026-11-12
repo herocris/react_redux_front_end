@@ -34,7 +34,8 @@ Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 La preparación posterior para presentar el proyecto tiene
 [prompts por tarea](portfolio-plan.md) y [progreso propio](portfolio-progress.md).
-P01–P08 están ejecutados; P08 añade recuperación de vistas con escenarios controlados.
+P01–P09 están ejecutados; P08 añade recuperación de vistas y P09 navegación
+desconocida con escenarios controlados.
 P06 incorpora adaptación limitada del vacío inicial,
 con contrato backend todavía pendiente. P07 configura y verifica medios locales,
 sin acreditar limpieza física ni producción. El estado actualizado y sus límites
@@ -2153,3 +2154,28 @@ Consolidación solicitada de P08: `d06ad3f` contiene implementación y recorrido
 informe y ambos progresos se registran en un segundo commit documental.
 Verificaciones del mismo código reutilizadas, diff e índice revisados.
 Sin push ni despliegue; P09 permanece sin ejecutar.
+
+## P09 — Navegación desconocida (12 de noviembre de 2026)
+
+Solo P09 de portafolio; los 16 pasos originales siguen cerrados. 404 MUI en
+router principal y once módulos, con URL conservada, foco y destinos derivados
+de permisos Redux. Guards en rutas concretas antes de montar consultas; entrada
+deliberada/login conservados. Recurso API 404 y 403 mantienen sus vistas y
+tratamiento HTTP, separados de ruta inexistente. Logout disponible incluso sin
+vistas autorizadas, con fallo y recuperación explícitos.
+
+260/260 pruebas, lint sin advertencias, build, sintaxis y diff correctos.
+Playwright MCP: siete grupos sobre build local/API simulada aprobados, más
+tema oscuro y recuperación por teclado aislados; capturas móvil/escritorio/oscuro
+inspeccionadas. Sin excepciones JS ni consultas de vistas desconocidas/denegadas.
+Preview sirvió documento HTTP 200 con vista 404; no acredita HTTP/fallback del
+hosting público, pendiente de P14. Detalles y límites en
+[informe P09](verification-not-found-p09-2026-11-12.md) y
+[progreso de portafolio](portfolio-progress.md). Artefacto TypeScript restaurado;
+sin dependencias nuevas, commits ni despliegues. P10 sin ejecutar; pendientes
+anteriores conservados.
+
+Consolidación solicitada de P09: `5c07f94` contiene implementación y pruebas;
+informe y ambos progresos se registran en un segundo commit documental.
+Verificaciones del mismo código reutilizadas, sin nueva ejecución de pruebas.
+Diff e índice revisados. Sin push ni despliegue; P10 permanece sin ejecutar.
