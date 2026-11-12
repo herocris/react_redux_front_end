@@ -1959,3 +1959,33 @@ Consolidación posterior solicitada: `f0ff9f8` registra auditorías reales previ
 `cd226a0` implementa P02 con sus pruebas. Documentación consolidada por separado,
 sin cambios adicionales de código ni repetición de las comprobaciones vigentes.
 Sin push ni despliegue.
+
+### P03 — Presentación de acceso denegado (11 de noviembre de 2026)
+
+Solo P03 del portafolio. Presentación accesible reutilizable y manejo de errores
+en listados/detalle/análisis/opciones, con reintento manual y logout siempre
+disponible sin elegir otra vista que pueda estar prohibida. Clasificación de
+401/403/transporte/5xx con cuerpos reales contrastados. Interceptor conserva
+identidad/body, validación y causa mediante metadatos privados. Un 403 de
+operación o refresh inicial no cierra sesión ni genera renovación/redirección;
+el router permite recuperar el arranque. Campos, archivo y diálogos se conservan
+ante escrituras rechazadas. Sin matriz de guards/menú/acciones de P04.
+
+217/217 pruebas Node, lint sin advertencias, build, sintaxis de recorridos y diff
+correctos; artefacto TypeScript restaurado. Playwright MCP: tres grupos reales
+(401/403, usuario sin permisos, teclado/logout) y cinco simulados (errores,
+rechazo/recuperación de lectura/alta/borrado y refresh inicial). Un usuario
+temporal creado/eliminado, sin cambios de asignaciones existentes; captura
+inspeccionada, contextos cerrados y cero excepciones de página. No se repite
+la matriz P01 ni se acredita una auditoría completa de accesibilidad.
+
+Contratos, decisiones, fuentes y límites en el
+[informe de autorización](verification-access-control-2026-11-10.md#p03--presentación-de-rechazos-11-de-noviembre-de-2026);
+estado central en [portfolio-progress.md](portfolio-progress.md#p03--acceso-denegado-y-errores-11-de-noviembre-de-2026).
+Siguiente P04 sin ejecutar; política del operador y P05 pendientes. Sin nuevas
+dependencias, backend, commits o despliegues. Los 16 pasos siguen cerrados.
+
+Consolidación solicitada (12 de noviembre de 2026): `e45e8c7` contiene código y
+pruebas de P03. Informe y progresos consolidados por separado. Se reutilizan las
+217 pruebas, lint, build y recorridos aprobados sin cambios de código; diff
+revisado. Sin push ni despliegue, sin avanzar P04/P05.

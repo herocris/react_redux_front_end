@@ -2,7 +2,7 @@
 
 ## Estado al 11 de noviembre de 2026
 
-**P01 y P02 ejecutados; las demás tareas siguen sin ejecutar.** La preparación del
+**P01, P02 y P03 ejecutados; las demás tareas siguen sin ejecutar.** La preparación del
 plan no ejecutó por sí misma ninguna tarea.
 Fuente: [portfolio-plan.md](portfolio-plan.md). Se conserva la refactorización
 cerrada en [refactor-progress.md](refactor-progress.md).
@@ -11,7 +11,7 @@ cerrada en [refactor-progress.md](refactor-progress.md).
 | --- | --- | --- | --- | --- |
 | P01 | Alta | Revalidar autorización backend | Completado con hallazgo de política | 186/186 según permisos actuales; operador difiere de la propuesta |
 | P02 | Alta | Tipos de identificador | Completado | Respuestas/OpenAPI, IDs numéricos y frontera URL verificados; informe P02 |
-| P03 | Media | Acceso denegado y tipos de error | Pendiente | Cuerpo real de errores 401/403 |
+| P03 | Media | Acceso denegado y tipos de error | Completado | Cuerpos reales 401/403, presentación reutilizable y recuperación verificados |
 | P04 | Alta | Permisos en rutas, menú y acciones | Pendiente | P01, P02 y P03 |
 | P05 | Alta | Revocación durante sesión abierta | Pendiente | P01 y P04 |
 | P06 | Alta | Paginación de sublistas vacías | Pendiente | Contrato real del backend |
@@ -175,3 +175,51 @@ previos; `cd226a0` contiene la implementación y pruebas de P02. Planes, informe
 y progresos se consolidan en un commit documental separado. Se reutilizan las
 213 pruebas, lint, build y seis casos reales anteriores: no cambió el código
 durante la preparación de commits. Sin push ni despliegue.
+
+### P03 — Acceso denegado y errores (11 de noviembre de 2026)
+
+Ejecutado solo P03. `AccessDenied` es una presentación accesible reutilizable
+con acciones por composición; `ApiRequestError` aporta reintento explícito y
+logout mediante el thunk existente. Integrada en listados, dashboard, detalle,
+análisis y opciones. Sin enlaces a destinos no comprobados: incluso con cero
+vistas permitidas se puede cerrar sesión. El botón del layout tiene nombre
+accesible. No se implantan guards, filtros de menú ni permisos de acciones.
+
+El interceptor conserva exactamente los rechazos/body y sus campos; metadatos
+HTTP/causa Axios en WeakMap privada, sin mutar cuerpos ni llevarlos a Redux.
+Clasificación separada de 401, 403, transporte y 5xx; validación por campo y
+contratos de mensajes preservados. Un 403 no renueva ni cierra sesión. Se corrige
+también el caso de refresh inicial 403: el thunk lo propaga sin `onLogout` y el
+router muestra recuperación, sin montar consultas protegidas. Los demás fallos
+de ese chequeo conservan la política anterior. Los cuerpos primitivos opacos
+mantienen el rechazo intacto y mensaje genérico; no se infiere estado por texto.
+
+Verificación nueva: **217/217 pruebas Node**, lint con cero advertencias, build,
+sintaxis de los dos recorridos y diff correctos; artefacto TypeScript restaurado.
+Playwright MCP real: **3 grupos**, cuerpos actuales 401/403 de lectura/escritura,
+usuario temporal sin permisos, navegación estable, teclado y cierre real hasta
+login. Un usuario creado y eliminado en `finally`; sin cambiar asignaciones o
+datos existentes. Captura local inspeccionada. Playwright simulado: **5 grupos**,
+incluidos 403 sin `code`, recuperación de lectura, alta rechazada con texto/PNG
+y modal conservados ante 403/422/transporte/500, borrado 403 con confirmación
+conservada y recuperación del refresh inicial. Cero excepciones de página y
+cero avisos inesperados en la simulación; contextos aislados cerrados.
+
+No se repite la matriz P01 ni se considera la simulación prueba de una escritura
+real exitosa. Los primeros intentos del script simulado fallaron por selectores
+de botón/elementos ocultos por el modal; corregidos y recorrido final aprobado.
+No se declara conformidad WCAG completa. Context7 y fuentes oficiales consultados
+con límites de versión registrados. Sin dependencias nuevas, backend, commits,
+push ni despliegue; acceso precargado de demo conservado.
+
+Decisiones, cuerpos reales, archivos, evidencia y límites en el
+[informe de autorización](verification-access-control-2026-11-10.md#p03--presentación-de-rechazos-11-de-noviembre-de-2026).
+**Siguiente tarea: P04**, sin ejecutar; confirmar la intención de la política
+actual de operador. P05 conserva revocación/limpieza y actualización de permisos
+en vivo; las demás tareas mantienen su estado.
+
+Consolidación solicitada (12 de noviembre de 2026): `e45e8c7` registra la
+implementación y pruebas de P03; informe y progresos se consolidan en un commit
+documental separado. Se reutilizan las 217 pruebas, lint, build y recorridos
+aprobados anteriores: el código no cambió al preparar los commits. Diff revisado.
+Sin push ni despliegue; P04 y P05 siguen pendientes.

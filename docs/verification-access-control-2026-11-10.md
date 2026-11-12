@@ -1,5 +1,101 @@
 # Verificación de roles y permisos — 10 de noviembre de 2026
 
+## P03 — Presentación de rechazos (11 de noviembre de 2026)
+
+Implementado únicamente P03. `AccessDenied` presenta una alerta persistente,
+con título asociado y acciones compuestas por el consumidor; no administra
+permisos, sesión ni navegación. `ApiRequestError` coordina reintento explícito
+y cierre de sesión con el thunk existente; si falla logout, conserva la sesión
+y muestra el error. Se integra en listados administrativos, dashboard, detalle
+de decomiso, análisis y estados de opciones. Las escrituras mantienen su error
+dentro del formulario/confirmación, sin desmontarlos ni invalidar por fracaso.
+El botón de logout del layout tiene ahora nombre accesible «Cerrar sesión».
+
+### Contratos y clasificación
+
+Respuestas actuales de API real `http://localhost/api`, sin interceptaciones:
+
+| Escenario | HTTP | Cuerpo completo de error observado |
+| --- | --- | --- |
+| Lectura de drogas sin sesión | 401 | `{ "error": "No autenticado", "code": 401 }` |
+| Lectura de drogas sin permisos | 403 | `{ "error": "User does not have the right permissions.", "code": 403 }` |
+| Alta de droga sin permisos | 403 | El mismo cuerpo 403; rechaza antes de validar el payload |
+
+El interceptor sigue rechazando con el mismo body, sin envolverlo, mutarlo ni
+convertirlo en éxito. Una `WeakMap` privada relaciona cuerpos objeto con su estado
+HTTP y causa Axios original; `getApiErrorCause` permite recuperar esa causa.
+Los metadatos no se copian a Redux ni se agregan al JSON. El estado HTTP tiene
+prioridad sobre `code` del body; sin metadatos se aceptan códigos HTTP numéricos,
+incluidos los cuerpos reales anteriores, y `response.status` de AxiosError.
+No se deduce autorización de textos traducidos ni del nombre de un rol.
+
+`getApiErrorMessage`/`getApiErrorText` conservan sus tipos públicos. Distinguen
+403 (permiso), 401 (autenticación), transporte sin respuesta y 5xx (servidor).
+Los mensajes de campos bajo `error` mantienen su precedencia/forma, con soporte
+adicional para `errors` de Laravel; `setServerFormErrors` conserva su contrato.
+Los errores locales permanecen genéricos. Los cuerpos primitivos opacos
+(por ejemplo HTML/string) siguen rechazándose intactos y muestran el mensaje
+genérico: no se les inventa un estado ni se usa un mapa global por texto que
+pueda confundir peticiones. Los contratos JSON observados sí conservan estado
+y causa incluso si el body omite `code`.
+
+### Sesión y salida
+
+Un 403 de operación no llama a refresh ni a logout, ni redirige. No se introduce
+una actualización automática de permisos; Query mantiene su política existente
+sin reintentos automáticos. En el chequeo inicial, `checkAuthToken` propaga 403
+sin ejecutar `onLogout`; `AppRouter` muestra recuperación mientras continúa en
+`checking`, con reintento manual y cierre de sesión, sin montar consultas de
+vistas protegidas. El tratamiento anterior de otros fallos de ese chequeo se
+conserva; P03 no redefine globalmente la política de renovación de sesión.
+
+La salida garantizada es cerrar sesión. No se ofrece dashboard, historial ni
+otra ruta que requiera permisos aún no comprobados. La presentación permite
+componer una salida validada por futuros guards. Menú, rutas y acciones siguen
+pendientes de P04; no se ha implantado su matriz. La limpieza de datos retenidos
+tras revocar permisos y la renovación de permisos durante la sesión pertenecen
+a P05; no se acreditan aquí. No se cambia la cuenta de demo ni sus asignaciones.
+
+### Verificación P03
+
+- `tests/api-errors.test.mjs`: clasificación con/sin código, prioridad HTTP,
+  identidad y causa de cuerpos congelados, validación por campo, lecturas y
+  escrituras 403 sin éxito/invalidación/salida de sesión, y refresh 403 desde
+  sesión autenticada o estado inicial. Se conserva la cobertura previa.
+- Playwright MCP, [recorrido real](../tests/browser/access-denied-real.js):
+  **3 grupos aprobados**, 401/403 de la tabla, cuenta temporal con cero permisos,
+  alerta etiquetada y persistente, acciones accesibles por Tab, URL estable,
+  un único refresh inicial y logout real hasta login. Un usuario temporal creado
+  y eliminado en `finally`; no se crean drogas ni se modifican roles/cuentas
+  existentes. Auditoría del servidor conservada, cero excepciones de página.
+- Playwright MCP, [recorrido simulado](../tests/browser/access-denied.js):
+  **5 grupos aprobados**, 403 sin código, 401/500/transporte diferenciados y
+  recuperación del listado; alta con 403/422/transporte/500 conserva texto,
+  archivo PNG y modal, cinco envíos con el mismo archivo hasta éxito; borrado
+  403 conserva selección/confirmación y reintento exitoso; refresh inicial 403
+  no monta consultas protegidas y se recupera manualmente. Ocho lecturas, cinco
+  altas y dos borrados simulados; tres refresh (inicial, rechazo de arranque y
+  reintento), cero logout, cero excepciones/avisos inesperados. Contextos cerrados
+  en `finally`, sin interceptaciones en la sesión administrativa real.
+- Captura local `.playwright-mcp/p03-access-denied-real.png` inspeccionada:
+  título, texto y acciones legibles, con foco visible. Recorrido breve de teclado;
+  no equivale a una auditoría WCAG ni de lector de pantalla completa.
+- Los primeros intentos del script simulado usaban un nombre de botón incorrecto
+  y buscaban la tabla sin incluir elementos ocultos por el modal; se corrigieron
+  los selectores. Esos intentos no se cuentan como recorridos aprobados.
+
+Skills React/composición aplicadas a estado derivado y acciones por children.
+Versiones resueltas: React 19.3.1, Axios 1.21.0, MUI 6.4.7, Router 7.18.5 y
+Query 5.107.1. Context7 consultado para interceptores y accesibilidad de Alert;
+no ofrece exactamente Axios 1.21.0/MUI 6.4.7. Contraste con las fuentes oficiales
+de [errores Axios](https://axios-http.com/docs/handling_errors) y
+[Alert MUI v6](https://v6.mui.com/material-ui/react-alert/), y con el cliente
+instalado mediante pruebas. No se actualizan dependencias.
+
+Resultados finales de suite/lint/build y continuidad en
+[portfolio-progress.md](portfolio-progress.md#p03--acceso-denegado-y-errores-11-de-noviembre-de-2026).
+P04/P05 y la decisión de política del operador siguen pendientes.
+
 ## P01 — Revalidación con Laravel actualizado
 
 **186/186 comprobaciones aprobadas según las asignaciones actuales del backend**:
@@ -234,7 +330,7 @@ Se incluyen aquí para que esta lista no quede limitada a los tres bloques de
 autorización. Estado centralizado en [portfolio-progress.md](portfolio-progress.md)
 y prompts completos en [portfolio-plan.md](portfolio-plan.md):
 
-- **P03 — Acceso denegado:** presentar 403 y distinguirlo de 401 y transporte.
+- **P03 — Acceso denegado:** completado; evidencia y límites en la sección P03.
 - **P08 — Recuperación de errores:** frontera para renderizado y vistas lazy.
 - **P09 — Página no encontrada:** vista 404 y navegación de recuperación.
 - **P11 — Revisión visual y accesible:** móvil, teclado, foco y formularios.
