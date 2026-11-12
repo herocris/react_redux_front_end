@@ -1,5 +1,178 @@
 # Verificación de roles y permisos — 10 de noviembre de 2026
 
+## P05 — Revocación con sesión abierta (12 de noviembre de 2026)
+
+Ejecutado únicamente P05. Implementación y comprobaciones nuevas con backend
+real y HTTP simulado. La cuenta temporal mantiene la misma cookie durante las
+revocaciones y asignaciones; no se vuelve a hacer login para recuperarla.
+Laravel refleja los cambios probados en `/refresh` y en operaciones posteriores.
+La evidencia anterior de P01/P03/P04 se conserva como historia.
+
+### Política de actualización y 403
+
+- Redux `auth.user` sigue siendo la única sesión. Se reutiliza
+  `authService.checkSession` (`POST /refresh`, cookies y contrato existentes).
+  `authorizationRevision` es un contador de retirada de consumidores y
+  `authorizationError` un mensaje serializable; no contienen otra identidad.
+  El coordinador conserva únicamente promesas, tiempos, señales y contadores de
+  pausa por store. No guarda usuario, permisos, contraseña ni token.
+- Un único hook del router programa una comprobación **cada 60 s con la pestaña
+  visible**. Foco, vuelta a visible y conexión disparan una comprobación pasiva,
+  limitada a una por 60 s. El tick periódico no se pospone por ese límite. La
+  acción accesible **Actualizar permisos** permite comprobar explícitamente,
+  incluso desde una ruta denegada. Comprobaciones concurrentes comparten promesa.
+  Cada comprobación tiene señal de sesión y plazo de **10 s**.
+- Un **403 HTTP de un endpoint de datos** notifica al consumidor de sesión sin
+  transformar el rechazo original. Puede iniciar una comprobación, con límite
+  de **una por 30 s**; las concurrentes se agrupan. Se excluyen login, register,
+  refresh, logout y respuestas de transporte ya retirado. No se repite la lectura
+  o escritura rechazada, no se llama a login ni se redirige por un 403. El plazo
+  y los límites evitan cadenas de refresh y tormentas de errores.
+- Con roles/permisos efectivos **idénticos**, el refresh actualiza los datos de
+  sesión sin retirar la generación, caché o formulario. El orden y los duplicados
+  de nombres no son cambios. Un 403 con permisos iguales conserva el rechazo,
+  texto, archivo y confirmación para recuperación explícita; no se interpreta
+  como éxito ni como prueba suficiente para expulsar al usuario.
+- Si cambian roles o permisos (asignación o revocación), se retira la señal de
+  transporte, se cancelan consultas y se limpian **ambas cachés completas** del
+  cliente Query. Se elige esta limpieza conservadora porque listas, detalles,
+  opciones, hijos y análisis tienen dependencias cruzadas. Antes de aplicar la
+  nueva sesión, el middleware retira el trabajo antiguo. El contador cambia la
+  key del árbol protegido: desmonta también selecciones, RHF, archivos, diálogos
+  y observadores que podrían conservar datos fuera de la caché. Los guards de
+  P04 evalúan de nuevo los permisos antes de montar consultas. Se conservan URL,
+  cuenta autenticada y filtros aplicados; los datos permitidos se consultan de
+  nuevo. **Un cambio de autorización descarta todos los borradores abiertos**,
+  incluso los de otro dominio. La misma política conservadora rige para altas.
+- Un refresh vivo **401** usa `onLogout`. Un refresh vivo 403, fallo de red,
+  timeout, respuesta inválida o 5xx bloquea el árbol protegido, retira trabajo y
+  cachés, conserva la identidad Redux y ofrece actualización manual/logout. Los
+  ticks y eventos pasivos se detienen hasta recuperar explícitamente; no hay
+  reintento automático del fallo. `useAccess` también bloquea con ese error.
+  La comprobación inicial del router conserva la política anterior de P03.
+- `onSessionRefreshed` distingue la misma cuenta de una distinta por `correo`,
+  la identidad disponible en el contrato actual (no hay ID de sesión). Solo una
+  cuenta diferente reinicia también filtros como frontera completa. Login,
+  checking y logout conservan su limpieza completa y reinician la coordinación
+  de refrescos. Cambiar el correo de la misma persona se trata conservadoramente
+  como cambio de identidad. No se deduce identidad del rol ni se añade un usuario
+  paralelo para resolverlo.
+- Logout tiene prioridad: pausa comprobaciones y aborta la comprobación viva
+  antes de solicitar la salida. Tras éxito limpia sesión/filtros/cachés; si falla,
+  conserva el comportamiento anterior y permite volver a comprobar. Los thunks
+  ligados a la señal retirada y los callbacks de `sessionMutationOptions` no
+  publican efectos tardíos. La limpieza del servidor se prueba por separado.
+
+### Límites deliberados
+
+No hay push de revocaciones. Antes de conocer el cambio puede seguir visible la
+última autorización confirmada: normalmente hasta el siguiente tick visible
+(60 s), más red hasta 10 s. Los temporizadores de pestañas suspendidas no son una
+garantía de tiempo real; al volver se usa la comprobación limitada o la acción
+manual. Durante una comprobación se conserva la edición hasta conocer su
+resultado. Un segundo 403 dentro del límite no vuelve a comprobar; el tick y
+la actualización manual siguen disponibles.
+
+Un 403 puede expresar una regla de recurso que no cambie `permissions`. No se
+inventa una revocación por nombre de endpoint. Si Laravel devolviera permisos
+obsoletos, esa sesión no acreditaría una revocación global: debe corregirse la
+fuente efectiva del backend (relaciones/caché Spatie y autorización por operación).
+No se ha observado ese defecto en las revocaciones probadas aquí. No se cubren
+todas las políticas por registro ni todos los controladores. La UI no es una
+frontera de seguridad y no puede retirar datos ya descargados fuera de la app.
+
+**Abortar transporte no revierte una escritura aceptada.** En el caso real se
+retuvo la entrega de un POST ya respondido 200 por Laravel, se revocó el permiso
+y se dejó llegar el resultado antiguo. El cliente no reabrió formulario, publicó
+éxito ni recuperó datos; una lectura administrativa independiente confirmó que
+el permiso temporal creado seguía persistido. Se eliminó expresamente en cleanup.
+La recuperación obtiene el estado actual del servidor, sin repetir el POST.
+
+### Evidencia nueva y limpieza
+
+| Comprobación | Resultado |
+| --- | --- |
+| Suite Node final | **231/231**; ocho pruebas contadas en el grupo nuevo, incluyendo su contenedor |
+| Lint / build / sintaxis / diff | Correctos; sin advertencias ESLint; artefacto TypeScript incidental restaurado |
+| Simulación P05 | **11 grupos**, 17 refresh, 8 lecturas, 4 escrituras simuladas; cero excepciones/avisos inesperados |
+| Regresión simulada P03 | **5 grupos**, 403/422/red/500, campos/PNG/diálogos, reintento y refresh inicial; cero excepciones/avisos inesperados |
+| API y UI reales | **6 grupos** por ejecución; dos ejecuciones con fixtures distintos, la final tras ajustes de coordinación |
+| Limpieza real | **6/6** registros eliminados: dos cuentas, dos roles propios y dos permisos creados por los POST retenidos |
+| Comprobación final independiente | Catálogos completos de usuarios/roles/permisos: **cero** registros `PORTFOLIO_P05_` |
+
+Las pruebas Node cubren igualdad semántica, conservación de filtros, revocación
+y asignación, cachés de consultas/mutaciones, lectura y escritura tardías aun
+sin consumir señal, agrupación/límite de 403, exclusión de refresh, bloqueo y
+recuperación, 401, cambio de cuenta, logout pendiente/fallido y respuesta antigua
+tras logout. La suite completa se ejecutó de nuevo sobre el código final.
+
+En navegador simulado se acelera el reloj para los ticks, límites, pestaña
+oculta, vuelta a visible, foco y reconexión; no es medición de latencia real.
+El 403 con permisos cambiados retira el formulario; con permisos iguales conserva
+texto/PNG y no repite escrituras. La regresión P03 adapta las expectativas de
+refresh a P05 y espera la retirada real de la fila tras borrar.
+
+El recorrido real usa un rol **propio temporal**, con `drug.view`, y permisos
+directos `permission.view/create/update` resueltos por nombre desde el catálogo
+actual. Prueba: retirar/reponer permiso del rol; desasignar/reasignar rol; editar
+un formulario sin cambios de autorización; retirar creación/edición directas;
+revocar view con lectura aceptada pendiente; revocar con escritura aceptada
+pendiente; recuperar permisos directos y cerrar sesión. Lectura de droga y alta
+de permiso posteriores a revocar devuelven **403** con
+`{"error":"User does not have the right permissions.","code":403}`. Refresh conserva
+el rol cuando solo cambia su contenido y lo retira al desasignarlo. Logout real
+lleva a login y el refresh posterior devuelve **401** con
+`{"error":"No autenticado","code":401}`. Cero excepciones de página en ambas ejecuciones.
+
+Solo se retrasa la **entrega** de las respuestas reales pendientes con
+`route.fetch`; ni cuerpos ni códigos se simulan en ese recorrido. Limpieza en
+`finally`, solo IDs propios, sin alterar cuentas/roles preexistentes o auditoría.
+Peticiones del helper espaciadas al menos 1,25 s, sin reintentos de escrituras ni
+429. No se crean archivos de medios en el backend. P01 no se repite como matriz
+completa; P04 gana integración selectiva nueva de rutas/menú/acciones en drogas
+y permisos, sin declarar probados todos sus perfiles/dependencias reales.
+
+Recorridos: [P05 simulado](../tests/browser/live-authorization.js),
+[P05 real](../tests/browser/live-authorization-real.js),
+[regresión P03](../tests/browser/access-denied.js) y
+[pruebas de coordinación](../tests/live-authorization.test.mjs).
+Resultados saneados, cuerpos y limpieza:
+[JSON P05](verification-access-control-p05-results-2026-11-12.json).
+Los primeros intentos simulados corrigieron selectores de cabecera/alerta y una
+aserción prematura tras borrar; no se cuentan como aprobados. No hubo fixtures
+reales fallidos; las dos ejecuciones reales terminaron y limpiaron sus registros.
+
+### Hallazgo Laravel y documentación consultada
+
+Se aisló el 500 anónimo observado anteriormente: en contextos sin cookie,
+`POST /api/refresh` con `Accept: application/json` devuelve **401**; con
+`Accept: */*` devuelve **500** y
+`{"message":"Excepción no controlada","error":"Route [login] not defined."}`.
+Login y refresh autenticados responden 200 actualmente. No se atribuye el fallo
+a revocación ni se presupone que los 500 históricos tuviesen todos esta causa.
+**Ajuste pendiente en Laravel:** los fallos de autenticación de rutas `/api/*`
+deben renderizar JSON 401 incluso sin negociación JSON, evitando la redirección
+a una ruta web `login` ausente. Revisar el handler/middleware de autenticación
+y su renderizado de excepciones según la versión Laravel instalada. Código
+Laravel ausente aquí; ajuste identificado, no implementado ni verificado.
+
+Versiones del lock verificadas: React **19.3.1**, Redux Toolkit **2.6.1**,
+TanStack Query **5.107.1**, Axios **1.21.0**. Sin cambios de dependencias. Skill
+React aplicada a listener único, derivación de capacidades y retirada por key.
+Context7 consultado para Query, RTK y Axios; no publica estas versiones exactas
+en su catálogo. Contraste con APIs/tipos instalados y documentación oficial:
+[QueryClient](https://tanstack.com/query/v5/docs/reference/QueryClient),
+[cancelación Query](https://tanstack.com/query/v5/docs/framework/react/guides/query-cancellation),
+[configureStore](https://redux-toolkit.js.org/api/configureStore),
+[interceptores Axios](https://axios-http.com/docs/interceptors) y
+[cancelación Axios](https://axios-http.com/docs/cancellation).
+Son referencias de familia mayor, no certificaciones de cada patch instalado;
+las pruebas locales y reales acreditan el comportamiento descrito.
+
+Cambios limitados a P05, guía y documentación asociada. Sin backend, dependencias,
+commits, push ni despliegue. Se conserva la demo precargada. P06 y posteriores
+no se ejecutan.
+
 ## P04 — Rutas, menú y acciones (12 de noviembre de 2026)
 
 Implementación frontend completada; nueva integración real pendiente. La API

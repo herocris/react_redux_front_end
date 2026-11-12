@@ -2,7 +2,7 @@
 
 ## Estado al 12 de noviembre de 2026
 
-**P01–P04 ejecutados; P04 tiene pendiente su nueva integración real por errores 500 del backend. Las demás tareas siguen sin ejecutar.** La preparación del
+**P01–P05 ejecutados. P05 verifica revocación real y aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel de respuesta anónima sin Accept JSON. Las demás tareas siguen sin ejecutar.** La preparación del
 plan no ejecutó por sí misma ninguna tarea.
 Fuente: [portfolio-plan.md](portfolio-plan.md). Se conserva la refactorización
 cerrada en [refactor-progress.md](refactor-progress.md).
@@ -12,8 +12,8 @@ cerrada en [refactor-progress.md](refactor-progress.md).
 | P01 | Alta | Revalidar autorización backend | Completado con hallazgo de política | 186/186 según permisos actuales; operador difiere de la propuesta |
 | P02 | Alta | Tipos de identificador | Completado | Respuestas/OpenAPI, IDs numéricos y frontera URL verificados; informe P02 |
 | P03 | Media | Acceso denegado y tipos de error | Completado | Cuerpos reales 401/403, presentación reutilizable y recuperación verificados |
-| P04 | Alta | Permisos en rutas, menú y acciones | Implementado y verificado con simulación; integración real pendiente | Backend local devuelve 500 en lectura anónima y refresh; informe de autorización |
-| P05 | Alta | Revocación durante sesión abierta | Pendiente | P01 y P04 |
+| P04 | Alta | Permisos en rutas, menú y acciones | Implementado y verificado con simulación; integración real selectiva nueva en P05 | Drogas/permisos con sesión temporal; resto de perfiles/dependencias reales sin repetir |
+| P05 | Alta | Revocación durante sesión abierta | Completado | Política viva, 231 pruebas, 11 grupos simulados, 6 reales y regresión P03; ajuste Laravel anónimo documentado |
 | P06 | Alta | Paginación de sublistas vacías | Pendiente | Contrato real del backend |
 | P07 | Alta | Configuración y renderizado de imágenes | Pendiente | URL pública real de medios |
 | P08 | Media | Recuperación de errores de render/lazy | Pendiente | Mantener carga diferida |
@@ -55,8 +55,10 @@ a preparar datos ficticios y documentar el recorrido existente.
   metadatos omitidos en sublistas vacías, tipos string frente a IDs numéricos.
   P02 resuelve la discrepancia de IDs con evidencia actual y OpenAPI; imágenes
   y sublistas quedan pendientes. Comprobar vigencia antes de implementarlas.
-- P04 integra permisos efectivos en rutas/menú/acciones; nueva integración real
-  pendiente por 500 del backend. P05 conserva actualización/revocación en vivo.
+- P04 integra permisos efectivos en rutas/menú/acciones. P05 implementa renovación
+  en vivo y verifica integración real selectiva con la cuenta temporal. Actualmente
+  el refresh anónimo JSON devuelve 401; sin Accept JSON se reproduce el 500 por
+  redirección a `login` ausente. Ver evidencia nueva y límites en autorización.
 - Entorno usado: API localhost/api, frontend 5174 y puerto 5173 reservado al
   backend. Comprobar disponibilidad y configuración en cada chat.
 
@@ -276,3 +278,73 @@ commit documental separado. Se reutilizan las 223 pruebas, lint, build y los
 recorridos aprobados del mismo código, sin contarlos como ejecuciones nuevas.
 Diff revisado. Sin push ni despliegue; integración real pendiente por 500 del
 backend y P05 sin ejecutar.
+
+### P05 — Autorizaciones en sesión abierta (12 de noviembre de 2026)
+
+Ejecutado solo P05. `refreshAuthorization` reutiliza el service y `/refresh`
+existentes, sin otra sesión. Un listener del router comprueba cada 60 s visible,
+al recuperar foco/conexión/visibilidad (límite 60 s) y mediante Actualizar permisos.
+Una respuesta 403 de datos puede agrupar una comprobación cada 30 s; endpoints
+auth y respuestas retiradas quedan excluidos. Plazo 10 s y ninguna repetición
+automática de operaciones. Un refresh idéntico conserva RHF/archivo/diálogos.
+
+Si cambian roles/permisos, el middleware retira señal, consultas y ambas cachés;
+la revisión Redux remonta consumidores para retirar también filas, opciones,
+selecciones y borradores locales. Se elige limpiar todo por dependencias cruzadas,
+también al asignar permisos. Misma cuenta conserva filtros, URL e identidad;
+otra cuenta (correo distinto según el contrato disponible) reinicia filtros.
+Un fallo vivo distinto de 401 bloquea acceso, limpia y ofrece recuperación
+manual/logout; detiene comprobaciones pasivas. 401 termina sesión. Logout pausa
+refresh para impedir que una respuesta concurrente lo desplace.
+
+Verificación final: **231/231 pruebas Node**, lint sin advertencias y build
+correctos; sintaxis de tres recorridos y diff comprobados. Artefacto TypeScript
+incidental restaurado. Playwright MCP simulado: **11 grupos P05** (incluidos
+ocultación/foco/conexión, 403 con y sin cambios, lectura/escritura pendientes,
+recuperación y logout); **5 grupos P03** con errores 403/422/red/500 y borradores
+con PNG conservados cuando los permisos no cambian. Cero excepciones/avisos
+inesperados. Expectativas históricas del recorrido P03 adaptadas a P05.
+
+Playwright MCP real: **6 grupos** en dos ejecuciones con fixtures propios,
+final repetida tras ajustes de coordinación. Una cuenta mantiene sesión al
+revocar/reponer permisos de su rol, retirar/reasignar el rol y retirar/reponer
+permisos directos. `/refresh` refleja los cambios y operaciones revocadas
+devuelven 403. Vista parada y formulario en edición reaccionan al tick; lectura
+200 pendiente no repone datos al revocar. Una escritura 200 retenida **permanece
+persistida en Laravel** aunque se aborte su entrega; no publica efectos tardíos.
+Recuperación sin nuevo login y logout real seguidos de refresh 401. Cero
+excepciones de página; no se simulan los cuerpos/códigos del recorrido real.
+
+Se eliminaron **6/6 fixtures** entre las dos ejecuciones: dos cuentas, dos roles
+propios y dos permisos creados. Comprobación administrativa final independiente
+de los catálogos completos: cero `PORTFOLIO_P05_`. No se alteran roles/cuentas
+existentes ni auditoría; helpers espaciados, sin 429 ni reintentos de escrituras.
+La integración selectiva nueva de P04 cubre drogas/permisos, no todos sus perfiles
+y dependencias. No se repite P01 como matriz ni se cuentan pruebas históricas.
+
+Límite: actualización eventual, dependiente del temporizador visible/red; durante
+la comprobación se conserva la edición. Cambiar autorización descarta todos los
+borradores, incluso de otros dominios; cancelar transporte nunca deshace una
+escritura aceptada. Context7 no ofrece los patches instalados exactos; contraste
+oficial y límites documentados. Sin nuevas dependencias, backend, commits o
+despliegues. Demo precargada conservada; AGENTS recoge la convención.
+
+Hallazgo backend separado: refresh anónimo con Accept JSON responde 401, con
+`Accept: */*` devuelve 500 `Route [login] not defined.`. Ajuste pendiente Laravel:
+renderizar autenticación `/api/*` como JSON 401 sin depender de esa cabecera,
+evitando redirección web. No se observa falta de revocación en los casos probados.
+Los fallos iniciales de los recorridos simulados fueron selectores/aserción
+prematura, corregidos antes de los resultados finales; ninguna fuga de fixtures.
+
+Política, resultados, archivos y límites en
+[autorización P05](verification-access-control-2026-11-10.md#p05--revocación-con-sesión-abierta-12-de-noviembre-de-2026)
+y [JSON P05](verification-access-control-p05-results-2026-11-12.json).
+Siguiente tarea del plan: **P06**, sin ejecutar. Las demás mantienen su estado.
+
+Consolidación solicitada (12 de noviembre de 2026): `354682e` contiene la
+implementación y pruebas de P05. Guía, informe, evidencia JSON y progresos se
+consolidan en un commit documental separado. Se reutilizan las 231 pruebas,
+lint, build y recorridos aprobados del mismo código, sin contarlos como nuevas
+ejecuciones. Diff e índice revisados; JSON saneado comprobado. Sin push ni
+despliegue. El ajuste Laravel de autenticación anónima sin Accept JSON sigue
+pendiente; P06 y posteriores no se ejecutan.

@@ -161,6 +161,14 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
   los consulta desde la sesión Redux. Los guards se sitúan antes de montar vistas
   con consultas. No inferir acceso por roles ni duplicar permisos en Query/contextos.
   El backend conserva la decisión efectiva; los rechazos no se tratan como éxito.
+- Revalidación en vivo (P05): usar `refreshAuthorization` y el `/refresh` existente,
+  sin otra sesión en Query. `onSessionRefreshed` conserva filtros para la misma
+  cuenta; cambios de roles/permisos o fallos de comprobación retiran transporte,
+  cachés y consumidores mediante `authorizationRevision`. Un refresh idéntico
+  conserva formularios. `onLogin` sigue siendo una frontera completa de sesión.
+  El 403 agrupa una comprobación limitada, sin repetir la operación; excluir
+  endpoints auth y respuestas retiradas. Política, tiempos y límites en el
+  [informe de autorización](docs/verification-access-control-2026-11-10.md).
 - PascalCase para componentes y tipos, `useX` para hooks y camelCase para
   funciones y variables. Respetar el formato local, sin reformateos masivos.
 - Componentes para presentación/formularios y hooks para coordinación. Aplicar

@@ -1,0 +1,198 @@
+{
+  "date": "2026-11-12",
+  "scope": "P05",
+  "real": {
+    "tag": "PORTFOLIO_P05_1794450445438",
+    "passed": [
+      "Own role permission revocation: refresh and operation enforce it; idle poll withdraws view",
+      "Role restoration, unassignment and reassignment recover the same open account",
+      "Unchanged refresh keeps editing; direct create/update revocation discards form and write is 403",
+      "Pending real read: accepted response is retired after direct view revocation",
+      "Pending real write committed on Laravel; cancellation suppresses client success, without undoing server data",
+      "Direct permissions recover without new login; real logout returns to login"
+    ],
+    "responses": [
+      {
+        "operation": "temporary login",
+        "status": 200,
+        "roles": [
+          "PORTFOLIO_P05_1794450445438"
+        ],
+        "permissions": [
+          "permission.view",
+          "permission.create",
+          "permission.update",
+          "drug.view"
+        ]
+      },
+      {
+        "operation": "role permission revoked in open session",
+        "status": 200,
+        "roles": [
+          "PORTFOLIO_P05_1794450445438"
+        ],
+        "permissions": [
+          "permission.view",
+          "permission.create",
+          "permission.update"
+        ]
+      },
+      {
+        "operation": "read after role permission revocation",
+        "status": 403,
+        "body": {
+          "error": "User does not have the right permissions.",
+          "code": 403
+        }
+      },
+      {
+        "operation": "role unassigned in open session",
+        "status": 200,
+        "roles": [],
+        "permissions": [
+          "permission.view",
+          "permission.create",
+          "permission.update"
+        ]
+      },
+      {
+        "operation": "write after direct create revocation",
+        "status": 403,
+        "body": {
+          "error": "User does not have the right permissions.",
+          "code": 403
+        }
+      },
+      {
+        "operation": "held real read before revocation",
+        "status": 200
+      },
+      {
+        "operation": "server accepted held write",
+        "status": 200
+      },
+      {
+        "operation": "direct permissions reassigned",
+        "status": 200,
+        "roles": [
+          "PORTFOLIO_P05_1794450445438"
+        ],
+        "permissions": [
+          "permission.view",
+          "permission.create",
+          "permission.update",
+          "drug.view"
+        ]
+      },
+      {
+        "operation": "refresh after real logout",
+        "status": 401,
+        "body": {
+          "error": "No autenticado",
+          "code": 401
+        }
+      }
+    ],
+    "cleanup": [
+      {
+        "domain": "user",
+        "id": 40,
+        "status": 200,
+        "removed": true
+      },
+      {
+        "domain": "role",
+        "id": 9,
+        "status": 200,
+        "removed": true
+      },
+      {
+        "domain": "permission",
+        "id": 89,
+        "status": 200,
+        "removed": true
+      }
+    ],
+    "pageErrors": [],
+    "status": "passed",
+    "finalPrefixVerification": {
+      "user": {
+        "status": 200,
+        "complete": true,
+        "remaining": 0
+      },
+      "role": {
+        "status": 200,
+        "complete": true,
+        "remaining": 0
+      },
+      "permission": {
+        "status": 200,
+        "complete": true,
+        "remaining": 0
+      }
+    }
+  },
+  "earlierRealRun": {
+    "tag": "PORTFOLIO_P05_1794450035231",
+    "passedGroups": 6,
+    "cleanup": [
+      {
+        "domain": "user",
+        "id": 39,
+        "status": 200,
+        "removed": true
+      },
+      {
+        "domain": "role",
+        "id": 8,
+        "status": 200,
+        "removed": true
+      },
+      {
+        "domain": "permission",
+        "id": 88,
+        "status": 200,
+        "removed": true
+      }
+    ]
+  },
+  "simulation": {
+    "script": "tests/browser/live-authorization.js",
+    "passedGroups": 11,
+    "refreshes": 17,
+    "reads": 8,
+    "writes": 4,
+    "pageErrors": [],
+    "unexpectedConsole": []
+  },
+  "p03Regression": {
+    "script": "tests/browser/access-denied.js",
+    "passedGroups": 5,
+    "creates": 5,
+    "deletes": 2,
+    "reads": 8,
+    "refreshes": 4,
+    "logouts": 0,
+    "pageErrors": [],
+    "unexpectedConsole": []
+  },
+  "anonymousContentNegotiation": [
+    {
+      "accept": "application/json",
+      "status": 401,
+      "body": {
+        "error": "No autenticado",
+        "code": 401
+      }
+    },
+    {
+      "accept": "*/*",
+      "status": 500,
+      "body": {
+        "message": "Excepción no controlada",
+        "error": "Route [login] not defined."
+      }
+    }
+  ]
+}

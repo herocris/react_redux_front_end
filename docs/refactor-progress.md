@@ -2018,3 +2018,43 @@ Consolidación posterior solicitada: `6a19441` contiene código y pruebas de P04
 guía, informe y progresos se consolidan por separado. Verificaciones anteriores
 reutilizadas sin cambios de código ni nueva ejecución; diff revisado. Sin push
 ni despliegue. Se mantienen el pendiente de integración real por 500 y P05.
+
+### P05 — Revocación durante sesión abierta (12 de noviembre de 2026)
+
+Solo P05 de portafolio. Renovación de permisos por el `/refresh` existente:
+tick visible 60 s, foco/conexión/visibilidad limitados, acción manual y 403 de
+datos agrupado/límite 30 s, sin repetir operaciones. Plazo 10 s; refresh idéntico
+conserva edición/archivo. Cambio de autorización retira transporte, consultas,
+ambas cachés y consumidores locales por revisión Redux, conservando cuenta,
+URL y filtros. Cambio de cuenta sí reinicia filtros; no hay segunda sesión.
+Fallo de comprobación bloquea acceso y ofrece recuperación manual/logout sin
+bucles; 401 termina sesión. Logout tiene prioridad sobre refresh pendiente.
+
+**231/231 pruebas Node** finales, lint sin advertencias, build, sintaxis y diff
+correctos. Artefacto TypeScript restaurado. Playwright simulado: **11 grupos P05**
+y **5 de regresión P03**, sin excepciones/avisos inesperados. Playwright real:
+**6 grupos** por ejecución, dos ejecuciones con fixtures distintos (final tras
+ajustes de coordinación); rol/permisos directos revocados/reasignados sin nuevo
+login, vista parada, edición, lectura/escritura aceptadas pendientes, recuperación
+y logout. Laravel refleja las revocaciones en refresh y deniega operaciones 403.
+La escritura aceptada permanece en servidor; la entrega tardía no publica efectos.
+Se eliminaron **6/6 fixtures**, cero registros con prefijo P05 en comprobación
+final de catálogos completos. No se modifican cuentas/roles existentes.
+
+Nueva integración selectiva P04 en drogas/permisos; no se repite la matriz P01
+ni todos los perfiles/dependencias P04. Se aísla el 500 anónimo: Accept JSON da
+401, Accept `*/*` intenta redirigir a `login` ausente y da 500. Ajuste Laravel
+pendiente para JSON 401 en rutas API independientemente de Accept, sin cambios
+backend aquí. Límites de actualización eventual, descarte de todos los borradores
+al cambiar autorizaciones y versiones Context7 en
+[el informe de autorización](verification-access-control-2026-11-10.md#p05--revocación-con-sesión-abierta-12-de-noviembre-de-2026),
+[JSON nuevo](verification-access-control-p05-results-2026-11-12.json) y
+[progreso de portafolio](portfolio-progress.md#p05--autorizaciones-en-sesión-abierta-12-de-noviembre-de-2026).
+Sin dependencias nuevas, commits ni despliegues; demo conservada. P06 y siguientes
+no ejecutados; los 16 pasos originales permanecen cerrados.
+
+Consolidación posterior solicitada: `354682e` registra código y pruebas de P05;
+guía, informe, evidencia JSON y progresos se consolidan por separado. Se reutilizan
+las 231 pruebas, lint, build y recorridos del mismo código, sin nueva ejecución.
+Diff e índice revisados y JSON saneado comprobado. Sin push ni despliegue. El
+ajuste Laravel anónimo sigue pendiente; P06 y siguientes no se ejecutan.
