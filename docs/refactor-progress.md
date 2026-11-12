@@ -34,10 +34,11 @@ Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 La preparación posterior para presentar el proyecto tiene
 [prompts por tarea](portfolio-plan.md) y [progreso propio](portfolio-progress.md).
-P01–P11 están ejecutados; P08 añade recuperación de vistas, P09 navegación
+P01–P12 están ejecutados; P08 añade recuperación de vistas, P09 navegación
 desconocida y P10 identidad/panel de producto con escenarios controlados.
 P11 corrige barreras de interacción, móvil y contraste en recorridos representativos;
-no acredita conformidad WCAG completa. P12 y posteriores no se ejecutan.
+no acredita conformidad WCAG completa. P12 prepara doce registros ficticios
+persistentes y verifica el recorrido con API local. P13 y posteriores siguen pendientes.
 P06 incorpora adaptación limitada del vacío inicial,
 con contrato backend todavía pendiente. P07 configura y verifica medios locales,
 sin acreditar limpieza física ni producción. El estado actualizado y sus límites
@@ -2230,3 +2231,33 @@ Consolidación solicitada P11: `3b25c50` registra implementación y pruebas;
 informe, JSON, siete capturas y ambos progresos se consolidan por separado.
 Se reutilizan las verificaciones del mismo código sin repetirlas. Diff e índice
 revisados; sin push ni despliegue. P12 sigue sin ejecutar y los límites se conservan.
+
+## Portafolio P12 — Datos y recorrido de demo (12 de noviembre de 2026)
+
+Ejecutado únicamente P12. Acceso precargado y cuenta/asignaciones conservados.
+La sesión real tiene 73 permisos, incluidos los 48 del proyecto. Preparados
+doce registros ficticios persistentes `DEMO_P12_V1` en la API local, con cuatro
+catálogos propios, dos padres y seis hijos, más diez imágenes rotuladas DEMO.
+Definición e inventario separados de fixtures de pruebas. Usuarios y registros
+anteriores preservados. Preparador con rechazo de duplicados acreditado.
+
+261/261 pruebas, lint y build correctos. Siete grupos Playwright MCP con API
+real aprobados, incluidos login/recarga/logout, navegación y rechazos anónimos
+e inválidos 401; cero excepciones JS en páginas monitorizadas. Relectura
+independiente de 12 registros, diez imágenes decodificadas con 200 y análisis
+5/3/30 y dos puntos propios. Incidencias iniciales de selectores y sondeo CORS
+de bytes registradas; consumo normal de imágenes verificado. Artefacto
+TypeScript restaurado y comprobaciones documentales realizadas.
+
+[Guía](demo-guide.md), [informe P12](verification-demo-p12-2026-11-12.md) y
+[progreso de portafolio](portfolio-progress.md#p12--datos-y-recorrido-de-demo-12-de-noviembre-de-2026).
+Los datos permanecen en local. Limpieza/restablecimiento documentados;
+borrado/recreación y rollback parcial pendientes de ensayo. Preparación del
+entorno público y limpieza física de medios pendientes, con necesidades backend
+precisas en la guía. Límites previos conservados. Siguiente tarea P13.
+
+Consolidación solicitada P12: `a3f40e5` registra definición y scripts;
+guía, inventario, informe y ambos progresos se consolidan por separado.
+Se reutilizan las verificaciones del mismo código, con diff e índice revisados.
+Preparación pública, limpieza física y ensayo completo de restablecimiento
+mantienen su estado pendiente. P13 sigue pendiente.

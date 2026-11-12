@@ -1,0 +1,20 @@
+{
+  "environment": "API local http://localhost/api",
+  "preparedOn": "2026-11-12",
+  "prefix": "DEMO_P12_V1",
+  "complete": true,
+  "records": [
+    { "domain": "drug", "id": 29, "media": "drug/vCmLiyPT9bFyPeUu8K3M2ofoojzj9jNGtjnjgfl5.png" },
+    { "domain": "drugPresentation", "id": 9, "media": "drugPresentation/UAA1jR5Yb6ALsVAeXXzFstu9715uWBIM8OhffWV1.png" },
+    { "domain": "weapon", "id": 6, "media": "weapon/jz8kG9jddr8QTvBdJfeR7c77hz2pPFFzKKByr4VY.png" },
+    { "domain": "ammunition", "id": 6, "media": "ammunition/P1MZWH0jVHLH2fwSr2W0dHSvMuvaZACWTNVdmzhg.png" },
+    { "domain": "confiscation", "id": 5028 },
+    { "domain": "drugConfiscation", "id": 1027, "parent": 5028, "media": "drugConfiscation/uIVjf1kOU6QVJfpbNHfzVXmLRkLnRQdHnSg6VmpE.png" },
+    { "domain": "weaponConfiscation", "id": 1005, "parent": 5028, "media": "weaponConfiscation/xky96MnjxnRuWXVFp4Aq5KJnAyHXxCnSUWadXJXX.png" },
+    { "domain": "ammunitionConfiscation", "id": 1005, "parent": 5028, "media": "ammunitionConfiscation/uU6ofoydftpLxU1rLKSCgQp8kDka4pi5Pbh5v7Jt.png" },
+    { "domain": "confiscation", "id": 5029 },
+    { "domain": "drugConfiscation", "id": 1028, "parent": 5029, "media": "drugConfiscation/KwTAPEyQ0wWj6Kapwy3khs89y6bdwLgkNPRT3V0H.png" },
+    { "domain": "weaponConfiscation", "id": 1006, "parent": 5029, "media": "weaponConfiscation/dYqCtLfPo5fCUKikTYURSxVvITxJe52jaOyQX72P.png" },
+    { "domain": "ammunitionConfiscation", "id": 1006, "parent": 5029, "media": "ammunitionConfiscation/eu8L2cq9hXGn1f9WoJGMQxn79H5KWy1x5qNNJ5uN.png" }
+  ]
+}

@@ -2,7 +2,7 @@
 
 ## Estado al 12 de noviembre de 2026
 
-**P01–P11 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 verifica navegación desconocida y P10 identidad/panel con simulación local. P11 audita y corrige flujos representativos de accesibilidad/móvil con simulación; no acredita conformidad WCAG completa. P12 y posteriores siguen sin ejecutar.** La preparación del
+**P01–P12 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 verifica navegación desconocida y P10 identidad/panel con simulación local. P11 audita y corrige flujos representativos de accesibilidad/móvil con simulación; no acredita conformidad WCAG completa. P12 prepara doce registros ficticios persistentes y verifica el recorrido con API local. P13 y posteriores siguen pendientes.** La preparación del
 plan no ejecutó por sí misma ninguna tarea.
 Fuente: [portfolio-plan.md](portfolio-plan.md). Se conserva la refactorización
 cerrada en [refactor-progress.md](refactor-progress.md).
@@ -20,7 +20,7 @@ cerrada en [refactor-progress.md](refactor-progress.md).
 | P09 | Media | Página no encontrada | Completado con comprobaciones locales | Comodines, permisos, recuperación e HTTP SPA documentados; hosting público pendiente de P14 |
 | P10 | Alta | Identidad y dashboard de producto | Completado con comprobaciones locales | Decomisos, panel autorizado sin métricas ficticias, español y capturas; informe P10 |
 | P11 | Media | Móvil, aspecto y accesibilidad | Completado dentro del alcance representativo | 8 grupos de navegador, contraste de texto y 7 capturas; límites en informe P11 |
-| P12 | Alta | Datos y recorrido de demo | Pendiente | Conservar acceso precargado intencional; permisos verificados y P04 |
+| P12 | Alta | Datos y recorrido de demo | Completado en local con límites documentados | Acceso y asignaciones conservados; 12 registros persistentes, inventario y guía; preparación pública y limpieza física pendientes |
 | P13 | Media | Tests/lint/build en CI | Pendiente | Workflow existente |
 | P14 | Media | Comprobar despliegue público | Pendiente | URL real; preferible tras P07/P12/P13 |
 | P15 | Alta | README de portafolio | Pendiente | Reflejar resultados de las tareas anteriores |
@@ -612,3 +612,55 @@ Informe, JSON, siete capturas y ambos progresos se consolidan en un segundo
 commit documental. Se reutilizan las verificaciones del mismo código, sin nuevas
 ejecuciones. Diff e índice revisados. Sin push ni despliegue; P12 no se ejecuta
 y se conservan los límites de la auditoría representativa.
+
+## P12 — Datos y recorrido de demo (12 de noviembre de 2026)
+
+Ejecutado solo P12 sobre workspace inicialmente limpio. Acceso precargado,
+cuenta, credenciales y asignaciones conservados. Login real devuelve
+`administrador` con 73 permisos efectivos, 48 del proyecto y 25 históricos.
+La guía documenta sus capacidades administrativas actuales y el recorrido de
+consulta. La revisión funcional de la matriz permanece en P01/P04/P05.
+
+Preparados **12 registros ficticios persistentes** con prefijo `DEMO_P12_V1`:
+cuatro catálogos propios, dos decomisos y seis hijos. Diez PNG rotulados DEMO
+generados con canvas. Definición e inventario local separados de los fixtures
+históricos `PORTFOLIO_*`. `scripts/prepare-demo-p12.js` consume services
+existentes, comprueba permisos/duplicados antes de escribir, conserva IDs
+confirmados y ofrece rollback de sus altas ante fallo. La preparación completó
+en la API local y la repetición se detuvo en preflight al encontrar el prefijo.
+Los datos preparados permanecen guardados para visitas. Usuarios y registros
+anteriores conservados; auditoría del backend preservada.
+
+Verificación nueva: **261/261 pruebas**, lint y build correctos. Playwright MCP
+con API real y sin interceptaciones: **siete grupos aprobados** del recorrido
+`tests/browser/demo-p12.js`. Panel/listado descendente/detalle y tres acordeones,
+ocho rutas de catálogos/administración, gráfico y tabla con 5, mapa compartido con
+dos puntos, ruta desconocida, visitante y API anónima 401, login inválido 401,
+login precargado/recarga/logout 200. Cero excepciones JS en las dos páginas
+monitorizadas y cero fallos API de la pestaña principal en el recorrido final.
+Comprobación independiente de **12/12 registros** y **10/10 imágenes** decodificadas
+con HTTP 200. Services de gráficos devuelven 5/3/30 al filtrar el conjunto propio.
+
+Selectores iniciales de orden/columna y menú corregidos antes del recorrido
+final. Un sondeo fetch de medios encontró CORS entre orígenes; verificación de
+imágenes mediante su consumo normal completó con éxito. Dos intentos de guardar
+desde Node del MCP encontraron APIs indisponibles; inventario guardado desde el
+workspace y comparado exactamente. Sintaxis, JSON, enlaces y diff revisados;
+artefacto TypeScript restaurado con aprobación tras el límite de `.git`.
+
+[Guía de demo](demo-guide.md), [definición](demo-data-p12.json),
+[inventario local](demo-inventory-p12-local-2026-11-12.json) e
+[informe P12](verification-demo-p12-2026-11-12.md). La guía detalla limpieza
+por IDs y relaciones y nueva preparación. Borrado/recreación completo y rollback
+parcial quedan pendientes de ensayo. La preparación pública y su inventario
+corresponden al entorno de destino. Limpieza física de medios pendiente de
+procedimiento backend; un reinicio automático/atómico requeriría implementación
+Laravel. Límites P05/P06/P07 conservados. Cambios locales y datos locales
+preparados. Siguiente tarea **P13**; P13–P15/O01/O02 conservan su estado.
+
+Consolidación solicitada: `a3f40e5` registra definición y scripts P12. Guía,
+inventario local, informe y ambos progresos se consolidan en un segundo commit
+documental. Se reutilizan las 261 pruebas, lint, build y recorridos del mismo
+código, sin nuevas ejecuciones. Diff e índice revisados. Preparación pública,
+limpieza física y ensayo completo de restablecimiento conservan sus pendientes.
+P13 mantiene su estado pendiente.
