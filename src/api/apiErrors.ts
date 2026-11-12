@@ -41,6 +41,7 @@ export const getApiErrorMessage = (error: unknown): ApiErrorMessage => {
     if (kind === 'unauthenticated') return 'No autenticado. Inicia sesión para continuar.';
     if (kind === 'transport') return 'No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.';
     if (kind === 'server') return 'Error del servidor. No se pudo completar la solicitud. Inténtalo más tarde.';
+    if (getApiErrorStatus(error) === 404) return 'Recurso no encontrado. Puede haber sido eliminado o no estar disponible.';
     // Also support callers that still hold an AxiosError rather than its body.
     if (isRecord(error) && isRecord(error.response)) return getApiErrorMessage(error.response.data);
     if (isRecord(error)) {

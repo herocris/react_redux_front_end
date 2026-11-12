@@ -1,12 +1,14 @@
-import { Routes, Route, Navigate } from 'react-router';
+import { NotFoundPage } from '../../../router/NotFoundPage';
+import { AccessRoute } from '../../../router/AccessRoute';
+import { Routes, Route } from 'react-router';
 import { AmmunitionView } from '../views';
 
 export const AmmunitionRoutes = () => {
   return (
     <Routes>
       {/* <Route path='user' element={<UserView />} /> */}
-      <Route path='/' element={<AmmunitionView/>} />
-      <Route path='/*' element={<Navigate to="/ammunition/" />} />
+      <Route path='/' element={<AccessRoute domain="ammunition"><AmmunitionView/></AccessRoute>} />
+      <Route path='*' element={<NotFoundPage />} />
     </Routes>
   )
 }

@@ -1,12 +1,14 @@
-import { Routes, Route, Navigate } from 'react-router';
+import { NotFoundPage } from '../../../router/NotFoundPage';
+import { AccessRoute } from '../../../router/AccessRoute';
+import { Routes, Route } from 'react-router';
 import { ActivityView } from '../views';
 
 export const ActivityRoutes = () => {
   return (
     <Routes>
       {/* <Route path='user' element={<UserView />} /> */}
-      <Route path='/' element={<ActivityView/>} />
-      <Route path='/*' element={<Navigate to="/actividad/" />} />
+      <Route path='/' element={<AccessRoute domain="activity"><ActivityView/></AccessRoute>} />
+      <Route path='*' element={<NotFoundPage />} />
     </Routes>
   )
 }

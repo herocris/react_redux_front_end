@@ -4,7 +4,7 @@ import { Link, Navigate } from 'react-router';
 import { AccessDenied } from '../components/AccessDenied';
 import { GrapLayout } from '../shared/layout/GraphLayout';
 import { useAppSelector } from '../hooks/hooks';
-import { selectSessionUser } from '../modules/auth/selectors';
+import { selectSessionUser, selectAuthStatus } from '../modules/auth/selectors';
 import { firstAllowedPath, type AccessDomain, type AccessAction } from '../modules/auth/access';
 import { useAccess } from '../modules/auth/hooks/useAccess';
 
@@ -20,7 +20,9 @@ export const DeniedRoute = () => {
 export const AccessRoute = ({ domain, action = 'view', children }: {
     domain: AccessDomain; action?: AccessAction; children: ReactNode;
 }) => {
+    const status = useAppSelector(selectAuthStatus);
     const access = useAccess(domain);
+    if (status === 'not-authenticated') return <Navigate to="/auth/login" replace />;
     return access[action] ? children : <DeniedRoute />;
 };
 export const SessionLanding = () => {

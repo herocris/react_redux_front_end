@@ -1,11 +1,13 @@
-import { Routes, Route, Navigate } from 'react-router';
+import { NotFoundPage } from '../../../router/NotFoundPage';
+import { AccessRoute } from '../../../router/AccessRoute';
+import { Routes, Route } from 'react-router';
 import { DashBoardView } from '../views';
 
 export const DashBoardRoutes = () => {
   return (
     <Routes>
-      <Route path='/' element={<DashBoardView />} />
-      <Route path='/*' element={<Navigate to="/dashboard/" />} />
+      <Route path='/' element={<AccessRoute domain="dashboard"><DashBoardView /></AccessRoute>} />
+      <Route path='*' element={<NotFoundPage />} />
     </Routes>
   )
 }

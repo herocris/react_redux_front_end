@@ -50,6 +50,22 @@ test('errores HTTP y thunks con el cliente real y un transporte simulado', async
         }
     });
 
+    await t.test('404 conserva recurso, causa y rechazo sin confundirse con ruta inexistente o 403', async () => {
+        const body = { message: 'Private model detail' };
+        let cause;
+        api.defaults.adapter = async config => {
+            cause = new axios.AxiosError('Missing', 'ERR_BAD_REQUEST', config, undefined,
+                { data: body, status: 404, statusText: 'Not Found', headers: {}, config });
+            throw cause;
+        };
+        await assert.rejects(api.get('/confiscation/999999'), error => error === body);
+        assert.equal(getApiErrorStatus(body), 404);
+        assert.equal(getApiErrorCause(body), cause);
+        assert.match(getApiErrorText(body), /^Recurso no encontrado/);
+        assert.doesNotMatch(getApiErrorText(body), /Private|Página|Acceso denegado/);
+        assert.match(getApiErrorText({ response: { status: 404, data: body } }), /^Recurso no encontrado/);
+    });
+
     await t.test('clasifica cuerpos reales 401/403 sin deducir autorización del texto', () => {
         assert.equal(getApiErrorKind({ error: 'No autenticado', code: 401 }), 'unauthenticated');
         assert.equal(getApiErrorKind({ error: 'This action is unauthorized.', code: 403 }), 'forbidden');
