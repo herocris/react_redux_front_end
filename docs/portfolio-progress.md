@@ -2,7 +2,7 @@
 
 ## Estado al 12 de noviembre de 2026
 
-**P01–P09 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 verifica navegación desconocida con simulación local; P10 y posteriores siguen sin ejecutar.** La preparación del
+**P01–P10 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 verifica navegación desconocida y P10 identidad/panel con simulación local; P11 y posteriores siguen sin ejecutar.** La preparación del
 plan no ejecutó por sí misma ninguna tarea.
 Fuente: [portfolio-plan.md](portfolio-plan.md). Se conserva la refactorización
 cerrada en [refactor-progress.md](refactor-progress.md).
@@ -18,7 +18,7 @@ cerrada en [refactor-progress.md](refactor-progress.md).
 | P07 | Alta | Configuración y renderizado de imágenes | Completado en local con límites documentados | Base confirmada y 200; conservación/reemplazo/fallback verificados; limpieza física no acreditada |
 | P08 | Media | Recuperación de errores de render/lazy | Completado con escenarios controlados | Frontera de vistas, recuperación explícita y carga diferida verificadas; informe P08 |
 | P09 | Media | Página no encontrada | Completado con comprobaciones locales | Comodines, permisos, recuperación e HTTP SPA documentados; hosting público pendiente de P14 |
-| P10 | Alta | Identidad y dashboard de producto | Pendiente | Considerar permisos de P04 |
+| P10 | Alta | Identidad y dashboard de producto | Completado con comprobaciones locales | Decomisos, panel autorizado sin métricas ficticias, español y capturas; informe P10 |
 | P11 | Media | Móvil, aspecto y accesibilidad | Pendiente | Preferible después de P03–P10 |
 | P12 | Alta | Datos y recorrido de demo | Pendiente | Conservar acceso precargado intencional; permisos verificados y P04 |
 | P13 | Media | Tests/lint/build en CI | Pendiente | Workflow existente |
@@ -517,3 +517,47 @@ Informe y ambos progresos se consolidan en un segundo commit documental.
 Se reutilizan las 260 pruebas, lint, build y recorridos del mismo código; no se
 repiten por esta consolidación. Diff e índice revisados. Sin push ni despliegue;
 hosting público pendiente de P14 y P10 sin ejecutar.
+
+## P10 — Identidad y panel de producto (12 de noviembre de 2026)
+
+Ejecutado solo P10. Se propone **Decomisos · Gestión y análisis** como identidad
+descriptiva, sin marca previa acordada. Título, favicon SVG propio, `lang="es"`,
+login/registro y navegación coherentes. Acceso precargado conservado. Textos de
+contraseña, acciones/tablas y calendarios MUI/Day.js en español, sin cambiar
+rutas, contratos ni mensajes del backend. Tema claro/oscuro reutilizado.
+
+El panel pasa a accesos explicados según permisos efectivos; no consulta datos
+ni muestra contadores. Barras/líneas y mapas anteriores eran constantes de
+`demoData.ts`, retirado sin otros consumidores; la tabla remota de drogas sigue
+en su catálogo. La procedencia API no acredita autenticidad de registros: demo
+identificada y cifras oficiales no afirmadas. Preparar datos persiste en P12.
+`dashboard.view` permite el panel sin otras lecturas; cada destino conserva sus
+dependencias/guards. Estado vacío con actualización de permisos/logout, sesión
+única y lazy conservados. Menú móvil se cierra al navegar.
+
+**260/260 pruebas Node**, lint sin advertencias y build correctos. Playwright MCP
+en preview local con sesión/API simuladas: **5 grupos P10**, **7 de regresión
+P04** y **7 de P09**, sin excepciones ni avisos inesperados. P10 verifica permisos
+parciales, vacío/denegación sin consultas, origen/aviso de demo, carga diferida,
+teclado, listado vacío/error/reintento, calendario español, móvil/retorno/logout.
+1440×1000 y 390×844 sin desbordamiento; cinco capturas inspeccionadas, sesión
+ficticia y campos precargados enmascarados. Recorridos históricos adaptados a
+etiquetas nuevas, sin declarar que se repitieron todos. Sintaxis y diff revisados;
+artefacto TypeScript restaurado.
+
+Context7 y fuentes oficiales consultados; patches exactos no disponibles,
+contraste con APIs instaladas y navegador documentado. Incidencias iniciales
+del evaluador/selector de fecha y captura durante Grow corregidas antes de los
+resultados finales. No hubo escrituras, integración backend nueva, dependencias,
+commits ni despliegues. No se acredita hosting público ni auditoría completa de
+accesibilidad. Informe, fuentes y capturas:
+[P10](verification-product-p10-2026-11-12.md), recorrido
+`tests/browser/product-p10.js`. Límites previos conservados. Siguiente: **P11**,
+sin ejecutar; P12–P15/O01/O02 mantienen su estado.
+
+Consolidación solicitada: `e3fd8fe` registra implementación y pruebas P10.
+AGENTS, informe, cinco capturas enmascaradas/ficticias y ambos progresos se
+consolidan en un segundo commit documental. Se reutilizan las 260 pruebas,
+lint, build y recorridos del mismo código; no se repiten por esta consolidación.
+Diff e índice revisados. Sin push ni despliegue; P11 sigue sin ejecutar y los
+límites de integración, datos y hosting se conservan.

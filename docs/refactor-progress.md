@@ -34,8 +34,8 @@ Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 La preparación posterior para presentar el proyecto tiene
 [prompts por tarea](portfolio-plan.md) y [progreso propio](portfolio-progress.md).
-P01–P09 están ejecutados; P08 añade recuperación de vistas y P09 navegación
-desconocida con escenarios controlados.
+P01–P10 están ejecutados; P08 añade recuperación de vistas, P09 navegación
+desconocida y P10 identidad/panel de producto con escenarios controlados.
 P06 incorpora adaptación limitada del vacío inicial,
 con contrato backend todavía pendiente. P07 configura y verifica medios locales,
 sin acreditar limpieza física ni producción. El estado actualizado y sus límites
@@ -2179,3 +2179,27 @@ Consolidación solicitada de P09: `5c07f94` contiene implementación y pruebas;
 informe y ambos progresos se registran en un segundo commit documental.
 Verificaciones del mismo código reutilizadas, sin nueva ejecución de pruebas.
 Diff e índice revisados. Sin push ni despliegue; P10 permanece sin ejecutar.
+
+## P10 — Identidad y dashboard de producto (12 de noviembre de 2026)
+
+Solo P10: identidad propuesta **Decomisos**, favicon propio y español coherente
+en entrada, navegación y controles compartidos. Panel de accesos autorizados,
+sin consultas ni métricas ficticias; demo identificada. Retirados los gráficos
+y mapas constantes y su archivo sin consumidores; datos remotos en sus vistas.
+`dashboard.view` independiente con destinos protegidos, estado vacío, sesión y
+lazy conservados. Menú móvil se cierra al navegar; acceso precargado intacto.
+
+260/260 pruebas, lint y build correctos. Playwright MCP simulado en build local:
+5 grupos P10 y regresión de 7 grupos P04/7 P09, sin excepciones ni avisos
+inesperados. Capturas escritorio/móvil/oscuro revisadas sin datos personales,
+login enmascarado. Calendario español, teclado, error/vacío/reintento, permisos
+y carga diferida comprobados. No se verifican datos reales, Laravel ni hosting;
+P11 y preparación de datos P12 siguen pendientes. Sin dependencias, commits o
+despliegues. Decisiones, incidencias corregidas, documentación de versiones y
+evidencia en [informe P10](verification-product-p10-2026-11-12.md) y
+[progreso de portafolio](portfolio-progress.md#p10--identidad-y-panel-de-producto-12-de-noviembre-de-2026).
+
+Consolidación solicitada P10: `e3fd8fe` contiene implementación y pruebas;
+guía, informe, capturas y ambos progresos se registran en un segundo commit
+documental. Se reutilizan las verificaciones del mismo código sin repetirlas;
+diff e índice revisados. Sin push ni despliegue; P11 permanece sin ejecutar.

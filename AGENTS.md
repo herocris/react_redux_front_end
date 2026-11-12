@@ -161,6 +161,9 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
   los consulta desde la sesión Redux. Los guards se sitúan antes de montar vistas
   con consultas. No inferir acceso por roles ni duplicar permisos en Query/contextos.
   El backend conserva la decisión efectiva; los rechazos no se tratan como éxito.
+- P10: el panel de inicio es navegación sin consultas ni métricas. Requiere
+  `dashboard.view`; cada acceso visible comprueba sus propios permisos y
+  dependencias. No reintroducir las dependencias globales del antiguo demo.
 - Revalidación en vivo (P05): usar `refreshAuthorization` y el `/refresh` existente,
   sin otra sesión en Query. `onSessionRefreshed` conserva filtros para la misma
   cuenta; cambios de roles/permisos o fallos de comprobación retiran transporte,
