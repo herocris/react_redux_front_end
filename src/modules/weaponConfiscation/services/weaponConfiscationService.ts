@@ -1,7 +1,7 @@
 import { readId } from '../../../api/identifiers';
 import api from '../../../api/graphdataApi';
 import type { ListParams } from '../../../api/catalog';
-import type { TableOptions } from '../../../shared/interfaces/sharedInterfaces';
+import { readSublistPagination, type SublistResponse } from '../../../api/sublistPagination';
 import type { WeaponConfiscation } from '../types';
 
 type Relation = { identificador: number; descripcion: string };
@@ -16,11 +16,12 @@ const toEntity = ({ decomiso, arma, ...rest }: Response): WeaponConfiscation => 
     ...rest, identificador: readId(rest.identificador),
 });
 export const weaponConfiscationService = {
-    async list(parent: number, { page, sortBy, orderType, per_page, search_by, valueSearch }: ListParams, signal?: AbortSignal) {
+    async list(parent: number, params: ListParams, signal?: AbortSignal) {
+        const { page, sortBy, orderType, per_page, search_by, valueSearch } = params;
         const sort = sortBy === 'id' ? 'identificador' : sortBy;
-        const { data: { data, ...tableOptions } } = await api.get<TableOptions & { data: Response[] }>(
+        const { data } = await api.get<SublistResponse<Response>>(
             `/weaponConfiscation/${readId(parent)}/confiscation?page=${page}&sort_by=${sort}&type=${orderType}&per_page=${per_page}&${search_by}=${valueSearch}`, { signal });
-        return { rows: data.map(toEntity), tableOptions };
+        return { rows: data.data.map(toEntity), tableOptions: readSublistPagination(data, params) };
     },
     async create(values: WeaponConfiscation, signal?: AbortSignal) {
         const { data } = await api.post<Response>('/weaponConfiscation', values,

@@ -118,7 +118,10 @@ test('confiscaciones: contratos, consultas anidadas, escrituras y sesión', asyn
                 assert.equal(hashes.size, 7);
                 if (!main) assert.notDeepEqual(key(7), key(9));
                 let calls = 0;
-                api.defaults.adapter = async config => { calls++; return reply(config, body()); };
+                api.defaults.adapter = async config => {
+                    calls++;
+                    return reply(config, body(8, Number(new URL(config.url, 'http://test').searchParams.get('page'))));
+                };
                 await Promise.all([client.fetchQuery(list()), client.fetchQuery(list())]);
                 await client.fetchQuery(list());
                 assert.equal(calls, 1);

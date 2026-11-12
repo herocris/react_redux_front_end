@@ -53,7 +53,7 @@ export const useWeaponConfiscation = () => {
         listLoading: query.isFetching, listError: query.isError ? getApiErrorText(query.error) : '',
         retryList: () => void query.refetch(),
         listUnavailable: query.isError || !query.data || mutation.isPending,
-        page, pageSize, total: query.data?.tableOptions.total ?? 0,
+        page, pageSize, total: query.isError ? -1 : query.data?.tableOptions.total ?? -1,
         onPageChange: setPage,
         onPageSizeChange: (size: number) => { setPageSize(size); setPage(0); },
         weaponConfiscations: query.data?.rows ?? [],
