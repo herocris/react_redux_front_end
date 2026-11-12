@@ -1,8 +1,8 @@
+import { ApiRequestError } from '../../../components/ApiRequestError';
 import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import type { GridColDef } from '@mui/x-data-grid';
 import type { PermissionEntity } from '../types';
 import { PermissionError } from '../components/PermissionError';
-import { Button } from '@mui/material';
 import { AddFloatingButton, EntityList } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { PermissionFormModal } from '../components/PermissionFormModal';
@@ -18,7 +18,7 @@ export const PermissionView = () => {
     DeletePermission,
     paginationModel, sortModel, filterModel,
     onPaginationModelChange, onSortModelChange, onFilterModelChange,
-    listLoading, listError, retryList, rowCount, onEdit, onDelete,
+    listLoading, listFailure, retryList, rowCount, onEdit, onDelete,
     handleOpen,
     handleOpenDialog,
     loading,
@@ -33,8 +33,7 @@ export const PermissionView = () => {
     <>
       <GrapLayout>
         {!open && !openDialog && <PermissionError message={errorMessage} />}
-        <PermissionError message={listError} />
-        {listError && <Button onClick={retryList} disabled={listLoading}>Reintentar listado</Button>}
+        <ApiRequestError error={listFailure} retry={retryList} busy={listLoading} retryLabel="Reintentar listado" />
         <EntityList
           rows={permissions} columns={columns} rowCount={rowCount} loading={listLoading}
           paginationModel={paginationModel} sortModel={sortModel} filterModel={filterModel}

@@ -1,6 +1,6 @@
-import { Alert, Button } from '@mui/material';
-import { getApiErrorText } from '../../../api/apiErrors';
+import { Alert } from '@mui/material';
+import { ApiRequestError } from '../../../components/ApiRequestError';
 import type { OptionsStatus } from '../queries/optionsStatus';
 export const CatalogOptionsStatus = ({ pending, error, retry }: OptionsStatus) => error
-    ? <Alert severity="error" action={<Button onClick={retry}>Reintentar catálogos</Button>}>{getApiErrorText(error)}</Alert>
+    ? <ApiRequestError error={error} retry={retry} retryLabel="Reintentar catálogos" />
     : pending ? <Alert severity="info">Cargando catálogos…</Alert> : null;

@@ -1,5 +1,5 @@
+import { ApiRequestError } from '../../../components/ApiRequestError';
 import { logoColumn } from '../../../components/logoColumn';
-import { Button } from '@mui/material';
 import type { GridColDef } from '@mui/x-data-grid';
 import type { AmmunitionEntity } from '../types';
 import { ConfirmDialog } from '../../../components/ConfirmDialog';
@@ -21,7 +21,7 @@ export const AmmunitionView = () => {
     DeleteAmmunition,
     paginationModel, sortModel, filterModel,
     onPaginationModelChange, onSortModelChange, onFilterModelChange,
-    listLoading, listError, retryList, rowCount, onEdit, onDelete,
+    listLoading, listFailure, retryList, rowCount, onEdit, onDelete,
     handleOpen,
     handleOpenDialog,
     loading,
@@ -36,8 +36,7 @@ export const AmmunitionView = () => {
     <>
       <GrapLayout>
         {!open && !openDialog && <AmmunitionError message={errorMessage} />}
-        <AmmunitionError message={listError} />
-        {listError && <Button onClick={retryList} disabled={listLoading}>Reintentar listado</Button>}
+        <ApiRequestError error={listFailure} retry={retryList} busy={listLoading} retryLabel="Reintentar listado" />
         <EntityList rows={ammunitions} columns={columns} rowCount={rowCount} loading={listLoading}
           paginationModel={paginationModel} sortModel={sortModel} filterModel={filterModel}
           onPaginationModelChange={onPaginationModelChange}

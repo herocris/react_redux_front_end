@@ -1,4 +1,5 @@
-import { Alert, Button, useMediaQuery } from '@mui/material';
+import { Alert, useMediaQuery } from '@mui/material';
+import { ApiRequestError } from '../../../components/ApiRequestError';
 import type { GridColDef } from '@mui/x-data-grid';
 import { AddFloatingButton, EntityList } from '../../../components';
 import { ConfirmDialog } from '../../../components/ConfirmDialog';
@@ -12,8 +13,7 @@ export const ConfiscationsView = () => {
     const view = useConfiscationView();
     const matches = useMediaQuery('(min-width:600px)');
     return <GrapLayout>
-        {view.listError && <Alert severity="error">{view.listError}
-            <Button disabled={view.listLoading} onClick={view.retryList}>Reintentar listado</Button></Alert>}
+        <ApiRequestError error={view.listFailure} retry={view.retryList} busy={view.listLoading} retryLabel="Reintentar listado" />
         <EntityList rows={view.confiscations} columns={matches ? columns : columns.slice(1, 3)}
             rowCount={view.rowCount} loading={view.listLoading} paginationModel={view.paginationModel}
             sortModel={view.sortModel} filterModel={view.filterModel}

@@ -1,5 +1,5 @@
-import { Alert, Button } from '@mui/material';
-import { getApiErrorText } from '../../../api/apiErrors';
+import { Alert } from '@mui/material';
+import { ApiRequestError } from '../../../components/ApiRequestError';
 
 export interface PermissionOptionsStatusProps {
     pending: boolean;
@@ -8,7 +8,6 @@ export interface PermissionOptionsStatusProps {
 }
 
 export const PermissionOptionsStatus = ({ pending, error, retry }: PermissionOptionsStatusProps) => (
-    error ? <Alert severity="error" action={<Button onClick={retry}>Reintentar permisos</Button>}>
-        {getApiErrorText(error)}
-    </Alert> : pending ? <Alert severity="info">Cargando permisos…</Alert> : null
+    error ? <ApiRequestError error={error} retry={retry} retryLabel="Reintentar permisos" />
+        : pending ? <Alert severity="info">Cargando permisos…</Alert> : null
 );

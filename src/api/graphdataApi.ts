@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { getEnvVariables } from '../helpers/getEnvVariables';
 import { getSessionSignal } from './sessionScope';
+import { rememberHttpFailure } from './apiErrors';
 
 const { VITE_API_URL } = getEnvVariables()
 
@@ -27,6 +28,9 @@ calendarApi.interceptors.response.use(
         const reason = axios.isAxiosError<unknown>(error)
             ? error.response?.data ?? error
             : error;
+        if (axios.isAxiosError(error) && error.response) {
+            rememberHttpFailure(reason, error.response.status, error);
+        }
         return Promise.reject(reason);
     },
 )

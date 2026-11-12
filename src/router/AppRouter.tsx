@@ -2,9 +2,10 @@ import { Navigate, Route, Routes } from 'react-router';
 import { AuthRoutes } from '../modules/auth';
 import { useAppDispatch, useAppSelector } from '../hooks/hooks';
 import { selectAuthStatus } from '../modules/auth/selectors';
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { checkAuthToken } from '../modules/auth/thunks';
 import { Box, CircularProgress } from '@mui/material';
+import { ApiRequestError } from '../components/ApiRequestError';
 
 
 const UserRoutes = lazy(() => import('../modules/user/routes/UserRoutes').then(module => ({ default: module.UserRoutes })));
@@ -29,13 +30,24 @@ const RouteLoading = () => (
 export const AppRouter = () => {
     const status = useAppSelector(selectAuthStatus);
     const dispatch = useAppDispatch();
+    const [sessionFailure, setSessionFailure] = useState<unknown>(null);
+    const [checking, setChecking] = useState(false);
+    const checkSession = useCallback(async () => {
+        setChecking(true);
+        try { await dispatch(checkAuthToken()); setSessionFailure(null); }
+        catch (error) { setSessionFailure(error); }
+        finally { setChecking(false); }
+    }, [dispatch]);
     useEffect(() => {
-        dispatch(checkAuthToken())
-    }, [dispatch])
+        void checkSession();
+    }, [checkSession])
 
 
 
     if (status === 'checking') {
+        if (sessionFailure != null) return <Box component="main" sx={{ p: 3 }}>
+            <ApiRequestError error={sessionFailure} retry={() => void checkSession()} busy={checking} />
+        </Box>;
         return (
             <Box
                 sx={{

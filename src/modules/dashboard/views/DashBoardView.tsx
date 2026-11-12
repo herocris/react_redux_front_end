@@ -1,4 +1,4 @@
-import { ApiErrorAlert } from '../../../components/ApiErrorAlert';
+import { ApiRequestError } from '../../../components/ApiRequestError';
 import { logoColumn } from '../../../components/logoColumn';
 import type { GridColDef } from '@mui/x-data-grid';
 import type { DrugEntity } from '../../drug/types';
@@ -8,7 +8,7 @@ import { EntityList, } from '../../../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { useDrugView } from '../../drug/hooks';
 import {MapComponent } from '../../map';
-import { Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { barLineGraph, Mapitems } from '../demoData';
 
 
@@ -18,7 +18,7 @@ export const DashBoardView = () => {
   const {
     paginationModel, sortModel, filterModel,
     onPaginationModelChange, onSortModelChange, onFilterModelChange,
-    listLoading, listError, retryList, rowCount, drugs,
+    listLoading, listFailure, retryList, rowCount, drugs,
   } = useDrugView()
 
   return (
@@ -45,8 +45,7 @@ export const DashBoardView = () => {
         </Grid>
         <Typography variant='h4' sx={{ mb: 3 }}>Demo Dashboard</Typography>
         <Typography variant='h5' sx={{ mb: 3 }}>Material UI DataGrid</Typography>
-        <ApiErrorAlert message={listError} />
-        {listError && <Button onClick={retryList} disabled={listLoading}>Reintentar listado</Button>}
+        <ApiRequestError error={listFailure} retry={retryList} busy={listLoading} retryLabel="Reintentar listado" />
         <EntityList rows={drugs} columns={columns} rowCount={rowCount} loading={listLoading}
           paginationModel={paginationModel} sortModel={sortModel} filterModel={filterModel}
           onPaginationModelChange={onPaginationModelChange}

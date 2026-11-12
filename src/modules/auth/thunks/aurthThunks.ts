@@ -1,4 +1,4 @@
-import { getApiErrorText } from '../../../api/apiErrors';
+import { getApiErrorKind, getApiErrorText } from '../../../api/apiErrors';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { onChecking, onLogin, onLogout, clearErrorMessage } from '../slices/authSlice';
 import { authService } from '../services/authService';
@@ -61,8 +61,11 @@ export const checkAuthToken = () => {
         try {
             const user = await authService.checkSession(request.signal);
             if (request.isCurrent()) dispatch(onLogin(user));
-        } catch {
-            if (request.isCurrent()) dispatch(onLogout());
+        } catch (error) {
+            if (!request.isCurrent()) return;
+            // A forbidden session check is not proof that the session expired.
+            if (getApiErrorKind(error) === 'forbidden') throw error;
+            dispatch(onLogout());
         }
     };
 };

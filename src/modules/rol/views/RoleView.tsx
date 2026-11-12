@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import { ApiRequestError } from '../../../components/ApiRequestError';
 import type { GridColDef } from '@mui/x-data-grid';
 import type { RoleEntity } from '../types';
 import { ConfirmDialog } from '../../../components/ConfirmDialog';
@@ -20,7 +20,7 @@ export const RoleView = () => {
     DeleteRole,
     paginationModel, sortModel, filterModel,
     onPaginationModelChange, onSortModelChange, onFilterModelChange,
-    listLoading, listError, retryList, rowCount, onEdit, onDelete,
+    listLoading, listFailure, retryList, rowCount, onEdit, onDelete,
     handleOpen,
     handleOpenDialog,
     loading,
@@ -39,8 +39,7 @@ export const RoleView = () => {
         {!open && <PermissionOptionsStatus pending={permissionOptionsQuery.isPending}
           error={permissionOptionsQuery.error} retry={() => { void permissionOptionsQuery.refetch(); }} />}
         {!open && !openDialog && <RoleError message={errorMessage} />}
-        <RoleError message={listError} />
-        {listError && <Button onClick={retryList} disabled={listLoading}>Reintentar listado</Button>}
+        <ApiRequestError error={listFailure} retry={retryList} busy={listLoading} retryLabel="Reintentar listado" />
         <EntityList rows={roles} columns={columns} rowCount={rowCount} loading={listLoading}
           paginationModel={paginationModel} sortModel={sortModel} filterModel={filterModel}
           onPaginationModelChange={onPaginationModelChange}

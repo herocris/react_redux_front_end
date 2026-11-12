@@ -82,6 +82,7 @@ export const useRoleView = () => {
     onFilterModelChange: (model: GridFilterModel) => {
       setFilterModel(model); setPaginationModel(value => ({ ...value, page: 0 }));
     },
+    listFailure: query.isError ? query.error : null,
     listLoading: query.isFetching, listError: query.isError ? getApiErrorMessage(query.error) : '',
     retryList: () => { void query.refetch(); },
     permisos, permissionOptionsQuery,

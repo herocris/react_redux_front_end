@@ -166,7 +166,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                     </IconButton>
                     <IconButton
                         color="inherit"
-                        aria-label="open drawer"
+                        aria-label="Cerrar sesi?n"
                         edge="end"
                         onClick={onLogout}
                     >

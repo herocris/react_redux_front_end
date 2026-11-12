@@ -1,12 +1,12 @@
 import { parseRouteId } from '../../../api/identifiers';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
-import { Alert, Button, CircularProgress } from '@mui/material';
+import { Alert, CircularProgress } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { ConfiscationForm, SubConfiscations } from '../components';
 import { GrapLayout } from '../../../shared/layout/GraphLayout';
 import { BackFloatingButton } from '../../../components';
-import { getApiErrorText } from '../../../api/apiErrors';
+import { ApiRequestError } from '../../../components/ApiRequestError';
 import { confiscationDetailOptions } from '../queries/confiscationQueries';
 
 export const EditView = () => {
@@ -24,9 +24,7 @@ const EditConfiscation = ({ id: confiscationId }: { id: number }) => {
             <Grid size={{ xs: 12, md: 1 }}><BackFloatingButton /></Grid>
             <Grid size={{ xs: 12, md: 5 }}>
                 {query.isFetching && <CircularProgress aria-label="Cargando decomiso" size={24} />}
-                {query.isError && <Alert severity="error">{getApiErrorText(query.error)}
-                    <Button disabled={query.isFetching} onClick={() => void query.refetch()}>Reintentar</Button>
-                </Alert>}
+                {query.isError && <ApiRequestError error={query.error} busy={query.isFetching} retry={() => void query.refetch()} />}
                 {query.data && <ConfiscationForm key={confiscationId} initial={query.data} />}
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
