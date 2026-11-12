@@ -1,6 +1,7 @@
 import { Avatar, List, ListItem, ListItemText, ListItemAvatar, Badge, Box, Button, ListItemButton, Typography, Zoom } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { getEnvVariables } from '../../../helpers/getEnvVariables';
+import { getMediaUrl } from '../../../helpers/getMediaUrl';
+import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import { memo } from 'react';
 import { AmmunitionConfiscation } from '../../ammunitionConfiscation';
 import { WeaponConfiscation } from '../../weaponConfiscation';
@@ -14,8 +15,6 @@ interface ListSubConfiscationProps {
     list: DrugConfiscation[] | WeaponConfiscation[] | AmmunitionConfiscation[]
     disabled?: boolean
 }
-
-const { VITE_LOCAL_PHOTOS_URL } = getEnvVariables();
 
 export const ListSubConfiscation = memo(({ onCreate, onEdit, onDelete, list, disabled }: ListSubConfiscationProps) => {
     return (
@@ -31,7 +30,9 @@ export const ListSubConfiscation = memo(({ onCreate, onEdit, onDelete, list, dis
                             <ListItem key={itemList.identificador ?? index} disablePadding sx={{ display: 'block' }}><ListItemButton disabled={disabled || !onEdit} onClick={() => { if (itemList.identificador !== undefined) onEdit?.(itemList.identificador); }}>
                                 <ListItemAvatar>
                                     <Badge badgeContent={itemList.cantidad} color="primary" sx={{ margin: 0 }}>
-                                        <Avatar alt={"Remy Sharp"} src={`${VITE_LOCAL_PHOTOS_URL}/${itemList?.foto}` as string} />
+                                        <Avatar alt="Foto del subdecomiso" src={getMediaUrl(itemList.foto)}>
+                                            <BrokenImageOutlinedIcon titleAccess="Imagen no disponible" />
+                                        </Avatar>
                                     </Badge>
                                 </ListItemAvatar>
                                 {

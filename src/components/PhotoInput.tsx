@@ -2,8 +2,9 @@ import { useRef, useState, useEffect } from "react";
 import { Box, Avatar, Typography, IconButton, Tooltip, Zoom } from "@mui/material";
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import DeleteIcon from "@mui/icons-material/Delete";
+import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import { useController, type Control, type FieldPathByValue, type FieldValues } from "react-hook-form";
-import { getEnvVariables } from "../helpers/getEnvVariables";
+import { getMediaUrl } from "../helpers/getMediaUrl";
 interface FileUploadFieldProps<T extends FieldValues, Output extends FieldValues> {
     name: FieldPathByValue<T, File | string | null | undefined | (File | string)[]>;
     control: Control<T, unknown, Output>;
@@ -11,8 +12,6 @@ interface FileUploadFieldProps<T extends FieldValues, Output extends FieldValues
     accept?: string;
     multiple?: boolean;
 }
-
-const { VITE_LOCAL_PHOTOS_URL } = getEnvVariables();
 
 export const PhotoInput = <T extends FieldValues, Output extends FieldValues = T>({
     name,
@@ -22,7 +21,7 @@ export const PhotoInput = <T extends FieldValues, Output extends FieldValues = T
     multiple = false
 }: FileUploadFieldProps<T, Output>) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [previews, setPreviews] = useState<string[]>([]);
+    const [previews, setPreviews] = useState<(string | undefined)[]>([]);
 
     const { field: { onChange, value, onBlur, ref }, fieldState: { error } } = useController({ name, control });
 
@@ -36,7 +35,7 @@ export const PhotoInput = <T extends FieldValues, Output extends FieldValues = T
                 return [url];
             }
             return typeof file === "string" && file.length > 0
-                ? [`${VITE_LOCAL_PHOTOS_URL}/${file}`]
+                ? [getMediaUrl(file)]
                 : [];
         });
         setPreviews(urls);
@@ -115,7 +114,9 @@ export const PhotoInput = <T extends FieldValues, Output extends FieldValues = T
                                         border: "2px solid #1976d2",
                                         boxShadow: 5,
                                     }}
-                                />
+                                >
+                                    <BrokenImageOutlinedIcon titleAccess="Imagen no disponible" />
+                                </Avatar>
                             </Box>
                         </Zoom>
                     ))}
