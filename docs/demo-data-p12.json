@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "prefix": "DEMO_P12_V1",
+  "catalogs": {
+    "drug": "DEMO_P12_V1 Sustancia A ficticia",
+    "drugPresentation": "DEMO_P12_V1 Envase ficticio",
+    "weapon": "DEMO_P12_V1 Arma de utileria ficticia",
+    "ammunition": "DEMO_P12_V1 Municion inerte ficticia"
+  },
+  "confiscations": [
+    {
+      "fecha": "2026-11-03",
+      "observacion": "DEMO_P12_V1 Escenario A. Registro completamente ficticio para demostracion.",
+      "direccion": "Punto de demostracion A, ubicacion aproximada ficticia",
+      "departamento": "Francisco Morazan",
+      "municipalidad": "Distrito Central",
+      "latitud": 14.1,
+      "longitud": -87.2,
+      "drugQuantity": 2,
+      "drugWeight": 1,
+      "weaponQuantity": 1,
+      "ammunitionQuantity": 10
+    },
+    {
+      "fecha": "2026-11-10",
+      "observacion": "DEMO_P12_V1 Escenario B. Registro completamente ficticio para demostracion.",
+      "direccion": "Punto de demostracion B, ubicacion aproximada ficticia",
+      "departamento": "Cortes",
+      "municipalidad": "San Pedro Sula",
+      "latitud": 15.5,
+      "longitud": -88.03,
+      "drugQuantity": 3,
+      "drugWeight": 2,
+      "weaponQuantity": 2,
+      "ammunitionQuantity": 20
+    }
+  ]
+}
