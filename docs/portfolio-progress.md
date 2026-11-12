@@ -2,7 +2,7 @@
 
 ## Estado al 12 de noviembre de 2026
 
-**P01–P12 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 verifica navegación desconocida y P10 identidad/panel con simulación local. P11 audita y corrige flujos representativos de accesibilidad/móvil con simulación; no acredita conformidad WCAG completa. P12 prepara doce registros ficticios persistentes y verifica el recorrido con API local. P13 y posteriores siguen pendientes.** La preparación del
+**P01–P13 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 verifica navegación desconocida y P10 identidad/panel con simulación local. P11 audita y corrige flujos representativos de accesibilidad/móvil con simulación; no acredita conformidad WCAG completa. P12 prepara doce registros ficticios persistentes y verifica el recorrido con API local. P13 configura CI y verifica sus comandos y estructura localmente; ejecución en GitHub pendiente. P14 y posteriores siguen pendientes.** La preparación del
 plan no ejecutó por sí misma ninguna tarea.
 Fuente: [portfolio-plan.md](portfolio-plan.md). Se conserva la refactorización
 cerrada en [refactor-progress.md](refactor-progress.md).
@@ -21,7 +21,7 @@ cerrada en [refactor-progress.md](refactor-progress.md).
 | P10 | Alta | Identidad y dashboard de producto | Completado con comprobaciones locales | Decomisos, panel autorizado sin métricas ficticias, español y capturas; informe P10 |
 | P11 | Media | Móvil, aspecto y accesibilidad | Completado dentro del alcance representativo | 8 grupos de navegador, contraste de texto y 7 capturas; límites en informe P11 |
 | P12 | Alta | Datos y recorrido de demo | Completado en local con límites documentados | Acceso y asignaciones conservados; 12 registros persistentes, inventario y guía; preparación pública y limpieza física pendientes |
-| P13 | Media | Tests/lint/build en CI | Pendiente | Workflow existente |
+| P13 | Media | Tests/lint/build en CI | Implementado con validación local | Instalación sin legacy, 261 pruebas, lint, build y actionlint aprobados; ejecución GitHub pendiente |
 | P14 | Media | Comprobar despliegue público | Pendiente | URL real; preferible tras P07/P12/P13 |
 | P15 | Alta | README de portafolio | Pendiente | Reflejar resultados de las tareas anteriores |
 | O01 | Opcional | E2E repetible | Sin iniciar | Solicitud explícita del usuario |
@@ -664,3 +664,115 @@ documental. Se reutilizan las 261 pruebas, lint, build y recorridos del mismo
 código, sin nuevas ejecuciones. Diff e índice revisados. Preparación pública,
 limpieza física y ensayo completo de restablecimiento conservan sus pendientes.
 P13 mantiene su estado pendiente.
+
+## P13 — Pruebas y lint como requisitos en CI (12 de noviembre de 2026)
+
+Ejecutado exclusivamente P13 sobre workspace inicialmente limpio. Se modifica
+[deploy-frontend.yml](../.github/workflows/deploy-frontend.yml). Los eventos
+`push` y `pull_request` ejecutan `checks` para todas las ramas; `push` también
+cubre tags. Sus pasos obligatorios y secuenciales son `npm ci`, `npm test`,
+`npm run lint -- --max-warnings=0` y `npm run build`. Un fallo detiene el job.
+Las pruebas Node existentes usan transporte controlado y el cargador SSR de
+Vite, con ejecución independiente del backend real.
+
+`deploy` depende de `checks` mediante `needs`, con la condición adicional
+`github.event_name == 'push' && github.ref == 'refs/heads/main'`. Así, el único
+despliegue habilitado corresponde a un push en main con checks aprobados.
+PR, pushes de otras ramas y tags ejecutan comprobaciones. Los secrets
+`REACT_ENV`, `DROPLET_HOST`, `DROPLET_USER` y `DROPLET_SSH_KEY` se referencian
+exclusivamente dentro del job de despliegue. Permisos del token automático
+limitados a `contents: read`, checkout con `persist-credentials: false` en ambos
+jobs y sin token de registro npm. El token automático de GitHub permite leer
+el repositorio durante checkout; las credenciales de despliegue solo pertenecen
+al job condicionado.
+
+Checks compila sin `.env` privado. Deploy realiza su propia instalación y
+compilación con `REACT_ENV`, escribe el contenido mediante variable de entorno
+y `printf`, empaqueta `dist.zip` y transfiere por SCP/SSH al destino existente.
+La expansión del secret queda en el entorno del paso. Las variables Vite se
+incorporan durante ese segundo build. Una compilación CI aprobada acredita la
+compilación genérica; la configuración efectiva de producción requiere su
+verificación de despliegue.
+
+### Versiones e instalación
+
+Node de ambos jobs queda fijado en **26.13.1**, parche LTS disponible en el
+índice oficial. npm distribuido con esa versión es **11.20.0**. Se comprobaron
+todas las restricciones `engines.node` del lockfile con semver, con cero
+incompatibilidades. Entre las dependencias resueltas figuran Vite **8.3.5**,
+plugin React **6.2.1** y Rolldown **1.2.16**, que requieren
+`^20.19.0 || >=22.12.0`; React/DOM **19.3.1**, TypeScript **5.8.2**, ESLint
+**9.37.0**, typescript-eslint **8.72.1**, React Router **7.18.5**, Query
+**5.107.1**, RHF **7.55.0**, resolvers **5.9.2**, Zod **4.6.7**, MUI **6.4.7**,
+Data Grid **7.27.3**, Date Pickers **8.14.0** y Recharts **3.3.0**. Las versiones
+proceden de `package-lock.json` v3.
+
+Se retira `--legacy-peer-deps` tras comprobar con npm **11.20.0** y configuración
+efectiva `legacy-peer-deps=false` un dry-run explícito y una instalación real
+aislada `npm ci --offline --no-audit --no-fund --legacy-peer-deps=false`.
+**285 paquetes instalados, exit 0**; `npm ls --all` también termina con 0.
+Las ausencias que enumera como `UNMET OPTIONAL DEPENDENCY` corresponden a
+integraciones/plataformas opcionales. El SHA256 del lockfile de la copia coincide
+con el original, sin cambios de manifiesto, lockfile o dependencias.
+La instalación CI usa `npm ci` y conserva la resolución de peers predeterminada.
+
+Actions revisadas en sus releases y manifiestos oficiales, fijadas por tags
+concretos. `actions/checkout` pasa de **v3** a **v7.0.1**; se añade
+`actions/setup-node@v7.1.0`; `appleboy/scp-action` pasa de **v0.1.3** a **v1.0.0**
+y `appleboy/ssh-action` de **v1.1.0** a **v1.2.5**. Se contrastaron los inputs
+empleados. Se sustituye `actions/cache@v3` por la caché npm integrada de
+setup-node en checks, ligada al lockfile. Esta guarda descargas npm. Deploy
+desactiva esa caché y realiza su instalación independiente.
+
+Context7 consultado para setup-node **v6.5.0**, última versión que ofreció el
+catálogo, y contrastado con el manifiesto oficial de **v7.1.0** para los inputs
+vigentes. Fuentes consultadas el 12 de noviembre de 2026.
+[setup-node](https://github.com/actions/setup-node/tree/v7.1.0),
+[checkout](https://github.com/actions/checkout/tree/v7.0.1),
+[SCP](https://github.com/appleboy/scp-action/tree/v1.0.0),
+[SSH](https://github.com/appleboy/ssh-action/tree/v1.2.5),
+[índice Node](https://nodejs.org/dist/index.json) y
+[npm ci](https://docs.npmjs.com/cli/v11/commands/npm-ci/).
+
+### Comprobaciones y límites
+
+- Copia temporal de los archivos versionados del workspace, sin `.env` local,
+  con la instalación limpia anterior. Entorno realmente ejecutado **Windows,
+  Node 26.13.0 y npm 11.20.0**. **261/261 pruebas aprobadas**, cero omitidas;
+  lint con cero advertencias y build correctos. El build y sus artefactos quedan
+  en la copia temporal, sin modificar el artefacto TypeScript del workspace.
+- **actionlint 1.7.12** descargado en temporal, validación del workflow final
+  con exit 0 mediante `actionlint -shellcheck= -pyflakes=`. ShellCheck y Pyflakes
+  desactivados por disponibilidad local. Análisis YAML con js-yaml y aserciones
+  de eventos, secuencia de comandos, dependencia, permisos, checkout y ausencia
+  de secrets/continuación tras error en checks aprobados. Cinco combinaciones
+  evento/ref evaluadas localmente dan el resultado esperado, incluidas PR con
+  ref main y push de tag. Esto verifica la estructura y expresión escrita.
+- Intento de descargar actionlint desde el sandbox bloqueado; descarga con
+  aprobación completada. Descarga del ejecutable Node **26.13.1** desde su
+  distribución oficial sin progreso, interrumpida. La ejecución local acredita
+  **26.13.0**; compatibilidad de **26.13.1** contrastada con `engines` y el índice
+  oficial, pendiente de ejecución exacta en Ubuntu/GitHub.
+- `git diff --check` y revisión del diff correctos. Logs locales en la carpeta
+  temporal `frontend-p13-peer-probe` (`install.log`, `peers.log`,
+  `tests-p13.log`, `lint-p13.log`, `build-p13.log`). Instalación desde la caché
+  npm local; disponibilidad del registro y paquetes nativos Linux pendientes
+  de una ejecución real en runner.
+- Ejecución de GitHub Actions, restauración de caché, secrets de producción,
+  transferencia SCP/SSH y configuración pública pendientes de comprobar. El
+  script remoto reemplaza dist mediante borrado/descompresión y tolera el fallo
+  del reinicio nginx con `|| true`; este procedimiento tiene límites de
+  atomicidad y diagnóstico. El despliegue actualizado requiere verificar sus
+  actions contra el servidor. Las protecciones de rama y checks requeridos
+  para autorizar merges pertenecen a la configuración de GitHub.
+
+Cambios locales preparados. Siguiente tarea **P14**, sin ejecutar. P15/O01/O02
+y los límites previos conservan su estado.
+
+Consolidación solicitada P13. `9c25c9b` registra el workflow; ambos progresos
+se consolidan en un segundo commit documental. Se reutilizan la instalación
+aislada, las 261 pruebas, lint, build y validaciones del mismo workflow, sin
+nuevas ejecuciones. Diff e índice revisados. El primer intento de preparar el
+índice quedó bloqueado por permisos de `.git`; el commit se creó con aprobación.
+Ejecución GitHub, Node 26.13.1 exacto y comprobación pública conservan sus
+pendientes. Sin push ni despliegue. P14 sigue sin ejecutar.

@@ -34,11 +34,13 @@ Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 La preparación posterior para presentar el proyecto tiene
 [prompts por tarea](portfolio-plan.md) y [progreso propio](portfolio-progress.md).
-P01–P12 están ejecutados; P08 añade recuperación de vistas, P09 navegación
+P01–P13 están ejecutados; P08 añade recuperación de vistas, P09 navegación
 desconocida y P10 identidad/panel de producto con escenarios controlados.
 P11 corrige barreras de interacción, móvil y contraste en recorridos representativos;
 no acredita conformidad WCAG completa. P12 prepara doce registros ficticios
-persistentes y verifica el recorrido con API local. P13 y posteriores siguen pendientes.
+persistentes y verifica el recorrido con API local. P13 configura checks y la
+dependencia del despliegue, con validación local; ejecución GitHub pendiente.
+P14 y posteriores siguen pendientes.
 P06 incorpora adaptación limitada del vacío inicial,
 con contrato backend todavía pendiente. P07 configura y verifica medios locales,
 sin acreditar limpieza física ni producción. El estado actualizado y sus límites
@@ -2261,3 +2263,42 @@ guía, inventario, informe y ambos progresos se consolidan por separado.
 Se reutilizan las verificaciones del mismo código, con diff e índice revisados.
 Preparación pública, limpieza física y ensayo completo de restablecimiento
 mantienen su estado pendiente. P13 sigue pendiente.
+
+## Portafolio P13 — Comprobaciones obligatorias en CI (12 de noviembre de 2026)
+
+Ejecutado solo P13. `deploy-frontend.yml` ejecuta instalación reproducible,
+261 pruebas actuales, lint con `--max-warnings=0` y build en push/PR.
+El job deploy requiere checks aprobados y exclusivamente push en main;
+sus secrets quedan en ese job. Token automático de lectura y checkout sin
+persistencia de credenciales. Build de checks sin `.env` privado; deploy
+compila con `REACT_ENV` antes del empaquetado y transferencia existentes.
+
+Node fijado en **26.13.1**, npm distribuido **11.20.0**; todas las restricciones
+Node del lockfile compatibles. Vite 8.3.5/plugin React 6.2.1, React 19.3.1,
+TypeScript 5.8.2 y ESLint 9.37.0 revisados. Checkout **v7.0.1**, setup-node
+**v7.1.0**, SCP **v1.0.0** y SSH **v1.2.5** contrastados con releases/manifiestos
+oficiales. Caché npm de checks mediante setup-node; deploy sin caché compartida.
+Context7 ofreció hasta setup-node v6.5.0, contrastado con documentación oficial
+v7.1.0. Versiones, fuentes y decisiones completas en
+[progreso P13](portfolio-progress.md#p13--pruebas-y-lint-como-requisitos-en-ci-12-de-noviembre-de-2026).
+
+Retirado `--legacy-peer-deps` tras dry-run e instalación limpia aislada con
+validación de peers explícita, **285 paquetes, exit 0**, y `npm ls --all` con 0.
+Lockfile idéntico por SHA256. Sin cambios de dependencias. En esa copia temporal,
+sin `.env` local, **261/261 pruebas**, lint con cero advertencias y build correctos
+con **Windows/Node 26.13.0/npm 11.20.0**. Artefactos generados en temporal.
+Actionlint **1.7.12**, análisis YAML/aserciones y cinco casos evento/ref aprobados;
+ShellCheck/Pyflakes desactivados. Diff revisado y sin errores de whitespace.
+
+Descarga temporal de Node 26.13.1 sin progreso, interrumpida; ejecución del
+parche exacto en Ubuntu y GitHub Actions pendiente. Instalación local usó caché
+npm; registro, nativos Linux, caché de Actions, secrets, SCP/SSH y build público
+sin acreditar. El procedimiento remoto tiene reemplazo no atómico y tolerancia
+del fallo de reinicio nginx. Detalles y logs temporales en el progreso enlazado.
+Siguiente **P14**, sin ejecutar; límites anteriores conservados.
+
+Consolidación solicitada P13. `9c25c9b` registra el workflow y ambos progresos
+se consolidan por separado. Verificaciones del mismo código reutilizadas;
+diff e índice revisados. Escritura de `.git` aprobada tras el bloqueo inicial
+del sandbox. Sin push ni despliegue; ejecución GitHub y Node 26.13.1 exacto
+pendientes. P14 sigue sin ejecutar.
