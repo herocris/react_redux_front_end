@@ -40,7 +40,8 @@ P11 corrige barreras de interacción, móvil y contraste en recorridos represent
 no acredita conformidad WCAG completa. P12 prepara doce registros ficticios
 persistentes y verifica el recorrido con API local. P13 configura checks y la
 dependencia del despliegue, con validación local; ejecución GitHub pendiente.
-P14 y posteriores siguen pendientes.
+P14 tiene revisión local y guía de despliegue, con verificación pública pendiente
+porque el propietario confirmó que aún carece de producción. P15 sigue pendiente.
 P06 incorpora adaptación limitada del vacío inicial,
 con contrato backend todavía pendiente. P07 configura y verifica medios locales,
 sin acreditar limpieza física ni producción. El estado actualizado y sus límites
@@ -2302,3 +2303,25 @@ se consolidan por separado. Verificaciones del mismo código reutilizadas;
 diff e índice revisados. Escritura de `.git` aprobada tras el bloqueo inicial
 del sandbox. Sin push ni despliegue; ejecución GitHub y Node 26.13.1 exacto
 pendientes. P14 sigue sin ejecutar.
+
+## Portafolio P14 — Revisión de despliegue (12 de noviembre de 2026)
+
+P14 parcial. El propietario confirmó que aún carece de producción. El candidato
+`crisdemo.xyz`, obtenido del enlace a documentación API del login, rechazó tres
+accesos Playwright MCP por HTTP/HTTPS, incluida `/api/documentation`.
+La correspondencia del candidato con el frontend queda sin confirmar.
+
+[Guía de despliegue](deployment-guide.md), [guía de demo](demo-guide.md) y
+`.env.template` actualizadas. Documentadas incorporación de variables al build,
+precedencias verificadas con Context7 Vite 8.3.5, diferencias local/producción,
+fallback SPA, bases raíz, API/CORS/cookies, medios y chunks. Nginx, secrets y
+servidor público permanecen sin acreditar. **261/261 pruebas**, lint con cero
+advertencias y dos builds completos aislados correctos. Las URLs localhost
+aparecen en el bundle compilado con `.env` local y faltan en el genérico.
+Se generan doce chunks separados de rutas, gráficos y mapa.
+
+La verificación pública de HTTPS, API/CORS, cookies, imágenes, recargas, chunks
+y consola/red queda pendiente de URL accesible. Cuenta demo pública sin usar.
+Detalles, logs y matriz en la guía y en [progreso de portafolio](portfolio-progress.md).
+Diff y enlaces revisados. Sin cambios de aplicación, infraestructura, datos,
+publicaciones o commits. P14 permanece parcial; P15/O01/O02 conservan su estado.

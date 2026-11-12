@@ -2,7 +2,7 @@
 
 ## Estado al 12 de noviembre de 2026
 
-**P01–P13 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 verifica navegación desconocida y P10 identidad/panel con simulación local. P11 audita y corrige flujos representativos de accesibilidad/móvil con simulación; no acredita conformidad WCAG completa. P12 prepara doce registros ficticios persistentes y verifica el recorrido con API local. P13 configura CI y verifica sus comandos y estructura localmente; ejecución en GitHub pendiente. P14 y posteriores siguen pendientes.** La preparación del
+**P01–P13 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 verifica navegación desconocida y P10 identidad/panel con simulación local. P11 audita y corrige flujos representativos de accesibilidad/móvil con simulación; no acredita conformidad WCAG completa. P12 prepara doce registros ficticios persistentes y verifica el recorrido con API local. P13 configura CI y verifica sus comandos y estructura localmente; ejecución en GitHub pendiente. P14 tiene revisión local y guía de despliegue. La verificación pública queda pendiente porque el propietario confirmó que aún carece de producción. P15 sigue pendiente.** La preparación del
 plan no ejecutó por sí misma ninguna tarea.
 Fuente: [portfolio-plan.md](portfolio-plan.md). Se conserva la refactorización
 cerrada en [refactor-progress.md](refactor-progress.md).
@@ -22,7 +22,7 @@ cerrada en [refactor-progress.md](refactor-progress.md).
 | P11 | Media | Móvil, aspecto y accesibilidad | Completado dentro del alcance representativo | 8 grupos de navegador, contraste de texto y 7 capturas; límites en informe P11 |
 | P12 | Alta | Datos y recorrido de demo | Completado en local con límites documentados | Acceso y asignaciones conservados; 12 registros persistentes, inventario y guía; preparación pública y limpieza física pendientes |
 | P13 | Media | Tests/lint/build en CI | Implementado con validación local | Instalación sin legacy, 261 pruebas, lint, build y actionlint aprobados; ejecución GitHub pendiente |
-| P14 | Media | Comprobar despliegue público | Pendiente | URL real; preferible tras P07/P12/P13 |
+| P14 | Media | Comprobar despliegue público | Parcial, revisión local realizada; producción pendiente | Propietario confirma que aún carece de producción; guía de despliegue y matriz pendientes |
 | P15 | Alta | README de portafolio | Pendiente | Reflejar resultados de las tareas anteriores |
 | O01 | Opcional | E2E repetible | Sin iniciar | Solicitud explícita del usuario |
 | O02 | Opcional | Flujos reales adicionales | Sin iniciar | Solicitud explícita del usuario |
@@ -776,3 +776,39 @@ nuevas ejecuciones. Diff e índice revisados. El primer intento de preparar el
 índice quedó bloqueado por permisos de `.git`; el commit se creó con aprobación.
 Ejecución GitHub, Node 26.13.1 exacto y comprobación pública conservan sus
 pendientes. Sin push ni despliegue. P14 sigue sin ejecutar.
+
+## P14 — Revisión de despliegue público (12 de noviembre de 2026)
+
+**Parcial. Verificación pública pendiente de disponer de producción.**
+El propietario confirmó que aún carece de ese entorno tras solicitar la URL.
+Se revisaron los cinco documentos de continuidad, configuración y código,
+con workspace inicialmente limpio. El enlace del login a documentación API
+permitió identificar `crisdemo.xyz` como candidato sin confirmar su uso como
+frontend. Playwright MCP intentó HTTPS y HTTP en raíz y HTTPS en
+`/api/documentation`; los tres accesos devolvieron `ERR_CONNECTION_REFUSED`.
+Se registra ese resultado observado y queda pendiente diagnosticar su causa.
+
+Preparadas [guía de despliegue](deployment-guide.md), actualización de
+[guía de demo](demo-guide.md) y comentarios de `.env.template` sobre compilación.
+Vite 8.3.5 verificado en lockfile y Context7 para la versión exacta. Revisadas
+precedencias `.env`, build genérico de checks y build con `REACT_ENV` de deploy,
+bases `/` de Vite/router, credenciales Axios y resolución de imágenes. La guía
+recoge fallback SPA, separación de API/medios/assets, estado HTTP de 404 cliente,
+caché/chunks y límites del reemplazo remoto existente. Configuración nginx y
+valores de producción siguen sin comprobar. El plan conserva su alcance.
+
+Verificación nueva, **261/261 pruebas**, cero omitidas/canceladas, lint con cero
+advertencias y dos builds completos aislados con exit 0. Build sin `.env` y
+build con `.env` local comparados; el segundo incorpora ambas URLs localhost
+en el JavaScript y el primero carece de ellas. Doce chunks de rutas, gráficos
+y mapa generados. Logs y reproducción en la guía. Estas comprobaciones locales
+mantienen pendiente acreditar transporte y entrega desde hosting público.
+
+Pendientes de URL accesible, HTTPS/certificado, API/CORS, atributos y persistencia
+de cookies, imágenes, recargas internas, chunks y consola/red funcionales.
+Cuenta demo pública sin utilizar y datos P12 acreditados únicamente en local.
+Enlace «Consultar API» pendiente de confirmar con el propietario del destino.
+Diff, enlaces locales y alcance documental revisados. Sin cambios de código de
+aplicación, infraestructura, escrituras de datos, publicaciones o commits.
+Siguiente acción de P14, recibir URL y retomar su matriz pública. P15/O01/O02
+y límites anteriores conservan su estado.

@@ -9,8 +9,12 @@ siguen en el formulario existente. Esta guía conserva esa cuenta y sus
 asignaciones.
 
 La preparación P12 se realizó en `http://localhost:5174`, con API
-`http://localhost/api` y medios `http://localhost/storage`. La URL pública
-y el funcionamiento del entorno publicado se comprobarán en P14.
+`http://localhost/api` y medios `http://localhost/storage`. En P14 el propietario
+confirmó que aún carece de producción. La verificación pública queda pendiente.
+El candidato `crisdemo.xyz`, enlazado desde el login para documentación API,
+rechazó las conexiones HTTP/HTTPS durante la comprobación. Configuración de
+build, fallback SPA, resultados y matriz pública pendientes en la
+[guía de despliegue P14](deployment-guide.md).
 
 Se añadieron **12 registros persistentes nuevos**, identificados con
 `DEMO_P12_V1`. Cuatro catálogos propios, dos decomisos y tres hijos de cada
