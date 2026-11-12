@@ -34,8 +34,9 @@ Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 La preparación posterior para presentar el proyecto tiene
 [prompts por tarea](portfolio-plan.md) y [progreso propio](portfolio-progress.md).
-P01–P05 están ejecutados; P06 incorpora adaptación limitada del vacío inicial,
-con contrato backend todavía pendiente. El estado actualizado y sus límites
+P01–P07 están ejecutados; P06 incorpora adaptación limitada del vacío inicial,
+con contrato backend todavía pendiente. P07 configura y verifica medios locales,
+sin acreditar limpieza física ni producción. El estado actualizado y sus límites
 están en el progreso de portafolio; su preparación no ejecuta por sí misma cambios.
 
 ## Decisiones acordadas
@@ -2091,3 +2092,39 @@ informe, evidencias JSON y progresos se consolidan por separado. Se reutilizan
 las 256 pruebas, lint, build y recorridos del mismo código, sin nueva ejecución.
 Diff e índice revisados. Sin push ni despliegue; contrato Laravel pendiente
 y P07 sin ejecutar.
+
+### P07 — Medios locales (12 de noviembre de 2026)
+
+Solo P07 de portafolio. Base confirmada por el usuario y GET real de archivo
+temporal: `http://localhost/storage`, 200/image/png también sin cookies. Variable
+resuelta en `.env` ignorado y documentada en `.env.template`. Helper compartido
+para logoColumn, PhotoInput y fotos de subdecomisos: URLs sin `undefined`,
+referencias intactas, fallback legible y liberación de object URLs conservada.
+No se cambian services, validación, contratos multipart ni medios existentes.
+
+**259/259 pruebas Node**, lint sin advertencias y build correctos. Playwright:
+7 grupos catálogo, 8 subdecomisos y 3 previews aprobados; entrega byte a byte,
+render tras recarga, edición sin reemplazo, reemplazo y fallback 403/404 de
+imagen. API real; solo fallback del catálogo simula imagen. Capturas inspeccionadas,
+cero excepciones reales finales; avisos de opciones MUI/Canvas2D documentados.
+Recorrido histórico de controles compartidos falló en fecha antes de fotos;
+no se declara aprobado. Cobertura de PhotoInput aislada aprobada.
+
+Nueve registros propios eliminados, listas de hijos vacías y comprobación final
+cero padres/drogas P07. Un rechazo de borrado seguido de vacío quedó verificado
+por relectura; causa inicial desconocida. **Limpieza física no acreditada:** PNG
+del sondeo sigue accesible con 200 tras borrar registro. Archivo inexistente bajo
+`/storage` responde 403; se distingue de configuración frontend. Backend y
+producción no modificados. Detalle, incidencias y evidencia en
+[backend P07](verification-backend-real-2026-11-10.md#p07--medios-públicos-12-de-noviembre-de-2026),
+[JSON P07](verification-media-p07-results-2026-11-12.json) y
+[progreso de portafolio](portfolio-progress.md#p07--configuración-y-renderizado-de-medios-12-de-noviembre-de-2026).
+Artefacto TypeScript restaurado; sin nuevas dependencias, commits ni despliegues.
+P08 sin ejecutar; los 16 pasos originales permanecen cerrados.
+
+Consolidación solicitada: `f179e3e` registra implementación, plantilla y pruebas
+de P07. Informe, evidencia JSON y progresos se consolidan por separado. Las
+259 pruebas, lint, build y recorridos del mismo código se reutilizan sin nueva
+ejecución. Diff e índice revisados; `.env` local permanece ignorado. Sin push
+ni despliegue; límites de servidor/limpieza y recorrido histórico conservados.
+P08 sin ejecutar.

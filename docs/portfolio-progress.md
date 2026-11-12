@@ -2,7 +2,7 @@
 
 ## Estado al 12 de noviembre de 2026
 
-**P01–P05 ejecutados. P05 verifica revocación real y aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel de respuesta anónima sin Accept JSON. Las demás tareas siguen sin ejecutar.** La preparación del
+**P01–P07 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 y posteriores siguen sin ejecutar.** La preparación del
 plan no ejecutó por sí misma ninguna tarea.
 Fuente: [portfolio-plan.md](portfolio-plan.md). Se conserva la refactorización
 cerrada en [refactor-progress.md](refactor-progress.md).
@@ -15,7 +15,7 @@ cerrada en [refactor-progress.md](refactor-progress.md).
 | P04 | Alta | Permisos en rutas, menú y acciones | Implementado y verificado con simulación; integración real selectiva nueva en P05 | Drogas/permisos con sesión temporal; resto de perfiles/dependencias reales sin repetir |
 | P05 | Alta | Revocación durante sesión abierta | Completado | Política viva, 231 pruebas, 11 grupos simulados, 6 reales y regresión P03; ajuste Laravel anónimo documentado |
 | P06 | Alta | Paginación de sublistas vacías | Implementado con adaptación limitada; contrato backend pendiente | Vacío inicial acreditado; fuera de rango conserva total; informe P06 |
-| P07 | Alta | Configuración y renderizado de imágenes | Pendiente | URL pública real de medios |
+| P07 | Alta | Configuración y renderizado de imágenes | Completado en local con límites documentados | Base confirmada y 200; conservación/reemplazo/fallback verificados; limpieza física no acreditada |
 | P08 | Media | Recuperación de errores de render/lazy | Pendiente | Mantener carga diferida |
 | P09 | Media | Página no encontrada | Pendiente | Integrar con P03/P04 si están implementados |
 | P10 | Alta | Identidad y dashboard de producto | Pendiente | Considerar permisos de P04 |
@@ -53,8 +53,9 @@ a preparar datos ficticios y documentar el recorrido existente.
   la intención de la política de roles sigue siendo decisión del backend.
 - Pendientes confirmados en la revisión previa: variable de imágenes ausente,
   metadatos omitidos en sublistas vacías, tipos string frente a IDs numéricos.
-  P02 resuelve la discrepancia de IDs con evidencia actual y OpenAPI; imágenes
-  y sublistas quedan pendientes. Comprobar vigencia antes de implementarlas.
+  P02 resuelve la discrepancia de IDs con evidencia actual y OpenAPI; P06 adapta
+  solo el vacío inicial y mantiene pendiente el contrato backend. P07 configura
+  y verifica las imágenes locales; limpieza física y entrega de producción sin acreditar.
 - P04 integra permisos efectivos en rutas/menú/acciones. P05 implementa renovación
   en vivo y verifica integración real selectiva con la cuenta temporal. Actualmente
   el refresh anónimo JSON devuelve 401; sin Accept JSON se reproduce el 500 por
@@ -401,3 +402,54 @@ informe, evidencias JSON y ambos progresos se consolidan por separado. Se
 reutilizan las 256 pruebas, lint, build y recorridos del mismo código, sin nueva
 ejecución. Diff e índice revisados. Sin push ni despliegue; contrato Laravel
 pendiente y P07 sin ejecutar.
+
+### P07 — Configuración y renderizado de medios (12 de noviembre de 2026)
+
+Ejecutado solo P07. El usuario confirma `http://localhost/storage`; subida
+temporal y GET 200/image/png acreditan la base, también sin cookies. `.env`
+local resuelto (ignorado), variable documentada sin secretos en `.env.template`.
+`getMediaUrl` centraliza resolución para logoColumn, PhotoInput y subdecomisos;
+sin base/referencia válida no hay petición `undefined`. Respeta referencias
+relativas/absolutas y conserva los valores originales de RHF/payloads. Fallbacks
+con inicial/icono y referencia eliminable aunque no pueda cargar; validadores,
+multipart y revocación de object URLs conservados.
+
+**259/259 pruebas Node**, lint sin advertencias, build, sintaxis y diff correctos.
+Playwright MCP operativo: **7 grupos catálogo** (creación, recarga, conservación,
+reemplazo y recuperación), **8 grupos subdecomisos** (tres services y paneles,
+incluido guardado UI de droga) y **3 grupos de ciclo de previews** aprobados.
+GET de PNG coincide byte a byte; imágenes decodificadas y capturas locales
+inspeccionadas. Solo se simulan respuestas de imagen 403/404 en el bloque de
+fallback del catálogo; API real y resto de recorridos sin interceptaciones.
+Cero excepciones en recorridos reales finales. Avisos MUI de opciones al cargar
+arma/munición y Canvas2D registrados; sin ampliar alcance para corregirlos.
+
+Diferencia acreditada: variable ausente es configuración frontend; archivo
+inexistente bajo `/storage` devuelve **403** del servidor, no fallo de variable
+ni prueba de permiso API revocado. Fuera de esa base devuelve 404. Se retienen
+referencias ante ambos códigos. No se modifica Laravel ni medios existentes.
+
+**Nueve registros temporales limpiados**, incluidos intentos iniciales; tres
+listas de hijos vacías y comprobación independiente cero drogas/padres P07.
+Un borrado rechazó inicialmente aunque una lectura posterior ya estaba vacía;
+causa sin determinar y script de limpieza adaptado a releer sin repetir writes.
+No se acredita limpieza física: el PNG del sondeo sigue público con 200 tras
+borrar su registro. Auditoría conservada. Sin acceso al disco backend; entrega
+de producción tampoco verificada.
+
+Intento del recorrido histórico de controles compartidos falla en la aserción
+de fecha antes de fotos (`format is not a function`); no se cuenta como aprobado.
+Cobertura específica PhotoInput ejecutada con éxito. Incidencias iniciales de
+selectores/firmas y supuesto 404, evidencia y límites de versiones en
+[informe backend P07](verification-backend-real-2026-11-10.md#p07--medios-públicos-12-de-noviembre-de-2026)
+y [JSON P07](verification-media-p07-results-2026-11-12.json).
+Artefacto TypeScript restaurado, sin dependencias nuevas, commits ni despliegues.
+Siguiente disponible **P08**, sin ejecutar; resto de pendientes conservados.
+
+Consolidación solicitada: `f179e3e` contiene implementación, plantilla y pruebas
+de P07. Informe, evidencia JSON y ambos progresos se consolidan en un commit
+documental separado. Se reutilizan las 259 pruebas, lint, build y recorridos del
+mismo código, sin nueva ejecución. Diff e índice revisados; `.env` local sigue
+ignorado. Sin push ni despliegue; limpieza física no acreditada, respuesta 403
+de archivos ausentes y fallo del recorrido histórico de fechas documentados.
+P08 permanece sin ejecutar.

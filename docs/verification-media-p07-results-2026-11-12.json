@@ -1,0 +1,122 @@
+{
+  "task": "P07",
+  "date": "2026-11-12",
+  "environment": {
+    "frontend": "http://localhost:5174",
+    "api": "http://localhost/api",
+    "mediaBase": "http://localhost/storage",
+    "confirmation": "User confirmed Laravel public media URL; temporary upload and anonymous GET verified it",
+    "localEnvironmentConfigured": true,
+    "environmentTemplateDocumented": true,
+    "backendModified": false
+  },
+  "automated": {
+    "node": { "passed": 259, "failed": 0, "cancelled": 0, "skipped": 0 },
+    "directedMediaAndValidation": { "passed": 14, "failed": 0, "includedInFullSuite": true },
+    "lint": "PASS: --max-warnings 0",
+    "build": "PASS",
+    "browserScriptSyntax": "PASS"
+  },
+  "browser": {
+    "catalogFinal": {
+      "script": "tests/browser/media-catalog-real.js",
+      "passedGroups": 7,
+      "pageErrors": [],
+      "realCases": [
+        "UI create with File preview and object URL release",
+        "PNG delivered as image/png with exact uploaded bytes and decoded at 32x32",
+        "Full reload renders saved image",
+        "Edit without File preserves exact reference",
+        "Replacement changes reference, delivers new bytes and renders after reload",
+        "Recovery after removing simulated image routes and no /undefined/ resource URLs"
+      ],
+      "simulatedCases": [
+        "HTTP 403 image only: logo initial and PhotoInput icon; image control retained",
+        "HTTP 404 image only: logo initial and PhotoInput icon; image control retained"
+      ],
+      "apiResponsesSimulated": false,
+      "imageRoutesRemoved": true,
+      "cleanup": { "domain": "drug", "id": 28, "removed": true }
+    },
+    "subconfiscation": {
+      "script": "tests/browser/media-subconfiscation-real.js",
+      "passedGroups": 8,
+      "pageErrors": [],
+      "apiOrImageResponsesSimulated": false,
+      "domains": ["drugConfiscation", "weaponConfiscation", "ammunitionConfiscation"],
+      "serviceCasesPerDomain": [
+        "Create PNG and deliver exact bytes with 200/image/png",
+        "Update without File keeps exact reference",
+        "Replacement changes reference and persists on read",
+        "Deliver replacement exact bytes with 200/image/png"
+      ],
+      "uiCases": [
+        "All three panels render list photo and existing PhotoInput preview",
+        "Drug child UI save without replacement returns to rendered list",
+        "Full reload renders saved child photo; no /undefined/ resources"
+      ],
+      "successfulMediaGets": 6,
+      "warnings": [
+        "MUI out-of-range selection during initial empty option loading for weapon/ammunition",
+        "Canvas2D willReadFrequently advisory from map"
+      ],
+      "initialCleanupRejection": {
+        "domain": "ammunitionConfiscation",
+        "id": 1004,
+        "cause": "Undetermined",
+        "independentListAfterRejection": "empty",
+        "subsequentManualDelete": "404: resource does not exist",
+        "finalState": "absent; parent removed after all three child lists independently read empty"
+      }
+    },
+    "previewControls": {
+      "script": "tests/browser/media-preview-controls.js",
+      "passedGroups": 3,
+      "cases": [
+        "Unavailable photo keeps exact RHF reference and removable placeholder",
+        "Multiple photo removal preserves next File and revokes superseded URL",
+        "Unmount releases every remaining object URL"
+      ],
+      "recordsCreated": 0,
+      "httpInterception": false
+    },
+    "screenshotsInspected": [
+      ".playwright-mcp/p07-catalog.png",
+      ".playwright-mcp/p07-fallback.png",
+      ".playwright-mcp/p07-subconfiscation.png"
+    ],
+    "historicalSharedControlsAttempt": {
+      "script": "tests/browser/shared-form-controls.js",
+      "result": "FAIL before photo cases",
+      "error": "format is not a function in date assertion",
+      "countedAsPassed": false,
+      "fixtureDisposed": true
+    },
+    "preparationFailures": [
+      "SVG title selector not visible; corrected to image role",
+      "Assumed missing image 404; actual storage route returned 403",
+      "Test helper initially used nested-list signature for catalog; corrected"
+    ]
+  },
+  "serverDiagnostics": {
+    "temporaryExistingMedia": { "status": 200, "contentType": "image/png", "bytesEqualUploaded": true },
+    "nonexistentStorageFile": { "status": 403, "contentType": "application/json", "internalCauseKnown": false },
+    "sameRelativePathWithoutStorageBase": { "status": 404, "contentType": "application/json" },
+    "anonymousMediaAfterProbeRecordDeletion": { "status": 200, "contentType": "image/png" },
+    "frontendMissingOrInvalidBase": "Unit-tested: absent src, no URL containing undefined; stored value unchanged",
+    "physicalCleanupVerified": false,
+    "physicalCleanupLimit": "No Laravel filesystem access. Probe PNG remains publicly accessible after its record is removed.",
+    "productionDeliveryVerified": false
+  },
+  "cleanup": {
+    "recordsCreatedAcrossAttempts": 9,
+    "recordsRemovedAcrossAttempts": 9,
+    "drugIds": [25, 26, 27, 28],
+    "parentIds": [5026, 5027],
+    "childIds": { "drugConfiscation": [1026], "weaponConfiscation": [1004], "ammunitionConfiscation": [1004] },
+    "independentChildListsBeforeParentRemoval": { "drugConfiscation": 0, "weaponConfiscation": 0, "ammunitionConfiscation": 0 },
+    "finalPrefixCheck": { "prefix": "PORTFOLIO_P07_", "drugs": 0, "parents": 0 },
+    "auditRetained": true,
+    "preexistingMediaFilesModified": false
+  }
+}

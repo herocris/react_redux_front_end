@@ -6,7 +6,11 @@ URL, pruebas y límites en [el informe P02](verification-identifiers-p02-2026-11
 Actualización P06 (12 de noviembre): nueva comprobación de los tres endpoints,
 adaptación limitada del vacío inicial y respuesta mínima solicitada a Laravel
 al final de este informe. La omisión de metadatos del backend sigue pendiente;
-no se considera resuelto el contrato completo. Imágenes continúa en P07.
+no se considera resuelto el contrato completo.
+Actualización P07 (12 de noviembre): base de medios confirmada y configurada,
+entrega/renderizado y conservación/reemplazo comprobados. Véase P07 al final:
+los archivos inexistentes bajo `/storage` pueden responder 403 y no se acredita
+limpieza física; un PNG temporal sigue accesible tras borrar su registro.
 El contenido siguiente conserva la evidencia histórica.
 
 ## Entorno y alcance
@@ -253,3 +257,116 @@ padre del recorrido UI; también dos padres del intento con tamaño 1 y uno del
 primer intento UI. Consulta final independiente por observación: cero padres
 `PORTFOLIO_P06_`. Se conserva auditoría; no se acredita eliminación física de
 imágenes. Sin commits, despliegues ni cambios fuera de P06.
+
+## P07 — Medios públicos (12 de noviembre de 2026)
+
+Solo P07, con API real `http://localhost/api` y Vite en 5174. El usuario confirma
+la base configurada por Laravel: **`http://localhost/storage`**. No se deduce
+del nombre del framework. OpenAPI actual no documenta endpoints de medios;
+la confirmación se contrasta con una subida temporal: referencia relativa
+`drug/<nombre>.png`, GET público 200, `Content-Type: image/png`. La misma
+referencia sin `/storage` responde 404. Un contexto independiente sin cookies
+también recibe el PNG con 200. No se cambió configuración/código de Laravel.
+
+### Cambio frontend y contrato
+
+- `.env` local (ignorado por Git) y [.env.template](../.env.template) definen
+  `VITE_LOCAL_PHOTOS_URL=http://localhost/storage`. Comprobado en el módulo
+  servido por Vite, junto con `VITE_API_URL=http://localhost/api`. La plantilla
+  explica base por entorno, reinicio y carácter público de las variables VITE_.
+- [getMediaUrl](../src/helpers/getMediaUrl.ts) resuelve referencias relativas
+  contra esa base, respeta URLs HTTP(S) absolutas y rutas desde la raíz del
+  mismo origen (sin duplicar `/storage`). Normaliza barras/escape para mostrar,
+  sin modificar referencias en RHF ni payloads. Sin referencia/base válida
+  devuelve `undefined` como ausencia de `src`, nunca la cadena `undefined`.
+- `logoColumn`, `PhotoInput` y `ListSubConfiscation` usan ese helper. El logo
+  toma descripción/nombre como alternativa legible; los otros muestran icono
+  «Imagen no disponible». Avatar administra el fallo de carga. Una referencia
+  sin preview permanece en RHF y conserva su control de eliminación; no se
+  confunde con ausencia de archivo. Se conservan índices de imágenes múltiples.
+- No cambian services, validadores, límite 5.000.000 bytes, rechazo de vacíos,
+  multipart ni `_method=PUT`. Los archivos nuevos siguen usando object URLs,
+  revocadas al cambiar el valor y al desmontar.
+
+### Resultados nuevos
+
+**259/259 pruebas Node**, incluidas resolución/configuración y las pruebas
+vigentes de los siete validadores y multipart. Lint con cero advertencias,
+build y sintaxis de los tres recorridos nuevos correctos. No se añaden paquetes.
+Artefacto TypeScript generado restaurado; diff comprobado.
+
+- [Catálogo real](../tests/browser/media-catalog-real.js): **7 grupos aprobados**.
+  Crear droga por UI con PNG azul, comprobar preview blob y su liberación,
+  guardar/recargar y decodificar imagen de 32×32. GET devuelve exactamente los
+  bytes subidos. Editar descripción conserva referencia exacta. Reemplazar por
+  PNG rojo cambia referencia, entrega los nuevos bytes y renderiza tras recarga.
+  Interceptaciones **solo de imagen** para casos señalados 403/404: inicial del
+  logo e icono de PhotoInput visibles, valor/control conservado y recuperación
+  al retirar la ruta. No se simula ninguna respuesta de API en este recorrido.
+- [Subdecomisos reales](../tests/browser/media-subconfiscation-real.js): **8
+  grupos aprobados**. Cada uno de los tres services crea con PNG, conserva la
+  referencia al editar sin archivo, reemplaza y relee su nueva referencia;
+  seis GET entregan los bytes esperados con 200/image/png. Los tres paneles
+  muestran foto de lista y preview existente; droga se guarda además por UI
+  sin reemplazo y vuelve a la lista. Recarga completa vuelve a mostrar la foto.
+  Sin interceptaciones de red en este recorrido.
+- [Previews aisladas](../tests/browser/media-preview-controls.js): **3 grupos
+  aprobados**. Referencia no disponible intacta en RHF, eliminación correcta en
+  una lista referencia/File y revocación de todas las object URLs al actualizar
+  y desmontar. No crea registros. La respuesta de imagen no disponible es real.
+- Cero excepciones de página en los dos recorridos reales finales. Capturas
+  locales inspeccionadas: `.playwright-mcp/p07-catalog.png`, `p07-fallback.png`
+  y `p07-subconfiscation.png`. Muestran respectivamente PNG azul, fallback y
+  PNG naranja. No se solicitan rutas `/undefined/` en las recargas comprobadas.
+
+Evidencia saneada: [resultados P07](verification-media-p07-results-2026-11-12.json).
+Los errores de consola de imagen 403/404 son esperados en los fallbacks. En
+subdecomisos aparecen avisos MUI de opciones aún vacías al abrir arma/munición
+y Canvas2D del mapa; no son fallos de entrega ni se corrigen fuera de P07.
+
+### Diagnóstico y límites de servidor
+
+| Situación | Evidencia actual | Interpretación y acción |
+| --- | --- | --- |
+| Variable ausente o base inválida | Pruebas del helper: no hay URL de imagen | Configuración frontend; definir base y recargar/reiniciar Vite. No deducir una ruta de la API. |
+| Archivo subido temporal existente | GET 200/image/png, bytes iguales y `img.decode()` correcto | Base y entrega local verificadas. |
+| Archivo ficticio inexistente bajo `/storage/drug/…` | GET **403** application/json | Respuesta del servidor de archivos/ruta, no variable ausente ni prueba de revocación de permisos API. No se conoce su causa interna sin acceso Laravel. |
+| Misma ruta relativa fuera de `/storage` | GET 404 application/json | Base/ruta incorrecta; no demuestra que la subida haya fallado. |
+| Imagen responde 403 o 404 | Ambos códigos controlados en navegador | Fallback, conservando la referencia; no repetir escritura ni enviar la imagen a través del interceptor de sesión API. |
+
+Para backend queda revisar la respuesta de archivos ausentes y la política de
+retención: no se puede inferir existencia por 403, ni atribuirlo a permisos del
+filesystem. No se modifican enlaces, permisos ni archivos de medios existentes.
+Esto verifica HTTP local; no acredita entrega HTTPS/CDN de producción.
+
+**Limpieza:** eliminados los nueve registros propios de todas las ejecuciones:
+sondeo droga 25; drogas UI 26, 27 y 28; padres 5026 y 5027; hijos droga 1026,
+arma 1004 y munición 1004. Tres listas por padre vacías antes de borrar 5027;
+comprobación independiente final: cero drogas y cero padres `PORTFOLIO_P07_`.
+La primera promesa de borrado de munición rechazó; la lectura posterior ya
+devuelve vacío y un intento manual posterior respondió 404. No se conoce la
+causa de ese rechazo inicial. El script ahora relee antes de decidir limpieza,
+sin repetir automáticamente escrituras. Auditoría conservada.
+
+**Limpieza física no acreditada.** Después de eliminar la droga 25, su PNG del
+sondeo sigue devolviendo **200 a un contexto sin cookies**. Esto confirma que
+ese archivo sigue accesible públicamente; no hay acceso al filesystem Laravel
+para inspeccionar/eliminar bytes o acreditar la limpieza de los demás archivos.
+No se declara que borrar registros o reemplazar fotos borre archivos físicos.
+
+Incidencias de preparación: selector del `<title>` SVG sustituido por rol de
+imagen; supuesto 404 de archivo ausente corregido al observar 403; firma de
+listado del helper de prueba corregida. Fixtures de esos intentos limpiados;
+resultados finales anteriores separados de intentos fallidos. El recorrido
+histórico `shared-form-controls.js` también se intentó y falló antes del bloque
+de foto en una aserción de fecha (`format is not a function`); no se cuenta
+como aprobado ni se cambia su flujo ajeno a P07. La cobertura de foto se ejecutó
+en el recorrido aislado nuevo con éxito.
+
+Context7 cubre Vite **8.3.5** exacto: [variables públicas y reinicio](https://github.com/vitejs/vite/blob/v8.3.5/docs/guide/env-and-mode.md).
+Para MUI instalado **6.4.7** ofrece la documentación oficial v6, sin ese patch
+exacto: [fallback de Avatar](https://v6.mui.com/material-ui/react-avatar/#fallbacks),
+contrastado con `node_modules/@mui/material/Avatar/Avatar.js` resuelto localmente.
+React 19.3.1/RHF 7.55.0 permanecen; no se altera su API ni la política de sesión.
+Skill React aplicada a derivación de URLs y limpieza de recursos, sin cambios
+de arquitectura. Sin commits, despliegues ni avance a P08; P06 backend permanece.
