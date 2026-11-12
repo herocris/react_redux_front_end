@@ -2,7 +2,7 @@
 
 ## Estado al 12 de noviembre de 2026
 
-**P01–P07 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 y posteriores siguen sin ejecutar.** La preparación del
+**P01–P08 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 y posteriores siguen sin ejecutar.** La preparación del
 plan no ejecutó por sí misma ninguna tarea.
 Fuente: [portfolio-plan.md](portfolio-plan.md). Se conserva la refactorización
 cerrada en [refactor-progress.md](refactor-progress.md).
@@ -16,7 +16,7 @@ cerrada en [refactor-progress.md](refactor-progress.md).
 | P05 | Alta | Revocación durante sesión abierta | Completado | Política viva, 231 pruebas, 11 grupos simulados, 6 reales y regresión P03; ajuste Laravel anónimo documentado |
 | P06 | Alta | Paginación de sublistas vacías | Implementado con adaptación limitada; contrato backend pendiente | Vacío inicial acreditado; fuera de rango conserva total; informe P06 |
 | P07 | Alta | Configuración y renderizado de imágenes | Completado en local con límites documentados | Base confirmada y 200; conservación/reemplazo/fallback verificados; limpieza física no acreditada |
-| P08 | Media | Recuperación de errores de render/lazy | Pendiente | Mantener carga diferida |
+| P08 | Media | Recuperación de errores de render/lazy | Completado con escenarios controlados | Frontera de vistas, recuperación explícita y carga diferida verificadas; informe P08 |
 | P09 | Media | Página no encontrada | Pendiente | Integrar con P03/P04 si están implementados |
 | P10 | Alta | Identidad y dashboard de producto | Pendiente | Considerar permisos de P04 |
 | P11 | Media | Móvil, aspecto y accesibilidad | Pendiente | Preferible después de P03–P10 |
@@ -453,3 +453,36 @@ mismo código, sin nueva ejecución. Diff e índice revisados; `.env` local sigu
 ignorado. Sin push ni despliegue; limpieza física no acreditada, respuesta 403
 de archivos ausentes y fallo del recorrido histórico de fechas documentados.
 P08 permanece sin ejecutar.
+
+## P08 — Frontera y recuperación de vistas (12 de noviembre de 2026)
+
+Completado exclusivamente P08. `ViewErrorBoundary.tsx` envuelve Suspense/Routes
+en `AppRouter`, conservando proveedores, coordinación de sesión y lazy. Fallback
+genérico accesible con foco, alerta, un reintento local, recarga manual, otra
+vista permitida y logout. Navegación/revisión de sesión reinician la frontera;
+ninguna recarga automática. No se muestran excepciones ni se cambian errores
+HTTP de Query. Sin nuevas dependencias, runner, monitorización o despliegues.
+
+Verificación nueva: **259/259 pruebas**, lint sin advertencias, build aprobado y
+diff revisado. Playwright MCP sobre preview producción: cuatro grupos P08
+aprobados (render persistente/transitorio, rechazo de import y recuperación,
+HTTP separado, móvil/logout), sin pageErrors. Regresión lazy de seis grupos
+aprobada a 1280×900, sin errores inesperados. Primer intento agotó una aserción
+de mapa >300 px con mapa de 298 px; diagnóstico y repetición documentados, sin
+ampliar alcance a mapas. Captura móvil revisada. Artefacto TypeScript restaurado.
+
+Informe y recorrido reproducible:
+[P08](verification-view-errors-p08-2026-11-12.md),
+`tests/browser/view-error-boundary.js`. Imports rechazados quedan cacheados por
+React: reintento local no garantiza descargarlos; recarga requiere pulsación.
+Edición local desmontada puede perderse; proveedores no se remontan. No cubre
+bootstrap, proveedores superiores, fallback propio o callbacks asíncronos
+arbitrarios; pruebas de sesión/API simuladas, sin acreditar hosting real ni
+auditoría completa de accesibilidad. Límites previos conservados.
+Siguiente disponible: **P09**, sin ejecutar.
+
+Consolidación solicitada: `d06ad3f` registra implementación y recorrido P08.
+Informe y ambos progresos se consolidan en un segundo commit documental.
+Se reutilizan las verificaciones del mismo código: 259 pruebas, lint, build y
+recorridos descritos; sin repetirlas por cambios exclusivamente documentales.
+Diff e índice revisados. Sin push ni despliegue; P09 sigue sin ejecutar.

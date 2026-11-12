@@ -34,7 +34,8 @@ Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 La preparación posterior para presentar el proyecto tiene
 [prompts por tarea](portfolio-plan.md) y [progreso propio](portfolio-progress.md).
-P01–P07 están ejecutados; P06 incorpora adaptación limitada del vacío inicial,
+P01–P08 están ejecutados; P08 añade recuperación de vistas con escenarios controlados.
+P06 incorpora adaptación limitada del vacío inicial,
 con contrato backend todavía pendiente. P07 configura y verifica medios locales,
 sin acreditar limpieza física ni producción. El estado actualizado y sus límites
 están en el progreso de portafolio; su preparación no ejecuta por sí misma cambios.
@@ -2128,3 +2129,27 @@ de P07. Informe, evidencia JSON y progresos se consolidan por separado. Las
 ejecución. Diff e índice revisados; `.env` local permanece ignorado. Sin push
 ni despliegue; límites de servidor/limpieza y recorrido histórico conservados.
 P08 sin ejecutar.
+
+## P08 — Recuperación de vistas (12 de noviembre de 2026)
+
+Paso posterior exclusivo de portafolio; no reabre los 16 pasos cerrados.
+Frontera alrededor de Suspense/Routes, bajo los proveedores y la coordinación
+de sesión. Mensaje accesible sin datos de excepción, foco, un reintento local,
+recarga explícita, navegación permitida y cierre de sesión; sin bucles automáticos.
+Query conserva su UI HTTP y las rutas conservan carga diferida.
+
+259/259 pruebas nuevas ejecutadas, lint y build aprobados. Playwright MCP con
+build producción/API simulada: cuatro grupos P08 aprobados y regresión lazy
+de seis grupos aprobada en escritorio; móvil revisado. Primer intento de la
+regresión agotó aserción de ancho del mapa (298 px); repetición a 1280×900
+aprobada, sin cambios de mapa. Detalles, archivos, límites de frontera,
+rechazo lazy cacheado, pérdida posible de edición y consola esperada en
+[informe P08](verification-view-errors-p08-2026-11-12.md).
+Artefacto TypeScript restaurado; sin instalaciones, commits ni despliegues.
+Siguiente tarea P09 sin ejecutar; límites previos conservados. Estado completo
+en [progreso de portafolio](portfolio-progress.md).
+
+Consolidación solicitada de P08: `d06ad3f` contiene implementación y recorrido;
+informe y ambos progresos se registran en un segundo commit documental.
+Verificaciones del mismo código reutilizadas, diff e índice revisados.
+Sin push ni despliegue; P09 permanece sin ejecutar.
