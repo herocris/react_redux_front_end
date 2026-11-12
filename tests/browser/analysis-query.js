@@ -14,7 +14,7 @@ async (page) => {
             body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=', 'base64') });
         if (!['fetch', 'xhr'].includes(request.resourceType())) return route.fallback();
         if (url.pathname.endsWith('/refresh')) return route.fulfill({ json: {
-            user: { name: 'Fixture', email: 'fixture@example.test' }, roles: [], permissions: [],
+            user: { name: 'Fixture', email: 'fixture@example.test' }, roles: [], permissions: ["graph","map","drug","weapon","ammunition"].flatMap(domain => (['dashboard', 'graph', 'map', 'activity'].includes(domain) ? ['view'] : ['view', 'create', 'update', 'delete']).map(action => domain + '.' + action)),
         } });
         if (url.pathname.endsWith('/logout')) return route.fulfill({ json: {} });
         if (url.pathname.endsWith('GraphIndex') || url.pathname.endsWith('/confiscation/map')) {

@@ -13,7 +13,7 @@ export const useRoleView = () => {
   const [activeRole, setActiveRole] = useState<Role>({ nombre: '', permisos: [] });
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-  const { permisos, permissionOptionsQuery } = usePermissionOptions();
+  const { permisos, permissionOptionsQuery } = usePermissionOptions(open);
   const client = useQueryClient();
   const listOptions = roleListOptions({
     page: paginationModel.page + 1, per_page: paginationModel.pageSize,

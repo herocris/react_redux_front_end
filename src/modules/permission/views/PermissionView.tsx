@@ -1,3 +1,4 @@
+import { useAccess } from '../../auth/hooks/useAccess';
 import { ApiRequestError } from '../../../components/ApiRequestError';
 import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import type { GridColDef } from '@mui/x-data-grid';
@@ -14,6 +15,7 @@ const columns: GridColDef<PermissionEntity>[] = [
 ];
 
 export const PermissionView = () => {
+  const access = useAccess('permission');
   const {
     DeletePermission,
     paginationModel, sortModel, filterModel,
@@ -39,8 +41,8 @@ export const PermissionView = () => {
           paginationModel={paginationModel} sortModel={sortModel} filterModel={filterModel}
           onPaginationModelChange={onPaginationModelChange}
           onSortModelChange={onSortModelChange} onFilterModelChange={onFilterModelChange}
-          onEdit={onEdit} onDelete={onDelete} />
-        {open &&
+          onEdit={access.update ? onEdit : undefined} onDelete={access.delete ? onDelete : undefined} />
+        {open && (activePermission?.id === undefined ? access.create : access.update) &&
           <PermissionFormModal
             handleOpen={handleOpen}
             loading={loading}
@@ -54,7 +56,7 @@ export const PermissionView = () => {
             <PermissionError message={errorMessage} />
           </ConfirmDialog>
         }
-        <AddFloatingButton handleOpen={handleOpen} />
+        {access.create && <AddFloatingButton handleOpen={handleOpen} />}
       </GrapLayout>
     </>
   )

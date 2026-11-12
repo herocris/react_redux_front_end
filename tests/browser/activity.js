@@ -27,7 +27,7 @@ async (page) => {
             if (request.resourceType() === 'image') return route.fulfill({ contentType: 'image/png', body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=', 'base64') });
             if (!['fetch', 'xhr'].includes(request.resourceType())) return route.fallback();
             const url = new URL(request.url());
-            if (url.pathname.endsWith('/refresh')) return route.fulfill({ json: { user: { name: 'Fixture', email: 'fixture@example.test' }, roles: [], permissions: [] } });
+            if (url.pathname.endsWith('/refresh')) return route.fulfill({ json: { user: { name: 'Fixture', email: 'fixture@example.test' }, roles: [], permissions: ["activity"].flatMap(domain => (['dashboard', 'graph', 'map', 'activity'].includes(domain) ? ['view'] : ['view', 'create', 'update', 'delete']).map(action => domain + '.' + action)) } });
             if (url.pathname.endsWith('/activity')) {
                 attempts++;
                 calls.push({ method: request.method(), query: url.search });

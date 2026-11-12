@@ -32,7 +32,7 @@ async (page) => {
         if (!['fetch', 'xhr'].includes(request.resourceType())) return route.fallback();
         if (request.url().endsWith('/refresh')) {
             return route.fulfill({ status: authenticated ? 200 : 401, json: authenticated
-                ? { user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: [] }
+                ? { user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: ["dashboard","drug","graph","map","weapon","ammunition","confiscation","drugConfiscation","weaponConfiscation","ammunitionConfiscation","drugPresentation","user","role","permission","activity"].flatMap(domain => (['dashboard', 'graph', 'map', 'activity'].includes(domain) ? ['view'] : ['view', 'create', 'update', 'delete']).map(action => domain + '.' + action)) }
                 : { message: 'Sin sesión' } });
         }
         return route.fulfill({ json: { data: [] } });

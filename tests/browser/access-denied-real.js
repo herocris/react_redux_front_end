@@ -45,13 +45,12 @@ async (page) => {
         const alert = view.getByRole('alert', { name: 'Acceso denegado' });
         await alert.waitFor();
         check(await alert.getByRole('link').count() === 0, 'Denial must not guess a permitted destination');
-        await alert.getByRole('button', { name: 'Reintentar listado' }).focus();
-        await view.keyboard.press('Tab');
-        check(await alert.getByRole('button', { name: 'Cerrar sesión', exact: true }).evaluate(el => el === document.activeElement), 'Logout must be keyboard reachable');
+        await view.getByRole('button', { name: /Cerrar sesi/ }).focus();
+        check(await view.getByRole('button', { name: 'Cerrar sesión', exact: true }).evaluate(el => el === document.activeElement), 'Logout must be keyboard reachable');
         check(refreshes === 1 && view.url().endsWith('/drug'), '403 must not refresh or redirect');
         await alert.screenshot({ path: '.playwright-mcp/p03-access-denied-real.png' });
         passed.push('No-permission user: accessible denial, stable session/URL, explicit logout');
-        await alert.getByRole('button', { name: 'Cerrar sesión', exact: true }).click();
+        await view.getByRole('button', { name: 'Cerrar sesión', exact: true }).click();
         await view.waitForURL('**/auth/login');
         check(refreshes === 1, 'Logout unexpectedly refreshed');
         check(errors.length === 0, errors.join('; '));

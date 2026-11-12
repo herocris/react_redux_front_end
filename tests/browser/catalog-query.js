@@ -15,7 +15,7 @@ async (page) => {
         if (req.resourceType() === 'image') return route.fulfill({ contentType: 'image/png', body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=', 'base64') });
         if (!['fetch', 'xhr'].includes(req.resourceType())) return route.fallback();
         const url = new URL(req.url()), method = req.method();
-        if (url.pathname.endsWith('/refresh')) return route.fulfill({ json: { user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: [] } });
+        if (url.pathname.endsWith('/refresh')) return route.fulfill({ json: { user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: ["drug","weapon","ammunition","drugPresentation"].flatMap(domain => (['dashboard', 'graph', 'map', 'activity'].includes(domain) ? ['view'] : ['view', 'create', 'update', 'delete']).map(action => domain + '.' + action)) } });
         if (url.pathname.endsWith('/role') && method === 'GET') {
             const options = url.searchParams.get('per_page') === '100';
             reads.push({ page: url.searchParams.get('page'), size: url.searchParams.get('per_page'),

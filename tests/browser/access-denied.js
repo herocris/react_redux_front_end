@@ -20,7 +20,7 @@ async (page) => {
         if (path.endsWith('/refresh')) {
             refreshes++;
             if (refreshDenied) return route.fulfill({ status: 403, json: { error: 'User does not have the right permissions.', code: 403 } });
-            return route.fulfill({ json: { user: { name: 'P03', email: 'p03@example.test' }, roles: [], permissions: [] } });
+            return route.fulfill({ json: { user: { name: 'P03', email: 'p03@example.test' }, roles: [], permissions: ['drug.view', 'drug.create', 'drug.update', 'drug.delete'] } });
         }
         if (path.endsWith('/logout')) { logouts++; return route.fulfill({ json: {} }); }
         if (path.endsWith('/drug') && req.method() === 'GET') {

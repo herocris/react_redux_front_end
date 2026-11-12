@@ -1,8 +1,8 @@
+import { useAccess } from '../../auth/hooks/useAccess';
 import { ApiRequestError } from '../../../components/ApiRequestError';
 import type { GridColDef } from '@mui/x-data-grid';
 import type { RoleEntity } from '../types';
 import { ConfirmDialog } from '../../../components/ConfirmDialog';
-import { PermissionOptionsStatus } from '../../permission/components/PermissionOptionsStatus';
 import { RoleError } from '../components/RoleError';
 
 import { AddFloatingButton, EntityList, } from '../../../components';
@@ -16,6 +16,7 @@ const columns: GridColDef<RoleEntity>[] = [
 ];
 
 export const RoleView = () => {
+  const access = useAccess('role');
   const {
     DeleteRole,
     paginationModel, sortModel, filterModel,
@@ -36,16 +37,15 @@ export const RoleView = () => {
   return (
     <>
       <GrapLayout>
-        {!open && <PermissionOptionsStatus pending={permissionOptionsQuery.isPending}
-          error={permissionOptionsQuery.error} retry={() => { void permissionOptionsQuery.refetch(); }} />}
+
         {!open && !openDialog && <RoleError message={errorMessage} />}
         <ApiRequestError error={listFailure} retry={retryList} busy={listLoading} retryLabel="Reintentar listado" />
         <EntityList rows={roles} columns={columns} rowCount={rowCount} loading={listLoading}
           paginationModel={paginationModel} sortModel={sortModel} filterModel={filterModel}
           onPaginationModelChange={onPaginationModelChange}
           onSortModelChange={onSortModelChange} onFilterModelChange={onFilterModelChange}
-          onEdit={onEdit} onDelete={onDelete} />
-        {open &&
+          onEdit={access.update ? onEdit : undefined} onDelete={access.delete ? onDelete : undefined} />
+        {open && (activeRole?.id === undefined ? access.create : access.update) &&
           <RoleFormModal
             handleOpen={handleOpen}
             permisos={permisos}
@@ -62,7 +62,7 @@ export const RoleView = () => {
             <RoleError message={errorMessage} />
           </ConfirmDialog>
         }
-        <AddFloatingButton handleOpen={handleOpen} />
+        {access.create && <AddFloatingButton handleOpen={handleOpen} />}
       </GrapLayout>
     </>
   )

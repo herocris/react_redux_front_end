@@ -18,7 +18,7 @@ export const useAmmunitionConfiscation = () => {
     const [active, setActive] = useState<AmmunitionConfiscation>();
     const [open, setOpen] = useState(false);
     const [dialog, setDialog] = useState(false);
-    const { options: ammunitionCollection, query: optionsQuery } = useAmmunitionOptions();
+    const { options: ammunitionCollection, query: optionsQuery } = useAmmunitionOptions(open);
 
     const optionsStatus = combineOptionsStatus(optionsQuery);
     const query = useQuery(ammunitionConfiscationListOptions(confiscationId, {

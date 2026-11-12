@@ -31,7 +31,7 @@ async (page) => {
         if (!['xhr', 'fetch'].includes(request.resourceType())) return route.fallback();
         if (url.pathname.endsWith('/refresh')) {
             return route.fulfill({ contentType: 'application/json', body: JSON.stringify({
-                user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: [],
+                user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: ["confiscation"].flatMap(domain => (['dashboard', 'graph', 'map', 'activity'].includes(domain) ? ['view'] : ['view', 'create', 'update', 'delete']).map(action => domain + '.' + action)),
             }) });
         }
         if (request.method() !== 'GET') backendWrites++;

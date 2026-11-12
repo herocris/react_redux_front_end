@@ -1,3 +1,4 @@
+import { AccessRoute, SessionLanding } from './AccessRoute';
 import { Navigate, Route, Routes } from 'react-router';
 import { AuthRoutes } from '../modules/auth';
 import { useAppDispatch, useAppSelector } from '../hooks/hooks';
@@ -69,19 +70,19 @@ export const AppRouter = () => {
                     ? <Route path='/auth/*' element={<AuthRoutes />} />
                     :
                     <>
-                        <Route path='/user/*' element={<UserRoutes />} />
-                        <Route path='/dashboard/*' element={<DashBoardRoutes />} />
-                        <Route path='/rol/*' element={<RoleRoutes />} />
-                        <Route path='/permiso/*' element={<PermissionRoutes />} />
-                        <Route path='/actividad/*' element={<ActivityRoutes />} />
-                        <Route path='/ammunition/*' element={<AmmunitionRoutes />} />
-                        <Route path='/drug/*' element={<DrugRoutes />} />
-                        <Route path='/weapon/*' element={<WeaponRoutes />} />
-                        <Route path='/drugPresentation/*' element={<DrugPresentationRoutes />} />
-                        <Route path='/confiscation/*' element={<ConfiscationRoutes />} />
-                        <Route path='/*' element={<Navigate to="/dashboard" />} />
-                        <Route path='/graph' element={<GraphView/>} />
-                        <Route path='/map' element={<MapView/>} />
+                        <Route path='/user/*' element={<AccessRoute domain="user"><UserRoutes /></AccessRoute>} />
+                        <Route path='/dashboard/*' element={<AccessRoute domain="dashboard"><DashBoardRoutes /></AccessRoute>} />
+                        <Route path='/rol/*' element={<AccessRoute domain="role"><RoleRoutes /></AccessRoute>} />
+                        <Route path='/permiso/*' element={<AccessRoute domain="permission"><PermissionRoutes /></AccessRoute>} />
+                        <Route path='/actividad/*' element={<AccessRoute domain="activity"><ActivityRoutes /></AccessRoute>} />
+                        <Route path='/ammunition/*' element={<AccessRoute domain="ammunition"><AmmunitionRoutes /></AccessRoute>} />
+                        <Route path='/drug/*' element={<AccessRoute domain="drug"><DrugRoutes /></AccessRoute>} />
+                        <Route path='/weapon/*' element={<AccessRoute domain="weapon"><WeaponRoutes /></AccessRoute>} />
+                        <Route path='/drugPresentation/*' element={<AccessRoute domain="drugPresentation"><DrugPresentationRoutes /></AccessRoute>} />
+                        <Route path='/confiscation/*' element={<AccessRoute domain="confiscation"><ConfiscationRoutes /></AccessRoute>} />
+                        <Route path='/*' element={<SessionLanding />} />
+                        <Route path='/graph' element={<AccessRoute domain="graph"><GraphView /></AccessRoute>} />
+                        <Route path='/map' element={<AccessRoute domain="map"><MapView /></AccessRoute>} />
                     </>
             }
             <Route path='/*' element={<Navigate to="/auth/login" />} />

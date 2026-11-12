@@ -1,3 +1,4 @@
+import { useAccess } from '../../auth/hooks/useAccess';
 import { ApiRequestError } from '../../../components/ApiRequestError';
 import { logoColumn } from '../../../components/logoColumn';
 import type { GridColDef } from '@mui/x-data-grid';
@@ -17,6 +18,7 @@ const columns: GridColDef<WeaponEntity>[] = [
 ];
 
 export const WeaponView = () => {
+  const access = useAccess('weapon');
   const {
     DeleteWeapon,
     paginationModel, sortModel, filterModel,
@@ -41,8 +43,8 @@ export const WeaponView = () => {
           paginationModel={paginationModel} sortModel={sortModel} filterModel={filterModel}
           onPaginationModelChange={onPaginationModelChange}
           onSortModelChange={onSortModelChange} onFilterModelChange={onFilterModelChange}
-          onEdit={onEdit} onDelete={onDelete} />
-        {open &&
+          onEdit={access.update ? onEdit : undefined} onDelete={access.delete ? onDelete : undefined} />
+        {open && (activeWeapon?.id === undefined ? access.create : access.update) &&
           <WeaponFormModal
             handleOpen={handleOpen}
             loading={loading}
@@ -56,7 +58,7 @@ export const WeaponView = () => {
             <WeaponError message={errorMessage} />
           </ConfirmDialog>
         }
-        <AddFloatingButton handleOpen={handleOpen} />
+        {access.create && <AddFloatingButton handleOpen={handleOpen} />}
       </GrapLayout>
     </>
   )

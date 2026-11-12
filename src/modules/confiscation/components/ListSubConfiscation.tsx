@@ -1,4 +1,4 @@
-import { Avatar, List, ListItemText, ListItemAvatar, Badge, Box, Button, ListItemButton, Typography, Zoom } from '@mui/material';
+import { Avatar, List, ListItem, ListItemText, ListItemAvatar, Badge, Box, Button, ListItemButton, Typography, Zoom } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { getEnvVariables } from '../../../helpers/getEnvVariables';
 import { memo } from 'react';
@@ -8,34 +8,27 @@ import { DrugConfiscation } from '../../drugConfiscation';
 
 
 interface ListSubConfiscationProps {
-    setOpen: (open: boolean) => void
+    onCreate?: () => void
+    onEdit?: (id: number) => void
+    onDelete?: (id: number) => void
     list: DrugConfiscation[] | WeaponConfiscation[] | AmmunitionConfiscation[]
-    setActiveSubConfiscation: (id: number | number) => void
     disabled?: boolean
 }
 
 const { VITE_LOCAL_PHOTOS_URL } = getEnvVariables();
 
-export const ListSubConfiscation = memo(({ setOpen, list, setActiveSubConfiscation, disabled }: ListSubConfiscationProps) => {
-    const clickItemList = (id: number) => {
-        setActiveSubConfiscation(id)
-        setOpen(true)
-    }
-    const newItemList = () => {
-        setActiveSubConfiscation(0)
-        setOpen(true)
-    }
+export const ListSubConfiscation = memo(({ onCreate, onEdit, onDelete, list, disabled }: ListSubConfiscationProps) => {
     return (
         <Zoom in={true} style={{ transitionDelay: '50ms' }}>
             <Box sx={{ width: '100%' }}>
-                <Button aria-label="Añadir subdecomiso" disabled={disabled} fullWidth color="success" variant="contained" sx={{ mb: 1 }} onClick={() => newItemList()}>
+                {onCreate && <Button aria-label="Añadir subdecomiso" disabled={disabled} fullWidth color="success" variant="contained" sx={{ mb: 1 }} onClick={onCreate}>
                     <AddCircleIcon fontSize="medium" />
-                </Button>
+                </Button>}
                 <List sx={{ width: '100%', maxHeight: 220, overflow: 'auto', background: 'background.default' }}>
                     {list.length > 0
                         ?
                         list.map((itemList: DrugConfiscation | WeaponConfiscation | AmmunitionConfiscation, index) => (
-                            <ListItemButton disabled={disabled} key={itemList.identificador ?? index} onClick={() => { if (itemList.identificador !== undefined) clickItemList(itemList.identificador); }}>
+                            <ListItem key={itemList.identificador ?? index} disablePadding sx={{ display: 'block' }}><ListItemButton disabled={disabled || !onEdit} onClick={() => { if (itemList.identificador !== undefined) onEdit?.(itemList.identificador); }}>
                                 <ListItemAvatar>
                                     <Badge badgeContent={itemList.cantidad} color="primary" sx={{ margin: 0 }}>
                                         <Avatar alt={"Remy Sharp"} src={`${VITE_LOCAL_PHOTOS_URL}/${itemList?.foto}` as string} />
@@ -54,6 +47,8 @@ export const ListSubConfiscation = memo(({ setOpen, list, setActiveSubConfiscati
                                     <ListItemText primary={itemList.municion_nombre} />
                                 }
                             </ListItemButton>
+                            {onDelete && <Button disabled={disabled} aria-label="Borrar subdecomiso" onClick={() => { if (itemList.identificador !== undefined) onDelete(itemList.identificador); }}>Borrar</Button>}
+                            </ListItem>
                         )
                         )
                         :

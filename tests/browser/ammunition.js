@@ -33,7 +33,7 @@ async (page) => {
         if (!['fetch', 'xhr'].includes(request.resourceType())) return route.fallback();
         const url = new URL(request.url());
         if (url.pathname.endsWith('/refresh')) return route.fulfill({ json: {
-            user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: [],
+            user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: ["ammunition"].flatMap(domain => (['dashboard', 'graph', 'map', 'activity'].includes(domain) ? ['view'] : ['view', 'create', 'update', 'delete']).map(action => domain + '.' + action)),
         } });
         if (url.pathname.endsWith('/ammunition') && request.method() === 'GET') {
             return route.fulfill({ json: {

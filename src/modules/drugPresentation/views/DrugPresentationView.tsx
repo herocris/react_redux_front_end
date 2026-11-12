@@ -1,3 +1,4 @@
+import { useAccess } from '../../auth/hooks/useAccess';
 import { ApiRequestError } from '../../../components/ApiRequestError';
 import { logoColumn } from '../../../components/logoColumn';
 import type { GridColDef } from '@mui/x-data-grid';
@@ -17,6 +18,7 @@ const columns: GridColDef<DrugPresentationEntity>[] = [
 ];
 
 export const DrugPresentationView = () => {
+  const access = useAccess('drugPresentation');
   const {
     DeleteDrugPresentation,
     paginationModel, sortModel, filterModel,
@@ -41,8 +43,8 @@ export const DrugPresentationView = () => {
           paginationModel={paginationModel} sortModel={sortModel} filterModel={filterModel}
           onPaginationModelChange={onPaginationModelChange}
           onSortModelChange={onSortModelChange} onFilterModelChange={onFilterModelChange}
-          onEdit={onEdit} onDelete={onDelete} />
-        {open &&
+          onEdit={access.update ? onEdit : undefined} onDelete={access.delete ? onDelete : undefined} />
+        {open && (activeDrugPresentation?.id === undefined ? access.create : access.update) &&
           <DrugPresentationFormModal
             handleOpen={handleOpen}
             loading={loading}
@@ -56,7 +58,7 @@ export const DrugPresentationView = () => {
             <DrugPresentationError message={errorMessage} />
           </ConfirmDialog>
         }
-        <AddFloatingButton handleOpen={handleOpen} />
+        {access.create && <AddFloatingButton handleOpen={handleOpen} />}
       </GrapLayout>
     </>
   )

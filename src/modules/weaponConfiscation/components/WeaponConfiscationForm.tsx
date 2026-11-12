@@ -1,3 +1,4 @@
+import { useAccess } from '../../auth/hooks/useAccess';
 import { CatalogOptionsStatus } from '../../resouce/components/CatalogOptionsStatus';
 import { useRef } from 'react';
 import { getApiErrorText } from '../../../api/apiErrors';
@@ -14,6 +15,7 @@ import { WeaponConfiscationFormProps } from '../';
 type FormFields = z.infer<typeof weaponConfiscationSchema>;
 type FormInput = z.input<typeof weaponConfiscationSchema>;
 export const WeaponConfiscationForm = ({ busy = false, optionsStatus, activeWeaponConfiscation, handleOpen, onSaveOrUptdate, weaponCollection, handleOpenDialog }: WeaponConfiscationFormProps) => {
+    const access = useAccess('weaponConfiscation');
     const {
         register,
         handleSubmit,
@@ -96,7 +98,7 @@ export const WeaponConfiscationForm = ({ busy = false, optionsStatus, activeWeap
                             <Button disabled={optionsStatus.pending || !!optionsStatus.error} aria-label="Guardar" type='submit' variant='contained' loading={isSubmitting} sx={{ width: '100%' }}>
                                 <Save/>
                             </Button>
-                            {activeWeaponConfiscation.identificador &&
+                            {access.delete && activeWeaponConfiscation.identificador &&
                                 <Button aria-label="Borrar subdecomiso" variant='contained' color="error" disabled={isSubmitting} loading={false} sx={{ width: '100%' }} onClick={() => handleOpenDialog()}>
                                     <Delete/>
                                 </Button>

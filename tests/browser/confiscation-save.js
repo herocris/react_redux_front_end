@@ -20,7 +20,7 @@ async (page) => {
         const request = route.request(), url = new URL(request.url());
         if (request.resourceType() === 'image') return route.fulfill({ contentType: 'image/png', body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=', 'base64') });
         if (!['fetch', 'xhr'].includes(request.resourceType()) || /\.(tsx?|m?js)$/.test(url.pathname)) return route.fallback();
-        if (url.pathname.endsWith('/refresh')) return route.fulfill({ json: { user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: [] } });
+        if (url.pathname.endsWith('/refresh')) return route.fulfill({ json: { user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: ["confiscation"].flatMap(domain => (['dashboard', 'graph', 'map', 'activity'].includes(domain) ? ['view'] : ['view', 'create', 'update', 'delete']).map(action => domain + '.' + action)) } });
         if (request.method() !== 'GET') {
             writes.push({ path: url.pathname, method: request.method(), body: request.postData() || '' });
             const result = mode;

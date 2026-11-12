@@ -21,7 +21,7 @@ async (page) => {
             body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=', 'base64') });
         if (!['fetch', 'xhr'].includes(request.resourceType()) || /\.(tsx?|m?js)$/.test(url.pathname)) return route.fallback();
         if (url.pathname.endsWith('/refresh')) return route.fulfill({ json: {
-            user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: [] } });
+            user: { name: 'Prueba', email: 'test@example.test' }, roles: [], permissions: ["confiscation","drugConfiscation","weaponConfiscation","ammunitionConfiscation","drug","weapon","ammunition","drugPresentation"].flatMap(domain => (['dashboard', 'graph', 'map', 'activity'].includes(domain) ? ['view'] : ['view', 'create', 'update', 'delete']).map(action => domain + '.' + action)) } });
         if (request.method() === 'DELETE') {
             if (failDelete) return route.fulfill({ status: 422, json: { error: 'Borrado rechazado' } });
             if (/\/confiscation\/11$/.test(url.pathname)) mainRemoved = true;

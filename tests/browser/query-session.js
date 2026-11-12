@@ -27,7 +27,7 @@ async (page) => {
         const url = new URL(request.url());
         requests.push({ path: url.pathname, method: request.method(), user });
         if (/\/(refresh|login)$/.test(url.pathname)) return route.fulfill({ json: {
-            user: { name: `Usuario ${user}`, email: `${user}@example.test` }, roles: [], permissions: [],
+            user: { name: `Usuario ${user}`, email: `${user}@example.test` }, roles: [], permissions: ["permission","role","user","drug"].flatMap(domain => (['dashboard', 'graph', 'map', 'activity'].includes(domain) ? ['view'] : ['view', 'create', 'update', 'delete']).map(action => domain + '.' + action)),
         } });
         if (url.pathname.endsWith('/logout')) {
             logoutAttempts++;

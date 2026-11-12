@@ -1,3 +1,4 @@
+import { canAccess, accessDestinations } from '../../modules/auth/access';
 import { IconButton, styled, AppBar, Box, CssBaseline, Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Link } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { ReactNode, useState } from 'react';
@@ -69,18 +70,23 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
 
     ]
     const displayMenuOptions = [
+        { name: 'Dashboard', url: '/dashboard', icon: <AccountCircle /> },
         { name: 'Graphs', url: '/graph', icon: <SignalCellularAlt /> },
         { name: 'Map', url: '/map', icon: <Map /> },
     ]
 
+    const visible = (item: { url: string }) => {
+        const destination = accessDestinations.find(entry => entry.path === item.url);
+        return !!destination && canAccess(user, destination.domain);
+    };
     const drawer = (
         <div>
-            <Toolbar onClick={() => navigate('/dashboard')} sx={{ cursor: 'pointer', fontWeight: 'bold', fontSize: '1.2rem' }}>
+            <Toolbar sx={{ fontWeight: 'bold', fontSize: '1.2rem' }}>
                 <AccountCircle sx={{ marginRight: '10px' }} fontSize="large" />{user.nombre}
             </Toolbar>
             <Divider />
             <List>
-                {displayMenuOptions.map((opt, index) => (
+                {displayMenuOptions.filter(visible).map((opt, index) => (
                     <ListItem key={index} disablePadding >
                         <ListItemButton onClick={() => navigate(opt.url)} selected={pathname == opt.url}>
                             <ListItemIcon>
@@ -93,7 +99,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
             </List>
             <Divider />
             <List>
-                {authMenuOptions.map((opt, index) => (
+                {authMenuOptions.filter(visible).map((opt, index) => (
                     <ListItem key={index} disablePadding >
                         <ListItemButton onClick={() => navigate(opt.url)} selected={pathname == opt.url}>
                             <ListItemIcon>
@@ -106,7 +112,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
             </List>
             <Divider />
             <List>
-                {menuOptions.map((opt, index) => (
+                {menuOptions.filter(visible).map((opt, index) => (
                     <ListItem key={index} disablePadding >
                         <ListItemButton onClick={() => navigate(opt.url)} selected={pathname == opt.url}>
                             <ListItemIcon>
@@ -166,7 +172,7 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                     </IconButton>
                     <IconButton
                         color="inherit"
-                        aria-label="Cerrar sesi?n"
+                        aria-label="Cerrar sesión"
                         edge="end"
                         onClick={onLogout}
                     >

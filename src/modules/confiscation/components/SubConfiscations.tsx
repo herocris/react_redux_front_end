@@ -1,3 +1,4 @@
+import { useAccess } from '../../auth/hooks/useAccess';
 import { MouseEvent, useState } from 'react';
 import { AllInbox, HomeRepairServiceOutlined, Vaccines,ExpandMore } from '@mui/icons-material';
 import { Accordion, AccordionSummary, AccordionDetails, Box, Typography } from '@mui/material';
@@ -7,6 +8,9 @@ import { CrudWeaponConfiscation } from '../../weaponConfiscation';
 
 
 export const SubConfiscations = () => {
+    const drug = useAccess('drugConfiscation');
+    const weapon = useAccess('weaponConfiscation');
+    const ammunition = useAccess('ammunitionConfiscation');
     const [selectedCard, setSelectedCard] = useState('panel1-header');
     const setCardId = (e: React.MouseEvent<HTMLDivElement>) => {
         // if (e.currentTarget.ariaExpanded && e.currentTarget.id == selectedCard) {
@@ -24,7 +28,7 @@ export const SubConfiscations = () => {
     return (
         <div>
             <div>
-                <Accordion expanded={selectedCard === "panel1-header"}>
+                {drug.view && <Accordion expanded={selectedCard === "panel1-header"}>
                     <AccordionSummary
                         expandIcon={<ExpandMore />}
                         aria-controls="panel1-content"
@@ -48,8 +52,8 @@ export const SubConfiscations = () => {
                         <CrudDrugConfiscation />
 
                     </AccordionDetails>
-                </Accordion>
-                <Accordion expanded={selectedCard === "panel2-header"}>
+                </Accordion>}
+                {weapon.view && <Accordion expanded={selectedCard === "panel2-header"}>
                     <AccordionSummary
                         expandIcon={<ExpandMore />}
                         aria-controls="panel2-content"
@@ -73,8 +77,8 @@ export const SubConfiscations = () => {
                         <CrudWeaponConfiscation />
 
                     </AccordionDetails>
-                </Accordion>
-                <Accordion expanded={selectedCard === "panel3-header"}>
+                </Accordion>}
+                {ammunition.view && <Accordion expanded={selectedCard === "panel3-header"}>
                     <AccordionSummary
                         expandIcon={<ExpandMore />}
                         aria-controls="panel3-content"
@@ -98,7 +102,7 @@ export const SubConfiscations = () => {
                         <CrudAmmunitionConfiscation />
 
                     </AccordionDetails>
-                </Accordion>
+                </Accordion>}
             </div>
 
         </div>

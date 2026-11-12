@@ -24,7 +24,7 @@ async (page) => {
     let gate;
     let attempt = 0;
     let mode;
-    const response = { user: { name: 'Sesión de prueba', email: 'session@example.test' }, roles: [], permissions: [] };
+    const response = { user: { name: 'Sesión de prueba', email: 'session@example.test' }, roles: [], permissions: ['drug.view'] };
     const routeHandler = async route => {
         const request = route.request();
         if (!['xhr', 'fetch'].includes(request.resourceType())) return route.fallback();
@@ -38,7 +38,7 @@ async (page) => {
                 return route.fulfill({ status: 422, json: { error: 'Acceso de prueba rechazado.' } });
             }
             return route.fulfill({ json: mode === 'register'
-                ? { user: { nombre: response.user.name, correo: response.user.email, roles: [], permisos: [] } }
+                ? { user: { nombre: response.user.name, correo: response.user.email, roles: [], permisos: response.permissions } }
                 : response });
         }
         if (path.endsWith('/logout')) return route.fulfill({ json: {} });
@@ -72,7 +72,7 @@ async (page) => {
             }
             check(await page.locator('form').evaluate(form => form === window.authTestForm), `${mode}: formulario conservado tras fallo`);
             await page.getByRole('button', { name: 'Login', exact: true }).click();
-            await page.waitForURL('**/dashboard');
+            await page.waitForURL('**/drug');
             await page.getByText('Sesión de prueba', { exact: true }).first().waitFor();
             check(attempt === 2, `${mode}: una petición por intento`);
             passed.push(`${mode}: espera, fallo, valores conservados, reintento y sesión visible`);

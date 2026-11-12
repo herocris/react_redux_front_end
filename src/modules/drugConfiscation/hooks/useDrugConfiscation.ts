@@ -18,8 +18,8 @@ export const useDrugConfiscation = () => {
     const [active, setActive] = useState<DrugConfiscation>();
     const [open, setOpen] = useState(false);
     const [dialog, setDialog] = useState(false);
-    const { options: drugCollection, query: optionsQuery } = useDrugOptions();
-    const { options: drugPresentationCollection, query: presentationQuery } = useDrugPresentationOptions();
+    const { options: drugCollection, query: optionsQuery } = useDrugOptions(open);
+    const { options: drugPresentationCollection, query: presentationQuery } = useDrugPresentationOptions(open);
     const optionsStatus = combineOptionsStatus(optionsQuery, presentationQuery);
     const query = useQuery(drugConfiscationListOptions(confiscationId, {
         page: page + 1, per_page: pageSize, sortBy: '', orderType: '', search_by: '', valueSearch: '',

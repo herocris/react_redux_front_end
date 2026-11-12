@@ -1,3 +1,4 @@
+import { useAccess } from '../../auth/hooks/useAccess';
 import { CatalogOptionsStatus } from '../../resouce/components/CatalogOptionsStatus';
 import { useRef } from 'react';
 import { getApiErrorText } from '../../../api/apiErrors';
@@ -16,6 +17,7 @@ type FormFields = z.infer<typeof drugConfiscationSchema>;
 type FormInput = z.input<typeof drugConfiscationSchema>;
 
 export const DrugConfiscationForm = memo(({ busy = false, optionsStatus, activeDrugConfiscation, handleOpen, onSaveOrUptdate, drugCollection, drugPresentationCollection, handleOpenDialog }: DrugConfiscationFormProps) => {
+    const access = useAccess('drugConfiscation');
     const {
         register,
         handleSubmit,
@@ -127,7 +129,7 @@ export const DrugConfiscationForm = memo(({ busy = false, optionsStatus, activeD
                             <Button disabled={optionsStatus.pending || !!optionsStatus.error} aria-label="Guardar" type='submit' variant='contained' loading={isSubmitting} sx={{ width: '100%' }}>
                                 <Save />
                             </Button>
-                            {activeDrugConfiscation.identificador &&
+                            {access.delete && activeDrugConfiscation.identificador &&
                                 <Button aria-label="Borrar subdecomiso" variant='contained' color="error" disabled={isSubmitting} loading={false} sx={{ width: '100%' }} onClick={() => handleOpenDialog()}>
                                     <Delete />
                                 </Button>

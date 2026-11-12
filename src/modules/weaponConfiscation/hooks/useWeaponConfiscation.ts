@@ -18,7 +18,7 @@ export const useWeaponConfiscation = () => {
     const [active, setActive] = useState<WeaponConfiscation>();
     const [open, setOpen] = useState(false);
     const [dialog, setDialog] = useState(false);
-    const { options: weaponCollection, query: optionsQuery } = useWeaponOptions();
+    const { options: weaponCollection, query: optionsQuery } = useWeaponOptions(open);
 
     const optionsStatus = combineOptionsStatus(optionsQuery);
     const query = useQuery(weaponConfiscationListOptions(confiscationId, {

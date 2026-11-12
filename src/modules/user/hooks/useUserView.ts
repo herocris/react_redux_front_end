@@ -14,8 +14,8 @@ export const useUserView = () => {
   const [activeUser, setActiveUser] = useState<User>({ nombre: '', correo: '', password: '', permisos: [], roles: [] });
   const [open, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-  const { permisos, permissionOptionsQuery } = usePermissionOptions();
-  const { options: roles, query: roleOptionsQuery } = useRoleOptions();
+  const { permisos, permissionOptionsQuery } = usePermissionOptions(open);
+  const { options: roles, query: roleOptionsQuery } = useRoleOptions(open);
   const client = useQueryClient();
   const listOptions = userListOptions({
     page: paginationModel.page + 1, per_page: paginationModel.pageSize,
