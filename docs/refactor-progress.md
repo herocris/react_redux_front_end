@@ -34,8 +34,10 @@ Reutilizar las comprobaciones siguientes si siguen correspondiendo al código.
 
 La preparación posterior para presentar el proyecto tiene
 [prompts por tarea](portfolio-plan.md) y [progreso propio](portfolio-progress.md).
-P01–P10 están ejecutados; P08 añade recuperación de vistas, P09 navegación
+P01–P11 están ejecutados; P08 añade recuperación de vistas, P09 navegación
 desconocida y P10 identidad/panel de producto con escenarios controlados.
+P11 corrige barreras de interacción, móvil y contraste en recorridos representativos;
+no acredita conformidad WCAG completa. P12 y posteriores no se ejecutan.
 P06 incorpora adaptación limitada del vacío inicial,
 con contrato backend todavía pendiente. P07 configura y verifica medios locales,
 sin acreditar limpieza física ni producción. El estado actualizado y sus límites
@@ -2203,3 +2205,28 @@ Consolidación solicitada P10: `e3fd8fe` contiene implementación y pruebas;
 guía, informe, capturas y ambos progresos se registran en un segundo commit
 documental. Se reutilizan las verificaciones del mismo código sin repetirlas;
 diff e índice revisados. Sin push ni despliegue; P11 permanece sin ejecutar.
+
+### P11 — Revisión visual, móvil y accesibilidad (12 de noviembre de 2026)
+
+Solo P11 de portafolio; los 16 pasos de migración siguen cerrados. Se corrigen
+modal recortado, errores de campos sin asociación, valores perdidos tras login
+fallido, bloqueo de reapertura del menú, tooltip sobre Guardar, etiquetas/selección
+de filtros, contraste y lectura alternativa de gráficos, nombres y foco de mapas.
+La selección del centro permite geocodificar con teclado; se preservan clic,
+validadores, campos/archivos y recuperación ante fallos. La tabla con scroll
+interno se conserva tras comprobar acceso a sus acciones con teclado.
+
+261/261 pruebas, lint sin advertencias y build correctos; Playwright MCP: ocho
+grupos P11 sobre build final y cinco de regresión P10. Viewports 1440/390/320,
+siete capturas inspeccionadas y muestras de texto con contraste 4,57–18,73:1.
+API, sesión, teselas y geocodificación simuladas; sin escrituras reales ni nueva
+integración Laravel. No se afirma conformidad WCAG completa, pruebas con lectores
+de pantalla o dispositivos físicos. Límites previos conservados. Sin dependencias,
+commits o despliegues; P12 y posteriores no ejecutados. Alcance, archivos, evidencia,
+fuentes y límites en [informe P11](verification-accessibility-p11-2026-11-12.md) y
+[progreso de portafolio](portfolio-progress.md#p11--móvil-aspecto-y-accesibilidad-12-de-noviembre-de-2026).
+
+Consolidación solicitada P11: `3b25c50` registra implementación y pruebas;
+informe, JSON, siete capturas y ambos progresos se consolidan por separado.
+Se reutilizan las verificaciones del mismo código sin repetirlas. Diff e índice
+revisados; sin push ni despliegue. P12 sigue sin ejecutar y los límites se conservan.

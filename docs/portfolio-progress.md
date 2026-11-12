@@ -2,7 +2,7 @@
 
 ## Estado al 12 de noviembre de 2026
 
-**P01–P10 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 verifica navegación desconocida y P10 identidad/panel con simulación local; P11 y posteriores siguen sin ejecutar.** La preparación del
+**P01–P11 ejecutados. P06 conserva un contrato backend pendiente; P07 verifica medios locales con límites de servidor y limpieza física. P05 aporta integración selectiva a P04; quedan sus perfiles/dependencias reales no recorridos y el ajuste Laravel anónimo sin Accept JSON. P08 verifica recuperación de render/lazy con simulación sobre build local. P09 verifica navegación desconocida y P10 identidad/panel con simulación local. P11 audita y corrige flujos representativos de accesibilidad/móvil con simulación; no acredita conformidad WCAG completa. P12 y posteriores siguen sin ejecutar.** La preparación del
 plan no ejecutó por sí misma ninguna tarea.
 Fuente: [portfolio-plan.md](portfolio-plan.md). Se conserva la refactorización
 cerrada en [refactor-progress.md](refactor-progress.md).
@@ -19,7 +19,7 @@ cerrada en [refactor-progress.md](refactor-progress.md).
 | P08 | Media | Recuperación de errores de render/lazy | Completado con escenarios controlados | Frontera de vistas, recuperación explícita y carga diferida verificadas; informe P08 |
 | P09 | Media | Página no encontrada | Completado con comprobaciones locales | Comodines, permisos, recuperación e HTTP SPA documentados; hosting público pendiente de P14 |
 | P10 | Alta | Identidad y dashboard de producto | Completado con comprobaciones locales | Decomisos, panel autorizado sin métricas ficticias, español y capturas; informe P10 |
-| P11 | Media | Móvil, aspecto y accesibilidad | Pendiente | Preferible después de P03–P10 |
+| P11 | Media | Móvil, aspecto y accesibilidad | Completado dentro del alcance representativo | 8 grupos de navegador, contraste de texto y 7 capturas; límites en informe P11 |
 | P12 | Alta | Datos y recorrido de demo | Pendiente | Conservar acceso precargado intencional; permisos verificados y P04 |
 | P13 | Media | Tests/lint/build en CI | Pendiente | Workflow existente |
 | P14 | Media | Comprobar despliegue público | Pendiente | URL real; preferible tras P07/P12/P13 |
@@ -561,3 +561,54 @@ consolidan en un segundo commit documental. Se reutilizan las 260 pruebas,
 lint, build y recorridos del mismo código; no se repiten por esta consolidación.
 Diff e índice revisados. Sin push ni despliegue; P11 sigue sin ejecutar y los
 límites de integración, datos y hosting se conservan.
+
+## P11 — Móvil, aspecto y accesibilidad (12 de noviembre de 2026)
+
+Ejecutado solo P11 sobre workspace inicialmente limpio. Se corrigen barreras
+confirmadas en login, navegación, tabla/diálogos, filtros, gráficos y mapas:
+modal adaptable con scroll/Cancelar; errores asociados de contraseña/foto;
+reapertura del menú tras Escape; foco seguro y restaurado en confirmación,
+detalle del marcador y alternancia mapa/formulario; fechas inicial/final distintas,
+tipos visuales con estado pulsado y zoom/marcadores nombrados. El tooltip de foto
+deja de interceptar Guardar en pantalla baja. Se conserva la tabla con su scroll
+interno, sin tratar densidad, sombras o ancho como defectos por sí mismos.
+
+Un rechazo de login desmontaba el formulario al cambiar la revisión de sesión.
+`onAuthenticationFailure` muestra el error sin cambiar esa revisión si ya se está
+sin sesión; las fronteras reales de login/logout y cancelación permanecen. Campos,
+archivos y edición RHF se conservan ante errores. «Usar centro del mapa» permite
+seleccionar coordenadas con teclado y reutiliza la geocodificación existente.
+No cambian validadores, contratos, credenciales, permisos o dependencias.
+
+Tabla desplegable para consultar los mismos datos de gráficos sin depender de
+hover/color; paletas estables por tema y textos adaptados. Enlaces de login
+subrayados pasan de 3,54/4,22:1 a 14,97:1. Las muestras finales de texto comprobadas
+en navegador están entre 4,57:1 y 18,73:1; no representan todos los estados ni
+una revisión exhaustiva de contraste no textual.
+
+**261/261 pruebas Node**, lint sin advertencias y build correctos. Regresión
+añadida en `tests/auth.test.mjs`; el montaje de un test de errores se adapta al
+estado raíz real `{ auth }`, conservando sus aserciones. Playwright MCP en preview
+local: **8 grupos P11** sobre build final y **5 grupos P10** selectivos, sin errores
+ni avisos inesperados. Escritorio 1440×1000, móvil 390×844 y casos 320×844/320×568.
+Login/validación, teclado/foco, rechazos/reintentos, multipart con la misma foto,
+gráficos, tabla ancha, mapa y fallo/recuperación de geocodificación comprobados.
+Siete capturas finales inspeccionadas, login enmascarado y datos ficticios.
+Sintaxis, JSON, enlaces y diff revisados; artefacto TypeScript restaurado.
+
+Informe y evidencia: [P11](verification-accessibility-p11-2026-11-12.md),
+[resultados](verification-accessibility-p11-results-2026-11-12.json) y recorrido
+`tests/browser/accessibility-p11.js`. Context7 y documentación oficial contrastados
+con versiones instaladas; límites de patches recogidos en el informe. Entorno
+de desarrollo con optimización caducada sustituido por preview/build local.
+API, teselas y geocodificación simuladas, dos escrituras interceptadas; ninguna
+cuenta o registro real modificado. No se acredita conformidad WCAG completa,
+lectores de pantalla, dispositivos físicos, cartografía real, todos los formularios
+ni hosting público. Límites anteriores conservados. Sin commits o despliegues.
+Siguiente: **P12**, sin ejecutar; P13–P15/O01/O02 mantienen su estado.
+
+Consolidación solicitada: `3b25c50` registra implementación y pruebas P11.
+Informe, JSON, siete capturas y ambos progresos se consolidan en un segundo
+commit documental. Se reutilizan las verificaciones del mismo código, sin nuevas
+ejecuciones. Diff e índice revisados. Sin push ni despliegue; P12 no se ejecuta
+y se conservan los límites de la auditoría representativa.

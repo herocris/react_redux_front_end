@@ -1,0 +1,142 @@
+{
+  "passed": [
+    "Login 1440/390/320: no overflow, validation association/focus, keyboard visibility, live HTTP error, draft and retry",
+    "Mobile drawer: Enter/Escape/focus return and navigation; table cell keyboard navigation without page overflow",
+    "Modal desktop/mobile/short 320: fits, traps/restores focus, visible Cancel; validation, failed multipart retains fields/file and retry succeeds",
+    "Delete confirmation: labelled, safe initial focus, Escape/restore; list HTTP error and retry",
+    "Confiscation grid at 320: internal horizontal scrollbar, cells/actions reachable by keyboard without page overflow",
+    "Graphs desktop/mobile: distinct dates, validation, labelled/pressed controls, bar/line/pie values via keyboard table, dark theme, error/retry retains filters",
+    "Map desktop/mobile: labelled region/zoom/marker, keyboard zoom and marker popup/Escape, no overflow; tiles simulated",
+    "Confiscation form: map receives/restores focus, geocoding failure preserves draft/manual editing, keyboard center selection recovers"
+  ],
+  "pageErrors": [],
+  "unexpectedConsole": [],
+  "simulatedWrites": 2,
+  "contrast": [
+    {
+      "label": "login light",
+      "samples": [
+        {
+          "text": "No autenticado. Inicia sesión para conti",
+          "color": "rgb(211, 47, 47)",
+          "ratio": 4.57
+        },
+        {
+          "text": "Registrar",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "ratio": 14.97
+        },
+        {
+          "text": "Consultar API",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "ratio": 14.97
+        }
+      ]
+    },
+    {
+      "label": "graph light",
+      "samples": [
+        {
+          "text": "Drogas",
+          "color": "rgb(25, 118, 210)",
+          "ratio": 4.6
+        },
+        {
+          "text": "Pastel",
+          "color": "rgb(25, 118, 210)",
+          "ratio": 4.6
+        },
+        {
+          "text": "Ver datos del gráfico",
+          "color": "rgba(0, 0, 0, 0.87)",
+          "ratio": 14.97
+        }
+      ]
+    },
+    {
+      "label": "graph dark",
+      "samples": [
+        {
+          "text": "Periodo",
+          "color": "rgba(255, 255, 255, 0.7)",
+          "ratio": 9.43
+        },
+        {
+          "text": "Fecha inicial",
+          "color": "rgba(255, 255, 255, 0.7)",
+          "ratio": 9.43
+        },
+        {
+          "text": "Fecha final",
+          "color": "rgba(255, 255, 255, 0.7)",
+          "ratio": 9.43
+        },
+        {
+          "text": "Drogas",
+          "color": "rgb(144, 202, 249)",
+          "ratio": 6.4
+        },
+        {
+          "text": "Drogas",
+          "color": "rgba(255, 255, 255, 0.7)",
+          "ratio": 9.43
+        },
+        {
+          "text": "Pastel",
+          "color": "rgb(144, 202, 249)",
+          "ratio": 6.4
+        },
+        {
+          "text": "Ver datos del gráfico",
+          "color": "rgb(255, 255, 255)",
+          "ratio": 18.73
+        }
+      ]
+    },
+    {
+      "label": "bar dark",
+      "samples": [
+        {
+          "text": "Ejemplo",
+          "color": "rgb(255, 255, 255)",
+          "ratio": 18.73
+        },
+        {
+          "text": "Enero",
+          "color": "rgb(255, 255, 255)",
+          "ratio": 18.73
+        },
+        {
+          "text": "Febrero",
+          "color": "rgb(255, 255, 255)",
+          "ratio": 18.73
+        },
+        {
+          "text": "0",
+          "color": "rgb(255, 255, 255)",
+          "ratio": 18.73
+        },
+        {
+          "text": "3",
+          "color": "rgb(255, 255, 255)",
+          "ratio": 18.73
+        },
+        {
+          "text": "6",
+          "color": "rgb(255, 255, 255)",
+          "ratio": 18.73
+        },
+        {
+          "text": "9",
+          "color": "rgb(255, 255, 255)",
+          "ratio": 18.73
+        },
+        {
+          "text": "12",
+          "color": "rgb(255, 255, 255)",
+          "ratio": 18.73
+        }
+      ]
+    }
+  ]
+}
