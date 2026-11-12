@@ -1,5 +1,128 @@
 # Verificación de roles y permisos — 10 de noviembre de 2026
 
+## P04 — Rutas, menú y acciones (12 de noviembre de 2026)
+
+Implementación frontend completada; nueva integración real pendiente. La API
+local respondió **500** tanto a `GET /api/drug` sin sesión como a
+`POST /api/refresh`. No se crearon fixtures ni se intentaron escrituras reales
+con ese estado. La matriz real de P01 permanece como evidencia histórica y
+fuente de contratos, no como una ejecución nueva de P04. No se atribuye causa
+al 500 ni se modifica Laravel, cuyo código no está en este workspace.
+
+### Propietario y política
+
+- `src/modules/auth/access.ts` contiene la política de permisos y dependencias;
+  `useAccess` deriva las capacidades desde la sesión Redux existente y exige
+  estado autenticado. No hay copia en Query/contextos ni bypass por nombre de
+  rol. Se usa exactamente la unión efectiva `permissions` de login/refresh,
+  adaptada a `user.permisos` por el service existente.
+- Se respetan las asignaciones observadas en P01. El operador puede crear/editar
+  catálogos y decomisos/hijos, pero no borrarlos. P04 no decide ni modifica la
+  política de roles del servidor. La discrepancia con la propuesta inicial
+  queda identificada; no impide aplicar los permisos efectivos solicitados.
+- `AccessRoute` envuelve los módulos lazy antes de montarlos. Un rechazo local
+  conserva URL y sesión, usa `AccessDenied` de P03 y el layout con logout. La
+  entrada elige una vista permitida; sin ninguna muestra denegación con logout,
+  sin redirigir en bucle a dashboard. El menú usa la misma política, incluido
+  Dashboard; el nombre de usuario deja de ser un enlace implícito a esa vista.
+- Cada escritura necesita `view` del dominio además de su acción. Los callbacks
+  de tabla y los botones de alta se omiten cuando falta autorización. Los
+  formularios no se montan sin permiso de acción/dependencias. El servidor
+  conserva la autorización efectiva: permitir iniciar una acción en la UI no
+  convierte un rechazo HTTP en éxito, no cierra el formulario ni invalida datos.
+
+### Dependencias explícitas de la interfaz actual
+
+| Consumidor | Requisitos adicionales a su propio `view`/acción |
+| --- | --- |
+| Crear/editar usuario | `role.view` y `permission.view` para sus selectores |
+| Crear/editar rol | `permission.view` |
+| Consultar hijos desde el detalle del padre | `confiscation.view` y `view` de cada tipo de hijo |
+| Crear/editar subdecomiso de droga | `drug.view` y `drugPresentation.view` |
+| Crear/editar subdecomiso de arma/munición | `weapon.view` / `ammunition.view` |
+| Gráficos y mapa | `drug.view`, `weapon.view`, `ammunition.view` para los filtros existentes |
+| Dashboard compuesto actual | `drug.view`, `graph.view`, `map.view` |
+
+Mapa/gráficos se protegen como vistas completas, incluidos sus filtros; no se
+introduce una variante sin selectores ni nuevas funciones de análisis. Dashboard
+requiere permiso para las tres secciones actuales, aunque mapas/gráficos usen
+datos de demo y solo la tabla consulte drogas. Estos requisitos son dependencias
+de esta interfaz, no nuevos permisos exigidos por los endpoints del backend.
+Los listados y borrados no requieren leer catálogos relacionados.
+
+Los siete hooks de opciones comprueban su `view`, bloquean también `refetch`
+manual sin permiso y no entregan datos cacheados de un catálogo no autorizado.
+Usuarios, roles y subdecomisos consultan opciones al abrir el formulario; sus
+hooks siguen llamándose incondicionalmente. Los guards se sitúan por encima de
+las consultas de vista; cada panel de hijos se monta solo con su propio `view`.
+
+### Prerrequisitos mínimos y consumidores
+
+Se añade `/confiscation/detail/:confiscationId` con los campos del padre en solo
+lectura y los paneles autorizados de los tres hijos. El listado ofrece
+`Ver detalle`. Es necesario porque antes los hijos solo se alcanzaban por
+`/edit/:id`, que ahora exige `confiscation.view` y `confiscation.update`.
+`/create` exige `view` + `create`. Se conserva `parseRouteId` antes de consultar.
+Tras crear, si falta `update`, se navega al detalle autorizado.
+
+`ListSubConfiscation` recibe callbacks opcionales de crear/editar/borrar.
+La confirmación de borrado es independiente del formulario: un usuario con
+`view` + `delete` puede borrar sin `update` ni permisos de catálogo. Se mantienen
+RHF, archivos, contratos HTTP, paginación, invalidación y errores de P03. Se
+corrige el comodín existente `/role/` a `/rol/` dentro del módulo protegido.
+AGENTS documenta el punto común de autorización. Sin dependencias nuevas.
+
+### Verificación nueva
+
+- **223/223 pruebas Node**: seis nuevas comprobaciones de política, perfiles
+  completos con los permisos del JSON de P01, permiso directo, dependencia de
+  catálogos, transiciones de sesión y guard real que impide montar el consumidor
+  y exige acción de creación. El render SSR usa `noExternal` de iconos MUI para
+  resolver su distribución ESM en el cargador de pruebas; no cambia Vite de app.
+- Lint sin advertencias, build y sintaxis de **30 recorridos** correctos. Los
+  fixtures de sesión de consumidores anteriores declaran permisos explícitos;
+  no se cuentan esos recorridos como ejecutados por adaptar sus fixtures.
+- Playwright MCP operativo con HTTP **simulado** en contexto aislado:
+  [access-control.js](../tests/browser/access-control.js), **7 grupos**. Quince
+  rutas directas sin permisos no generan lecturas de dominio; incluye create,
+  edit, detalle, dashboard, mapa y gráficos. Rol administrador sin permisos,
+  entrada por permiso directo, menú/CRUD, dependencias ausentes, tres perfiles
+  completos, tres tipos de hijo y permisos parciales de hijo comprobados.
+  Un borrado simulado rechazado con 403 conserva confirmación y no recarga datos.
+  Logout por teclado con cero permisos; cero excepciones de página y avisos
+  inesperados. Cada navegación de documento renueva sesión una vez; no hay bucle.
+  Capturas locales `.playwright-mcp/p04-detail.png` y `p04-denied.png`
+  inspeccionadas; solo datos ficticios. Recorrido final repetido tras los cambios
+  de menú/semántica de lista, con los mismos siete grupos aprobados.
+- Regresión simulada [access-denied.js](../tests/browser/access-denied.js):
+  **5 grupos**, 403/401/transporte/500, recuperación explícita, refresh inicial
+  rechazado y alta/borrado rechazados. Campos, PNG y diálogos conservados;
+  cero excepciones/avisos inesperados. Su fixture ahora permite las acciones
+  para alcanzar el rechazo HTTP detrás del guard de P04.
+- Comprobaciones reales nuevas: lectura anónima **500**, refresh **500**.
+  No se acredita una nueva matriz real de perfiles ni escrituras exitosas.
+  Recuperar el backend y repetir selectivamente integración real es pendiente.
+
+El primer intento del recorrido P04 esperaba tres botones visibles dentro de
+acordeones colapsados: se corrigió la aserción para contar también sus controles
+ocultos. El primer render de prueba SSR necesitó resolver los iconos de MUI;
+la configuración de prueba final y la suite completa pasan. No se contaron los
+intentos fallidos como verificación aprobada.
+
+Versiones del lock: React **19.3.1**, React Router **7.18.5**, React Redux
+**9.2.0**, Query **5.107.1**. Skills React/composición y Context7 consultados:
+composición de guards y diferencia entre `enabled` y `refetch` manual. Context7
+no indexa estos parches exactos de Router/Query; contrastado con
+[Router 7.18.5](https://reactrouter.com/7.18.5/api/components/Routes),
+[Query v5](https://tanstack.com/query/latest/docs/framework/react/guides/disabling-queries)
+y [reglas de hooks React 19.3](https://react.dev/reference/rules/rules-of-hooks).
+La guía de Query es por versión mayor, no una referencia fijada al parche.
+
+P05 sigue sin ejecutar: revocación/asignación en sesión abierta, actualización
+de permisos y limpieza específica tras revocación. No se afirma que ocultar una
+vista cancele una escritura aceptada por el servidor. No se avanzó P06–P15,
+se preservó la demo precargada y no hubo commits, despliegues ni cambios de roles.
+
 ## P03 — Presentación de rechazos (11 de noviembre de 2026)
 
 Implementado únicamente P03. `AccessDenied` presenta una alerta persistente,

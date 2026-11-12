@@ -32,8 +32,9 @@ no los modifica: usa cuentas temporales y consulta los IDs actuales por nombre.
 `administrador` tiene 73 permisos (48 del proyecto y 25 antiguos), `operador`
 tiene 27 y `analista` 11. El operador actual puede crear/editar los cuatro
 catálogos y no borrar decomisos/hijos, a diferencia de la propuesta de la tabla.
-Confirmar esa diferencia antes de implementar P04. No se ajustan asociaciones
-para hacer coincidir la prueba con una propuesta antigua.
+P04 aplica los permisos efectivos de la sesión sin ajustar asociaciones para
+hacer coincidir la interfaz con una propuesta antigua. La decisión de cambiar
+la política del operador sigue correspondiendo al backend.
 
 La matriz y el JSON de este catálogo conservan la propuesta original y sus IDs
 históricos. La evidencia actual y las diferencias por nombre están en
@@ -132,7 +133,8 @@ La verificación histórica detectó ausencia de restricciones en los endpoints
 probados y en la ruta administrativa del frontend. P01 revalidó las acciones
 representativas tras los cambios Laravel: ahora responden según los permisos
 efectivos, con 401/403/200 esperados. La integración de permisos en rutas,
-menú y acciones del frontend sigue pendiente. La evidencia histórica está en el
+menú y acciones del frontend está implementada en P04, con nueva integración real
+pendiente por errores 500 locales. La evidencia histórica y el resultado P04 están en el
 [informe de autorización](verification-access-control-2026-11-10.md).
 
 ## Reproducción

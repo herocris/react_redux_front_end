@@ -1989,3 +1989,32 @@ Consolidación solicitada (12 de noviembre de 2026): `e45e8c7` contiene código 
 pruebas de P03. Informe y progresos consolidados por separado. Se reutilizan las
 217 pruebas, lint, build y recorridos aprobados sin cambios de código; diff
 revisado. Sin push ni despliegue, sin avanzar P04/P05.
+
+### P04 — Autorización visual desde Redux (12 de noviembre de 2026)
+
+Solo P04 de portafolio: política central de permisos efectivos, guards antes
+de montar consultas, menú y CRUD filtrados, dependencias de catálogos/análisis
+y logout siempre disponible. Sin bypass por rol ni copia de sesión en Query.
+Detalle de decomiso de solo lectura como prerrequisito mínimo para consultar
+hijos sin editar padre; permisos por tipo de hijo y borrado sin exigir edición.
+Se preservan IDs numéricos, RHF/archivos, rechazos y contratos del servidor.
+
+223/223 pruebas Node, lint sin advertencias, build y sintaxis de 30 recorridos
+correctos. Playwright MCP simulado: siete grupos P04 y cinco de regresión P03,
+sin excepciones ni avisos inesperados. Rutas denegadas sin lecturas, perfiles
+completos de P01, permiso directo, dependencias y rechazo 403 con borrador y
+confirmación conservados. Fixtures antiguos adaptados sin contar su ejecución.
+
+Integración real nueva pendiente: lectura anónima y refresh local responden
+500; no se hicieron escrituras reales ni se reutiliza P01 como prueba nueva.
+La política efectiva del operador se respeta sin modificar roles. Decisiones,
+dependencias, incidencias y límites en
+[autorización](verification-access-control-2026-11-10.md#p04--rutas-menú-y-acciones-12-de-noviembre-de-2026)
+y [progreso de portafolio](portfolio-progress.md#p04--permisos-de-sesión-en-la-interfaz-12-de-noviembre-de-2026).
+P05 y las demás tareas siguen sin ejecutar. Sin nuevas dependencias, cambios
+backend, commits ni despliegues; los 16 pasos originales permanecen cerrados.
+
+Consolidación posterior solicitada: `6a19441` contiene código y pruebas de P04;
+guía, informe y progresos se consolidan por separado. Verificaciones anteriores
+reutilizadas sin cambios de código ni nueva ejecución; diff revisado. Sin push
+ni despliegue. Se mantienen el pendiente de integración real por 500 y P05.

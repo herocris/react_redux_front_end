@@ -157,6 +157,10 @@ el backend. Mantener los cambios dentro de la tarea solicitada.
 
 ## Convenciones de refactorización
 
+- Autorización visual: `auth/access.ts` define permisos y dependencias; `useAccess`
+  los consulta desde la sesión Redux. Los guards se sitúan antes de montar vistas
+  con consultas. No inferir acceso por roles ni duplicar permisos en Query/contextos.
+  El backend conserva la decisión efectiva; los rechazos no se tratan como éxito.
 - PascalCase para componentes y tipos, `useX` para hooks y camelCase para
   funciones y variables. Respetar el formato local, sin reformateos masivos.
 - Componentes para presentación/formularios y hooks para coordinación. Aplicar

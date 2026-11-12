@@ -1,8 +1,8 @@
 # Progreso de preparación para portafolio
 
-## Estado al 11 de noviembre de 2026
+## Estado al 12 de noviembre de 2026
 
-**P01, P02 y P03 ejecutados; las demás tareas siguen sin ejecutar.** La preparación del
+**P01–P04 ejecutados; P04 tiene pendiente su nueva integración real por errores 500 del backend. Las demás tareas siguen sin ejecutar.** La preparación del
 plan no ejecutó por sí misma ninguna tarea.
 Fuente: [portfolio-plan.md](portfolio-plan.md). Se conserva la refactorización
 cerrada en [refactor-progress.md](refactor-progress.md).
@@ -12,7 +12,7 @@ cerrada en [refactor-progress.md](refactor-progress.md).
 | P01 | Alta | Revalidar autorización backend | Completado con hallazgo de política | 186/186 según permisos actuales; operador difiere de la propuesta |
 | P02 | Alta | Tipos de identificador | Completado | Respuestas/OpenAPI, IDs numéricos y frontera URL verificados; informe P02 |
 | P03 | Media | Acceso denegado y tipos de error | Completado | Cuerpos reales 401/403, presentación reutilizable y recuperación verificados |
-| P04 | Alta | Permisos en rutas, menú y acciones | Pendiente | P01, P02 y P03 |
+| P04 | Alta | Permisos en rutas, menú y acciones | Implementado y verificado con simulación; integración real pendiente | Backend local devuelve 500 en lectura anónima y refresh; informe de autorización |
 | P05 | Alta | Revocación durante sesión abierta | Pendiente | P01 y P04 |
 | P06 | Alta | Paginación de sublistas vacías | Pendiente | Contrato real del backend |
 | P07 | Alta | Configuración y renderizado de imágenes | Pendiente | URL pública real de medios |
@@ -49,12 +49,14 @@ a preparar datos ficticios y documentar el recorrido existente.
 - P01 repitió la matriz tras los cambios Laravel: 186/186 comprobaciones según
   asignaciones actuales. Los 22 accesos indebidos de la matriz anterior quedan
   como historia. Operador tiene 27 permisos frente a los 23 propuestos;
-  confirmar esa política antes de P04 sin modificar asociaciones por deducción.
+  P04 respeta los permisos efectivos sin modificar asociaciones por deducción;
+  la intención de la política de roles sigue siendo decisión del backend.
 - Pendientes confirmados en la revisión previa: variable de imágenes ausente,
   metadatos omitidos en sublistas vacías, tipos string frente a IDs numéricos.
   P02 resuelve la discrepancia de IDs con evidencia actual y OpenAPI; imágenes
   y sublistas quedan pendientes. Comprobar vigencia antes de implementarlas.
-- El frontend todavía requiere integrar los permisos de sesión a su interfaz.
+- P04 integra permisos efectivos en rutas/menú/acciones; nueva integración real
+  pendiente por 500 del backend. P05 conserva actualización/revocación en vivo.
 - Entorno usado: API localhost/api, frontend 5174 y puerto 5173 reservado al
   backend. Comprobar disponibilidad y configuración en cada chat.
 
@@ -223,3 +225,54 @@ implementación y pruebas de P03; informe y progresos se consolidan en un commit
 documental separado. Se reutilizan las 217 pruebas, lint, build y recorridos
 aprobados anteriores: el código no cambió al preparar los commits. Diff revisado.
 Sin push ni despliegue; P04 y P05 siguen pendientes.
+
+### P04 — Permisos de sesión en la interfaz (12 de noviembre de 2026)
+
+Ejecutado solo P04. `auth/access.ts` y `useAccess` centralizan capacidades desde
+Redux, sin copia en Query/contextos ni bypass por rol. Guards antes de montar
+módulos lazy, create/edit por URL, menú filtrado y callbacks CRUD autorizados.
+Dependencias explícitas de catálogos en formularios, mapa/gráficos y dashboard
+compuesto. Hooks de opciones con `enabled` y reintento protegido; opciones de
+formularios se consultan al abrir. Salida por vista permitida o logout sin bucle.
+
+Prerrequisito mínimo: detalle de decomiso de solo lectura con navegación desde
+el listado, para consultar hijos sin editar el padre. Cada tipo de hijo exige
+su propio `view`; alta/edición requieren sus catálogos, borrado independiente
+del formulario permite `view` + `delete` sin `update`. Se conservan validaciones
+de IDs, formularios, archivos, rechazos e invalidación. Tras crear se navega a
+detalle si falta update. Comodín de roles corregido a `/rol`. Convención en AGENTS.
+
+Se aplican permisos efectivos confirmados en P01, incluidas las diferencias de
+operador, sin cambiar asociaciones ni imponer la propuesta histórica. La decisión
+de política de roles permanece en el backend. El servidor puede rechazar una
+acción admitida inicialmente por la UI: se conserva el formulario/confirmación.
+
+Verificación nueva: **223/223 pruebas Node**, lint sin advertencias, build y
+sintaxis de 30 recorridos correctos. Playwright MCP simulado: **7 grupos P04**
+(15 rutas sin permisos sin lecturas, permiso directo, perfiles completos,
+dependencias, tres hijos, borrado parcial 403, análisis y logout por teclado)
+y **5 grupos de regresión P03** (rechazo/recuperación y campos/archivo/diálogos
+conservados). Cero excepciones y avisos inesperados; contextos aislados cerrados.
+Capturas locales de detalle y denegación inspeccionadas con datos ficticios.
+Fixtures anteriores adaptados a sesiones con permisos explícitos; no se declara
+una repetición de todos los recorridos. Incidencias iniciales de aserción de
+acordeones y resolución de iconos SSR corregidas; suite final aprobada.
+
+**Límite real:** `GET /api/drug` anónimo y `POST /api/refresh` responden 500 ahora.
+Pendiente recuperar el backend y verificar selectivamente la nueva integración
+real; no se considera la matriz histórica P01 una ejecución nueva ni se hicieron
+escrituras/fixtures reales. Sin dependencias nuevas, backend, cambios de roles,
+commits o despliegues. Demo precargada conservada. Context7 y documentación
+oficial consultados; límites de versión, política de dependencias y evidencia
+en [el informe de autorización](verification-access-control-2026-11-10.md#p04--rutas-menú-y-acciones-12-de-noviembre-de-2026).
+
+Siguiente tarea del plan: **P05**, sin ejecutar, con backend operativo para su
+prueba real. Actualización/revocación en vivo y limpieza específica tras revocar
+siguen en P05; P06–P15/O01/O02 mantienen su estado.
+
+Consolidación solicitada (12 de noviembre de 2026): `6a19441` registra la
+implementación y pruebas de P04; guía, informe y progresos se consolidan en un
+commit documental separado. Se reutilizan las 223 pruebas, lint, build y los
+recorridos aprobados del mismo código, sin contarlos como ejecuciones nuevas.
+Diff revisado. Sin push ni despliegue; integración real pendiente por 500 del
+backend y P05 sin ejecutar.
