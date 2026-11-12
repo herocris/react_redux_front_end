@@ -43,6 +43,10 @@ export const authSlice = createSlice({
         clearErrorMessage: (state) => {
             state.errorMessage = undefined;
         },
+        onAuthenticationFailure: (state, { payload }: PayloadAction<string>) => {
+            // A rejected attempt from the login/register form changes no session.
+            if (state.status === 'not-authenticated') state.errorMessage = payload;
+        },
         onSessionRefreshed: (state, { payload }: PayloadAction<SessionUser>) => {
             if (state.status !== 'authenticated') return;
             if (authorizationChanged(state, payload)) state.authorizationRevision++;
@@ -57,5 +61,5 @@ export const authSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { onChecking, onLogin, onLogout, clearErrorMessage, onSessionRefreshed, onAuthorizationFailure } = authSlice.actions
+export const { onChecking, onLogin, onLogout, clearErrorMessage, onAuthenticationFailure, onSessionRefreshed, onAuthorizationFailure } = authSlice.actions
 

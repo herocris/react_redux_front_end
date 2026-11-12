@@ -3,6 +3,7 @@ import { GrapLayout } from "../../../shared/layout/GraphLayout"
 import Grid from '@mui/material/Grid2';
 import { useGraph } from "../hooks";
 import { BarGraph,LineGraph,PieGraph,FormGraph } from "../components";
+import { GraphDataTable } from '../components/GraphDataTable';
 
 export const GraphView = () => {
     const {
@@ -35,6 +36,7 @@ export const GraphView = () => {
                     {typeGraph == 'bar' && <BarGraph data={barLineGraph} />}
                     {typeGraph == 'line' && <LineGraph data={barLineGraph} />}
                     {typeGraph == 'pie' && <PieGraph data={pieGraph} />}
+                    <GraphDataTable data={typeGraph === 'pie' ? pieGraph : barLineGraph} />
                 </Grid>
             </Grid>
         </GrapLayout>

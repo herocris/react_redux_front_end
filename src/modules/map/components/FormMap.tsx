@@ -81,10 +81,10 @@ export const FormMap = ({ optionsStatus, drugCollection, weaponCollection, ammun
                         <Grid size={{ xs: 12 }} container spacing={2} sx={{ mt: 0, display: 'flex', alignItems: 'center', alignContent: 'center', gap: 2 }}>
                             <OptionSelector name='typeMap' setOption={value => setMapType(value)} iconList={graphIconList} control={control} />
                             <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
-                                <DatePickerField name={'start_date'} control={control} />
+                                <DatePickerField name={'start_date'} label="Fecha inicial" control={control} />
                             </Grid>
                             <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
-                                <DatePickerField name={'end_date'} control={control} />
+                                <DatePickerField name={'end_date'} label="Fecha final" control={control} />
                             </Grid>
 
                             <Grid size={{ xs: 12, md: 12 }}>

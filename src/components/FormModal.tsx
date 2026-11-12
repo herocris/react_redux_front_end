@@ -1,5 +1,5 @@
 import type { FormEventHandler, ReactElement, ReactNode } from 'react';
-import { Box, Modal, Typography, Zoom } from '@mui/material';
+import { Box, Button, Modal, Typography, Zoom } from '@mui/material';
 import { boxStyleFormModal } from '../helpers/boxStyle';
 
 interface FormModalProps {
@@ -28,6 +28,7 @@ export const FormModal = ({ titleId, title, busy, onClose, onSubmit, status, chi
                     </Zoom>
                 </fieldset>
             </form>
+            <Button disabled={busy} onClick={onClose} fullWidth>Cancelar</Button>
         </Box>
     </Modal>
 );

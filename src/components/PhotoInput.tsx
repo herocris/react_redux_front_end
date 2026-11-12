@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useId, useRef, useState, useEffect } from "react";
 import { Box, Avatar, Typography, IconButton, Tooltip, Zoom } from "@mui/material";
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,6 +21,7 @@ export const PhotoInput = <T extends FieldValues, Output extends FieldValues = T
     multiple = false
 }: FileUploadFieldProps<T, Output>) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const errorId = useId();
     const [previews, setPreviews] = useState<(string | undefined)[]>([]);
 
     const { field: { onChange, value, onBlur, ref }, fieldState: { error } } = useController({ name, control });
@@ -66,7 +67,7 @@ export const PhotoInput = <T extends FieldValues, Output extends FieldValues = T
             {/* Input invisible */}
             <input
                 type="file"
-                ref={element => { fileInputRef.current = element; ref(element); }}
+                ref={fileInputRef}
                 name={name}
                 aria-label={label}
                 onBlur={onBlur}
@@ -91,6 +92,8 @@ export const PhotoInput = <T extends FieldValues, Output extends FieldValues = T
                         >
                             <Box position="relative">
                                 <IconButton
+                                    ref={index === 0 ? ref : undefined}
+                                    aria-describedby={error ? errorId : undefined}
                                     aria-label={`Eliminar imagen ${index + 1}`}
                                     color="error"
                                     size="small"
@@ -126,11 +129,14 @@ export const PhotoInput = <T extends FieldValues, Output extends FieldValues = T
                     in={true}
                     style={{ transitionDelay: '40ms' }}
                 >
-                    <Tooltip title={label}>
+                    <Tooltip title={label} disableInteractive>
                         <Box
                             component="button"
+                            ref={ref}
                             type="button"
                             aria-label={label}
+                            aria-invalid={!!error}
+                            aria-describedby={error ? errorId : undefined}
                             display="flex"
                             flexDirection="column"
                             alignItems="center"
@@ -151,7 +157,7 @@ export const PhotoInput = <T extends FieldValues, Output extends FieldValues = T
                 </Zoom>
             )}
             {error && (
-                <Typography color="error" variant="caption">
+                <Typography id={errorId} role="alert" color="error" variant="caption">
                     {error.message}
                 </Typography>
             )}

@@ -1,4 +1,4 @@
-import {  FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, Typography } from '@mui/material';
+import {  FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useState } from 'react';
 import { PasswordFieldProps } from '../types';
@@ -22,6 +22,7 @@ export const PasswordField = <T extends FieldValues,>({ name, errorMessage, hasE
                 id={name}
                 label={name === 'passwordConfirmation' ? 'Confirmar contraseña' : 'Contraseña'}
                 error={hasError}
+                aria-describedby={hasError ? `${name}-error` : undefined}
                 type={showPassword ? 'text' : 'password'}
                 {...register(name)}
                 endAdornment={
@@ -41,9 +42,9 @@ export const PasswordField = <T extends FieldValues,>({ name, errorMessage, hasE
                 }
             />
             {hasError && (
-                <Typography color="error" variant="caption">
+                <FormHelperText id={`${name}-error`} error>
                     {errorMessage}
-                </Typography>
+                </FormHelperText>
             )}
         </FormControl>
     )

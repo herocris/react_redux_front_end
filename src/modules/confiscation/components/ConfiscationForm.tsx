@@ -17,6 +17,11 @@ export const ConfiscationForm = ({ initial }: { initial?: Confiscation }) => {
         onSaveOrUptdate,
         handleOpenMap,
     } = useConfiscationForm(initial)
+    const restoreLocationFocus = useRef(false);
+    const changeMap = (open: boolean) => {
+        restoreLocationFocus.current = !open;
+        handleOpenMap(open);
+    };
 
     const {
         register,
@@ -60,9 +65,15 @@ export const ConfiscationForm = ({ initial }: { initial?: Confiscation }) => {
                 <Typography variant='h5' sx={{ mb: 1 }}>{initial?.id ? 'Editar decomiso' : 'Crear decomiso'}</Typography>
                 {errors.root?.server && <Alert severity="error">{errors.root.server.message}</Alert>}
                 {openMap ?
-                    <ConfiscationMap handleOpen={handleOpenMap} lat={initial?.latitud ?? 51.505} lng={initial?.longitud ?? -0.09} nameLat={'latitud'} nameLng={'longitud'} nameDepto={'departamento'} nameMuni={'municipalidad'} control={control} />
+                    <ConfiscationMap handleOpen={changeMap} lat={initial?.latitud ?? 51.505} lng={initial?.longitud ?? -0.09} nameLat={'latitud'} nameLng={'longitud'} nameDepto={'departamento'} nameMuni={'municipalidad'} control={control} />
                     :
-                    <FieldsForm handleSubmit={handleSubmit} onSubmit={onSubmit} loading={isSubmitting} register={register} errors={errors} handleOpenMap={handleOpenMap} control={control} />
+                    <FieldsForm handleSubmit={handleSubmit} onSubmit={onSubmit} loading={isSubmitting} register={register} errors={errors} handleOpenMap={changeMap} control={control}
+                        locationButtonRef={button => {
+                            if (button && restoreLocationFocus.current) {
+                                button.focus();
+                                restoreLocationFocus.current = false;
+                            }
+                        }} />
                 }
             </Box>
         </>

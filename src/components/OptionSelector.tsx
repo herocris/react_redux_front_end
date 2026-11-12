@@ -15,13 +15,13 @@ export const OptionSelector = <T extends FieldValues, Output extends FieldValues
     const { field, fieldState } = useController({ name, control });
     const id = useId();
     return <Box sx={{ width: '100%' }}>
-        <BottomNavigation value={field.value} onBlur={field.onBlur} aria-describedby={id}
+        <BottomNavigation value={field.value} onBlur={field.onBlur} aria-describedby={fieldState.error ? id : undefined}
             onChange={(_event, value: string) => {
                 field.onChange(value);
                 setOption?.(value);
             }}>
             {iconList.map(icon => <BottomNavigationAction key={icon.value} value={icon.value}
-                label={icon.label} aria-label={icon.label} icon={icon.icono} />)}
+                label={icon.label} aria-label={icon.label} aria-pressed={field.value === icon.value} icon={icon.icono} />)}
         </BottomNavigation>
         {fieldState.error && <FormHelperText id={id} error>{fieldState.error.message}</FormHelperText>}
     </Box>;

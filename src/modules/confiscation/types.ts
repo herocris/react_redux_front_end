@@ -1,6 +1,7 @@
 import type { Control, FieldErrors, SubmitHandler, UseFormHandleSubmit, UseFormRegister } from "react-hook-form"
 import type { z } from 'zod';
 import type { confiscationSchema } from './validators';
+import type { Ref } from 'react';
 
 export interface Confiscation {
     id?: number,
@@ -26,6 +27,7 @@ export interface ConfiscationMapModalProps {
 }
 
 export interface FieldsFormProps {
+    locationButtonRef?: Ref<HTMLButtonElement>
     handleSubmit: UseFormHandleSubmit<z.input<typeof confiscationSchema>, z.output<typeof confiscationSchema>>
     onSubmit: SubmitHandler<z.output<typeof confiscationSchema>>
     loading: boolean

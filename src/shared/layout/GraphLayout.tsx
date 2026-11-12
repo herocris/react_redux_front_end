@@ -191,13 +191,13 @@ export const GrapLayout = ({ children, title = '', window }: GrapLayoutProps) =>
                     container={container}
                     variant="temporary"
                     open={mobileOpen}
-                    onTransitionEnd={handleDrawerTransitionEnd}
                     onClose={handleDrawerClose}
                     sx={{
                         display: { xs: 'block', md: 'none' },
                         '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
                     }}
                     slotProps={{
+                        transition: { onExited: handleDrawerTransitionEnd },
                         root: {
                             keepMounted: true, // Better open performance on mobile.
                         },

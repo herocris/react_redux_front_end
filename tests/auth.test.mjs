@@ -34,6 +34,24 @@ test('autenticación: contratos del service y transiciones de sesión', async t 
     const reply = (config, data = response) => ({ data, status: 200, statusText: 'OK', headers: {}, config });
     const newStore = () => configureStore({ reducer: { auth: authSlice.reducer } });
 
+    await t.test('P11: un intento fallido sin sesión conserva la revisión del formulario; logout sigue retirando sesión', async () => {
+        const store = newStore();
+        store.dispatch(authSlice.actions.onLogout());
+        const revision = store.getState().auth.authorizationRevision;
+        api.defaults.adapter = async () => { throw { error: 'Intento rechazado' }; };
+        for (const action of [thunks.startLoginWithEmailPassword(credentials), thunks.startCreatingUserWithEmailPassword(registration)]) {
+            await store.dispatch(action);
+            assert.equal(store.getState().auth.authorizationRevision, revision);
+            assert.equal(store.getState().auth.status, 'not-authenticated');
+            assert.equal(store.getState().auth.errorMessage, 'Intento rechazado');
+        }
+        store.dispatch(authSlice.actions.onLogin(session));
+        const authenticatedRevision = store.getState().auth.authorizationRevision;
+        store.dispatch(authSlice.actions.onLogout());
+        assert.equal(store.getState().auth.authorizationRevision, authenticatedRevision + 1);
+        assert.equal(store.getState().auth.user.correo, '');
+    });
+
     await t.test('POST, payloads, cookies y adaptación sin reinterpretar relaciones', async () => {
         const controller = new AbortController();
         for (const [path, payload, call, expected] of [

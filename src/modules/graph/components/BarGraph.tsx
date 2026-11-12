@@ -1,14 +1,13 @@
+import { graphColor } from './graphColors';
+import { Box, useTheme } from '@mui/material';
 import { BarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { BarGraphProps } from '../types';
 
 
-const randomHexColor = (): string => {
-    return "#" + Math.floor(Math.random() * 0xffffff)
-        .toString(16)
-        .padStart(6, "0");
-}
+
 
 export const BarGraph = ({ data }: BarGraphProps) => {
+    const { palette } = useTheme();
     return (
         <BarChart
             style={{ width: '100%', aspectRatio: 1.618 }}
@@ -22,13 +21,13 @@ export const BarGraph = ({ data }: BarGraphProps) => {
             }}
         >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis width="auto" />
+            <XAxis dataKey="name" tick={{ fill: 'currentColor' }} />
+            <YAxis width="auto" tick={{ fill: 'currentColor' }} />
             <Tooltip />
-            <Legend />
+            <Legend formatter={value => <Box component="span" sx={{ color: 'text.primary' }}>{value}</Box>} />
             {Object.keys(data[0] ?? {}).map((dat, index) => {
                 if (dat != 'name') {
-                    return <Bar key={index} dataKey={dat} fill={randomHexColor()} activeBar={<Rectangle fill="pink" stroke="blue" />} />
+                    return <Bar key={index} dataKey={dat} fill={graphColor(index, palette.mode)} activeBar={<Rectangle stroke={palette.text.primary} strokeWidth={2} />} />
                 }
             })}
         </BarChart>

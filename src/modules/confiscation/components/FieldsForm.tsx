@@ -4,7 +4,7 @@ import { Map, Save } from '@mui/icons-material';
 import { FieldsFormProps } from '../';
 import { DatePickerField } from '../../../components';
 
-export const FieldsForm = ({ handleSubmit, onSubmit, loading, register, errors, handleOpenMap, control }: FieldsFormProps) => {
+export const FieldsForm = ({ handleSubmit, onSubmit, loading, register, errors, handleOpenMap, control, locationButtonRef }: FieldsFormProps) => {
     return (
         <Zoom in={true} style={{ transitionDelay: '150ms' }}  >
             <form onSubmit={(event) => {
@@ -61,7 +61,7 @@ export const FieldsForm = ({ handleSubmit, onSubmit, loading, register, errors, 
                         />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 1, mt: 2 }}>
-                        <Button disabled={loading} variant='outlined' fullWidth aria-label="Seleccionar ubicación en el mapa" onClick={() => handleOpenMap(true)}>
+                        <Button ref={locationButtonRef} disabled={loading} variant='outlined' fullWidth aria-label="Seleccionar ubicación en el mapa" onClick={() => handleOpenMap(true)}>
                             <Map />
                         </Button>
                     </Grid>

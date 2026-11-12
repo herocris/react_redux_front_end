@@ -1,17 +1,15 @@
+import { graphColor } from './graphColors';
+import { useTheme } from '@mui/material';
 import { Cell, Pie, PieChart, PieLabelRenderProps, SectorProps, Sector, Tooltip } from 'recharts';
 import type { PieGraph as PieGraphData } from '../types';
 import { TooltipIndex } from 'recharts/types/state/tooltipSlice';
 
-const randomHexColor = (): string => {
-    return "#" + Math.floor(Math.random() * 0xffffff)
-        .toString(16)
-        .padStart(6, "0");
-}
+
 
 const RADIAN = Math.PI / 180;
 //const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: PieLabelRenderProps) => {
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: PieLabelRenderProps, color: string) => {
 
     // @ts-expect-error type unknown https://github.com/recharts/recharts/issues/6380
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -22,7 +20,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 
     return (
         // @ts-expect-error type unknown https://github.com/recharts/recharts/issues/6380
-        <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+        <text x={x} y={y} fill={color} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
             {/* @ts-expect-error type unknown https://github.com/recharts/recharts/issues/6380 */}
             {`${((percent ?? 1) * 100).toFixed(0)}%`}
         </text>
@@ -101,7 +99,7 @@ const renderActiveShape = ({
             />
             <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
             <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-            <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`${payload?.name} ${value}`}</text>
+            <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="currentColor">{`${payload?.name} ${value}`}</text>
             {/* <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
                 {`(Rate ${((percent ?? 1) * 100).toFixed(2)}%)`}
             </text> */}
@@ -111,6 +109,7 @@ const renderActiveShape = ({
 
 
 export const PieGraph = ({ data, isAnimationActive = true, defaultIndex = undefined }: PieGraphProps) => {
+    const { palette } = useTheme();
     return (
         <PieChart
             style={{
@@ -133,13 +132,13 @@ export const PieGraph = ({ data, isAnimationActive = true, defaultIndex = undefi
                 activeShape={renderActiveShape}
                 data={data ?? []}
                 labelLine={false}
-                label={renderCustomizedLabel}
+                label={props => renderCustomizedLabel(props, palette.mode === 'dark' ? '#121212' : '#fff')}
                 fill="#8884d8"
                 dataKey="value"
                 isAnimationActive={isAnimationActive}
             >
-                {data?.map((entry) => (
-                    <Cell key={`cell-${entry.name}`} fill={randomHexColor()} />
+                {data?.map((entry, index) => (
+                    <Cell key={`cell-${entry.name}`} fill={graphColor(index, palette.mode)} />
                 ))}
             </Pie>
             <Tooltip content={() => null} defaultIndex={defaultIndex} />

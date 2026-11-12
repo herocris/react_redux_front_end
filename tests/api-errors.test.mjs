@@ -157,13 +157,13 @@ test('errores HTTP y thunks con el cliente real y un transporte simulado', async
                 auth.startLoginWithEmailPassword({ email: user.correo, password: 'test' }),
                 auth.startCreatingUserWithEmailPassword({ name: user.nombre, email: user.correo, password: 'test' }),
             ]) {
-                const store = configureStore({ reducer: authSlice.reducer });
+                const store = configureStore({ reducer: { auth: authSlice.reducer } });
                 api.defaults.adapter = async () => { throw reason; };
                 await store.dispatch(request);
-                assert.equal(store.getState().status, 'not-authenticated');
-                assert.equal(store.getState().errorMessage, getApiErrorText(reason));
+                assert.equal(store.getState().auth.status, 'not-authenticated');
+                assert.equal(store.getState().auth.errorMessage, getApiErrorText(reason));
                 t.mock.timers.tick(4000);
-                assert.equal(store.getState().errorMessage, getApiErrorText(reason));
+                assert.equal(store.getState().auth.errorMessage, getApiErrorText(reason));
             }
         }
     });

@@ -1,6 +1,6 @@
 import { getApiErrorKind, getApiErrorText } from '../../../api/apiErrors';
 import type { Dispatch } from '@reduxjs/toolkit';
-import { onChecking, onLogin, onLogout, clearErrorMessage } from '../slices/authSlice';
+import { onChecking, onLogin, onLogout, clearErrorMessage, onAuthenticationFailure } from '../slices/authSlice';
 import { authService } from '../services/authService';
 import type { AuthState, LoginData, RegisterData } from '../types';
 import { getSessionSignal } from '../../../api/sessionScope';
@@ -23,27 +23,29 @@ export const checkingAuthentication = () => (dispatch: Dispatch) => {
 };
 
 export const startCreatingUserWithEmailPassword = (values: RegisterData) => {
-    return async (dispatch: Dispatch): Promise<void> => {
+    return async (dispatch: Dispatch, getState: () => { auth: AuthState }): Promise<void> => {
         const request = beginAuthRequest(dispatch);
         dispatch(clearErrorMessage());
         try {
             const user = await authService.register(values, request.signal);
             if (request.isCurrent()) dispatch(onLogin(user));
         } catch (error: unknown) {
-            if (request.isCurrent()) dispatch(onLogout(getApiErrorText(error)));
+            if (request.isCurrent()) dispatch(getState().auth.status === 'not-authenticated'
+                ? onAuthenticationFailure(getApiErrorText(error)) : onLogout(getApiErrorText(error)));
         }
     };
 };
 
 export const startLoginWithEmailPassword = (values: LoginData) => {
-    return async (dispatch: Dispatch): Promise<void> => {
+    return async (dispatch: Dispatch, getState: () => { auth: AuthState }): Promise<void> => {
         const request = beginAuthRequest(dispatch);
         dispatch(clearErrorMessage());
         try {
             const user = await authService.login(values, request.signal);
             if (request.isCurrent()) dispatch(onLogin(user));
         } catch (error: unknown) {
-            if (request.isCurrent()) dispatch(onLogout(getApiErrorText(error)));
+            if (request.isCurrent()) dispatch(getState().auth.status === 'not-authenticated'
+                ? onAuthenticationFailure(getApiErrorText(error)) : onLogout(getApiErrorText(error)));
         }
     };
 };

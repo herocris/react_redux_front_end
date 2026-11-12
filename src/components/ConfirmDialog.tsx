@@ -22,7 +22,7 @@ export const ConfirmDialog = ({ title, message, busy = false, onCancel, onConfir
             {children}
         </DialogContent>
         <DialogActions>
-            <Button disabled={busy} onClick={onCancel}>Cancelar</Button>
+            <Button autoFocus disabled={busy} onClick={onCancel}>Cancelar</Button>
             <Button loading={busy} onClick={() => { if (!busy) void onConfirm(); }} color="error">{confirmLabel}</Button>
         </DialogActions>
     </Dialog>;

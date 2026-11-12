@@ -1,5 +1,5 @@
 
-import { Button, TextField, Typography } from '@mui/material';
+import { Button, Link as MuiLink, TextField, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { AuthLayout } from '../layout';
 import { Link } from 'react-router';
@@ -52,7 +52,7 @@ export const LoginView = () => {
                     <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
                         <PasswordField name='password' register={register} errorMessage={errors.password?.message} hasError={!!errors.password} />
                     </Grid>
-                    <Typography color="error" variant="h6">
+                    <Typography role="alert" color="error" variant="h6">
                         {typeof errorMessage === 'string' ? errorMessage : undefined}
                     </Typography>
                     <Grid size={{ xs: 12, sm: 12 }} container spacing={2} sx={{ mb: 2, mt: 2 }}>
@@ -62,11 +62,11 @@ export const LoginView = () => {
                     </Grid>
                     <Grid container direction='row' justifyContent='end'>
                         <Typography sx={{ mr: 1 }}>¿No tienes cuenta?</Typography>
-                        <Typography component={Link} color='info' to="/auth/register">
+                        <MuiLink component={Link} color="text.primary" to="/auth/register">
                             Registrar
-                        </Typography>
+                        </MuiLink>
                         <Typography sx={{ mr: 1 }}>Documentación de la API:</Typography>
-                        <a href="https://crisdemo.xyz/api/documentation" target="_blank" rel="noopener noreferrer" style={{ color: '#298aebff' }}>Consultar API</a>
+                        <MuiLink color="text.primary" href="https://crisdemo.xyz/api/documentation" target="_blank" rel="noopener noreferrer">Consultar API</MuiLink>
                     </Grid>
                 </Grid>
                 </fieldset>

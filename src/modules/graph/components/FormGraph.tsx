@@ -120,10 +120,10 @@ export const FormGraph = ({ optionsStatus, drugCollection, weaponCollection, amm
                                 />
                             </Grid>
                             <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
-                                <DatePickerField name={'start_date'} control={control} />
+                                <DatePickerField name={'start_date'} label="Fecha inicial" control={control} />
                             </Grid>
                             <Grid size={{ xs: 12 }} sx={{ mt: 2 }}>
-                                <DatePickerField name={'end_date'} control={control} />
+                                <DatePickerField name={'end_date'} label="Fecha final" control={control} />
                             </Grid>
                             <OptionSelector name='typeConfiscation' iconList={confiscationIconList} control={control} />
                             <Grid size={{ xs: 12, md: 12 }}>
